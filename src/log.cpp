@@ -1,9 +1,13 @@
 #include "log.h"
 
+#include <utility>
+
 namespace o7si
 {
+namespace log
+{
 
-const char* LogLevel::ToString(LogLevel::Level level)
+const char* ToString(Level level)
 {
     switch (level)
     {
@@ -26,8 +30,7 @@ const char* LogLevel::ToString(LogLevel::Level level)
     }
 }
 
-
-LogLevel::Level LogLevel::FromString(const std::string& level)
+Level FromString(const std::string& level)
 {
     if (level == "ALL")
         return Level::ALL;
@@ -46,4 +49,27 @@ LogLevel::Level LogLevel::FromString(const std::string& level)
     return Level::UNKNOWN;
 }
 
+
+Logger::Information::Information(Level level, uint64_t time,
+                                 uint32_t threadId, std::string threadName,
+                                 std::string fileName, std::string funcName, uint32_t line)
+        : m_level(level), m_time(time),
+          m_threadId(threadId), m_threadName(std::move(threadName)),
+          m_fileName(std::move(fileName)), m_funcName(std::move(funcName)), m_line(line)
+{
 }
+
+Logger::Information::Information()
+        : Information(Level::UNKNOWN, - 1, - 1, "", "", "", - 1)
+{
+}
+
+std::shared_ptr<Logger> Logger::instance(new Logger());
+
+std::shared_ptr<Logger> Logger::getInstance()
+{
+    return instance;
+}
+
+}   // namespace log
+}   // namespace o7si

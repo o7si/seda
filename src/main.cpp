@@ -3,8 +3,9 @@
 
 int main(int argc, char* argv[])
 {
+
 #define LOGLEVEL_TEST(level) \
-    o7si::LogLevel::ToString(o7si::LogLevel::FromString(#level))
+    o7si::log::ToString(o7si::log::FromString(#level))
 
     std::cout << LOGLEVEL_TEST(ABC) << std::endl;
     std::cout << LOGLEVEL_TEST(ALL) << std::endl;
@@ -16,4 +17,4 @@ int main(int argc, char* argv[])
     std::cout << LOGLEVEL_TEST(OFF) << std::endl;
 
     return 0;
-}
+};
