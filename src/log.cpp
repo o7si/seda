@@ -1,6 +1,5 @@
+#include <iomanip>
 #include "log.h"
-
-#include <utility>
 
 namespace o7si
 {
@@ -53,7 +52,7 @@ Level FromString(const std::string& level)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Event::Information::Information(uint64_t time,
+Event::Information::Information(time_t time,
                                 uint32_t threadId, std::string threadName,
                                 std::string fileName, std::string funcName, uint32_t line)
         : m_time(time),
@@ -74,10 +73,17 @@ Event::~Event()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+Layout::Layout(std::string pattern)
+        : m_pattern(std::move(pattern))
+{
+}
+
 std::string Layout::formatter(Level level, const Event::Information& information)
 {
+    // TODO: 根据 pattern 生成结果
+
     std::ostringstream stream;
-    stream << "[" << information.m_time << "] [" << information.m_threadId << ":" << information.m_threadName << "] ["
+    stream << "[" << std::put_time(std::localtime(&information.m_time), "%Y-%m-%d %H:%M:%S") << "] [" << information.m_threadId << ":" << information.m_threadName << "] ["
            << information.m_fileName << ":" << information.m_funcName << ":" << information.m_line << "] ["
            << ToString(level) << "] " << information.m_stream.str();
     return stream.str();
@@ -85,13 +91,23 @@ std::string Layout::formatter(Level level, const Event::Information& information
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void ConsoleAppender::write(Level level, const Event::Information& information)
+Appender::Appender(std::shared_ptr<Layout> layout)
+        : m_layout(std::move(layout))
 {
-    std::cout << m_layout->formatter(level, information) << std::endl;
 }
 
-FileAppender::FileAppender(std::string fileName)
-        : m_fileName(std::move(fileName))
+ConsoleAppender::ConsoleAppender(std::shared_ptr<Layout> layout)
+        : Appender(std::move(layout))
+{
+}
+
+void ConsoleAppender::write(Level level, const Event::Information& information)
+{
+    std::cout << m_layout->formatter(level, information);
+}
+
+FileAppender::FileAppender(std::string fileName, std::shared_ptr<Layout> layout)
+        : Appender(std::move(layout)), m_fileName(std::move(fileName))
 {
     m_ofstream.open(m_fileName);
 }
@@ -107,6 +123,11 @@ void FileAppender::write(Level level, const Event::Information& information)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+Logger::Logger(Level level)
+        : baseline(level)
+{
+}
 
 std::shared_ptr<Logger> Logger::instance(new Logger());
 

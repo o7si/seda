@@ -6,13 +6,22 @@
 #include <memory>
 #include <string>
 #include <list>
+#include <chrono>
+#include <thread>
+
+#include "utils.h"
 
 #define LOG(level) \
     o7si::log::Event( \
             o7si::log::Logger::getInstance(), \
             o7si::log::FromString(#level), \
             o7si::log::Event::Information( \
-                0, 0, "", __FILE__, __FUNCTION__, __LINE__ \
+                std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), \
+                o7si::utils::convertThreadId(std::this_thread::get_id()), \
+                "()", \
+                __FILE__, \
+                __FUNCTION__, \
+                __LINE__ \
     )).stream()
 
 namespace o7si
@@ -61,7 +70,7 @@ public:
     struct Information
     {
         /// 时间戳
-        uint64_t m_time;
+        time_t m_time;
         /// 线程 ID
         uint32_t m_threadId;
         /// 线程名称
@@ -80,7 +89,7 @@ public:
             return m_stream;
         }
 
-        Information(uint64_t time,
+        Information(time_t time,
                     uint32_t threadId, std::string threadName,
                     std::string fileName, std::string funcName, uint32_t line);
     };
@@ -109,7 +118,11 @@ private:
 class Layout
 {
 public:
+    explicit Layout(std::string pattern);
     std::string formatter(Level level, const Event::Information& information);
+
+private:
+    std::string m_pattern;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,9 +131,10 @@ public:
 class Appender
 {
 public:
-    virtual void write(Level level, const Event::Information& information) = 0;
-
+    explicit Appender(std::shared_ptr<Layout> layout);
     virtual ~Appender() = default;
+
+    virtual void write(Level level, const Event::Information& information) = 0;
 
 protected:
     std::shared_ptr<Layout> m_layout;
@@ -130,6 +144,7 @@ protected:
 class ConsoleAppender : public Appender
 {
 public:
+    explicit ConsoleAppender(std::shared_ptr<Layout> layout);
     void write(Level level, const Event::Information& information) override;
 };
 
@@ -137,7 +152,7 @@ public:
 class FileAppender : public Appender
 {
 public:
-    explicit FileAppender(std::string fileName);
+    explicit FileAppender(std::string fileName, std::shared_ptr<Layout> layout);
 
     ~FileAppender() override;
 
@@ -177,9 +192,9 @@ public:
 
 private:
     /// 将构造函数修饰为私有，防止用户擅自实例化对象
-    Logger() = default;
+    explicit Logger(Level level = Level::DEBUG);
 
-    /// 日志级别，当大于该级别才进行输出
+    /// 日志级别，当大于该级别才进行输出，默认为 DEBUG
     Level baseline;
     /// 日志输出地列表
     std::list<std::shared_ptr<Appender>> m_appenders;

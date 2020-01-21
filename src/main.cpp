@@ -1,8 +1,7 @@
 #include <iostream>
-#include <chrono>
+#include <memory>
 #include <thread>
 #include "log.h"
-
 
 
 int main(int argc, char* argv[])
@@ -10,15 +9,20 @@ int main(int argc, char* argv[])
 
     o7si::log::Logger::getInstance()->setAppenders(
             {
-                    std::shared_ptr<o7si::log::Appender>(new o7si::log::ConsoleAppender),
-                    std::shared_ptr<o7si::log::Appender>(new o7si::log::FileAppender("log.txt"))
+                    std::shared_ptr<o7si::log::Appender>(new o7si::log::ConsoleAppender(
+                            std::make_shared<o7si::log::Layout>("")
+                    )),
+                    std::shared_ptr<o7si::log::Appender>(new o7si::log::FileAppender("log.txt",
+                            std::make_shared<o7si::log::Layout>(""))
+                    )
             }
-    )->setLevel(o7si::log::Level::DEBUG);
+    );
 
-    LOG(DEBUG) << "DEBUG" << "!!!";
-    LOG(INFO) << "INFO" << "!!!";
-    LOG(WARN) << "WARN" << "!!!";
-    LOG(ERROR) << "ERROR" << "!!!";
-    LOG(FATAL) << "FATAL" << "!!!";
+    int count = 10;
+    while (count --)
+    {
+        LOG(DEBUG) << "count = " << count << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     return 0;
 };
