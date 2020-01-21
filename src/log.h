@@ -7,6 +7,14 @@
 #include <string>
 #include <list>
 
+#define LOG(level) \
+    o7si::log::Event( \
+            o7si::log::Logger::getInstance(), \
+            o7si::log::FromString(#level), \
+            o7si::log::Event::Information( \
+                0, 0, "", __FILE__, __FUNCTION__, __LINE__ \
+    )).stream()
+
 namespace o7si
 {
 namespace log
@@ -148,9 +156,16 @@ class Logger
 public:
     void log(Level level, const Event::Information& information);
 
-    void setAppenders(std::initializer_list<std::shared_ptr<Appender>> appenders)
+    std::shared_ptr<Logger> setLevel(Level level)
+    {
+        baseline = level;
+        return instance;
+    }
+
+    std::shared_ptr<Logger> setAppenders(std::initializer_list<std::shared_ptr<Appender>> appenders)
     {
         m_appenders = appenders;
+        return instance;
     }
 
 public:
@@ -164,6 +179,8 @@ private:
     /// 将构造函数修饰为私有，防止用户擅自实例化对象
     Logger() = default;
 
+    /// 日志级别，当大于该级别才进行输出
+    Level baseline;
     /// 日志输出地列表
     std::list<std::shared_ptr<Appender>> m_appenders;
     /// 单例对象

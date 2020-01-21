@@ -117,10 +117,16 @@ std::shared_ptr<Logger> Logger::getInstance()
 
 void Logger::log(Level level, const Event::Information& information)
 {
+    // 当 logger 的 baseline 为 OFF 时，不输出该日志
+    if (baseline == Level::OFF)
+        return;
+    // 当 level 小于 logger 的 baseline 时，不输出该日志
+    if (level < baseline)
+        return;
+    // 当 logger 的 baseline 为 UNKNOWN 或 ALL 时，输出该日志
+    // 当 level 大于等于 logger 的 baseline 时，输出该日志
     for (const auto& appender : m_appenders)
-    {
         appender->write(level, information);
-    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
