@@ -24,6 +24,12 @@
                 __LINE__ \
     )).stream()
 
+#define LOG_DEBUG LOG(DEBUG)
+#define LOG_INFO LOG(INFO)
+#define LOG_WARN LOG(WARN)
+#define LOG_ERROR LOG(ERROR)
+#define LOG_FATAL LOG(FATAL)
+
 namespace o7si
 {
 namespace log
