@@ -17,14 +17,22 @@ namespace log
 /// 日志级别枚举类
 enum class Level
 {
-    UNKNOWN,
-    ALL,
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR,
-    FATAL,
-    OFF
+    /// 未知类型
+            UNKNOWN = 0,
+    /// 打开所有日志记录
+            ALL,
+    /// 调试信息
+            DEBUG,
+    /// 运行信息
+            INFO,
+    /// 警告信息
+            WARN,
+    /// 错误信息
+            ERROR,
+    /// 严重错误信息
+            FATAL,
+    /// 关闭所有日志记录
+            OFF
 };
 
 /// 获取日志级别对应的文本
@@ -32,9 +40,6 @@ const char* ToString(Level level);
 
 /// 通过文本获取日志级别对象
 Level FromString(const std::string& level);
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -59,15 +64,28 @@ public:
         std::string m_funcName;
         /// 行号
         uint32_t m_line;
+        /// 内容
+        std::ostringstream m_stream;
+
+        std::ostringstream& stream()
+        {
+            return m_stream;
+        }
 
         Information(uint64_t time,
                     uint32_t threadId, std::string threadName,
                     std::string fileName, std::string funcName, uint32_t line);
     };
 
-    Event(std::shared_ptr<Logger> logger, Level level, Information  information);
+    Event(std::shared_ptr<Logger> logger, Level level, Information information);
 
     ~Event();
+
+    std::ostringstream& stream()
+    {
+        return m_information.stream();
+    }
+
 private:
     /// 日志事件信息
     Information m_information;
@@ -93,6 +111,7 @@ class Appender
 {
 public:
     virtual void write(Level level, const Event::Information& information) = 0;
+
     virtual ~Appender() = default;
 
 protected:
@@ -110,8 +129,10 @@ public:
 class FileAppender : public Appender
 {
 public:
-    FileAppender(std::string fileName);
+    explicit FileAppender(std::string fileName);
+
     ~FileAppender() override;
+
     void write(Level level, const Event::Information& information) override;
 
 private:
@@ -121,20 +142,17 @@ private:
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 /// 日志
 class Logger
 {
 public:
     void log(Level level, const Event::Information& information);
+
     void setAppenders(std::initializer_list<std::shared_ptr<Appender>> appenders)
     {
         m_appenders = appenders;
     }
+
 public:
     /// 获取 Logger 的单例对象
     static std::shared_ptr<Logger> getInstance();

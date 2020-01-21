@@ -53,23 +53,6 @@ Level FromString(const std::string& level)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::shared_ptr<Logger> Logger::instance(new Logger());
-
-std::shared_ptr<Logger> Logger::getInstance()
-{
-    return instance;
-}
-
-void Logger::log(Level level, const Event::Information& information)
-{
-    for (const auto& appender : m_appenders)
-    {
-        appender->write(level, information);
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 Event::Information::Information(uint64_t time,
                                 uint32_t threadId, std::string threadName,
                                 std::string fileName, std::string funcName, uint32_t line)
@@ -87,6 +70,17 @@ Event::Event(std::shared_ptr<Logger> logger, Level level, Event::Information inf
 Event::~Event()
 {
     m_logger->log(m_level, m_information);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string Layout::formatter(Level level, const Event::Information& information)
+{
+    std::ostringstream stream;
+    stream << "[" << information.m_time << "] [" << information.m_threadId << ":" << information.m_threadName << "] ["
+           << information.m_fileName << ":" << information.m_funcName << ":" << information.m_line << "] ["
+           << ToString(level) << "] " << information.m_stream.str();
+    return stream.str();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -114,13 +108,19 @@ void FileAppender::write(Level level, const Event::Information& information)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::string Layout::formatter(Level level, const Event::Information& information)
+std::shared_ptr<Logger> Logger::instance(new Logger());
+
+std::shared_ptr<Logger> Logger::getInstance()
 {
-    std::ostringstream stream;
-    stream << "[" << information.m_time << "] [" << information.m_threadId << ":" << information.m_threadName << "] ["
-           << information.m_fileName << ":" << information.m_funcName << ":" << information.m_line << "] ["
-           << ToString(level) << "]";
-    return stream.str();
+    return instance;
+}
+
+void Logger::log(Level level, const Event::Information& information)
+{
+    for (const auto& appender : m_appenders)
+    {
+        appender->write(level, information);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
