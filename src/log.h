@@ -183,9 +183,25 @@ public:
         return instance;
     }
 
+    Level getLevel() const
+    {
+        return baseline;
+    }
+
     std::shared_ptr<Logger> setAppenders(std::initializer_list<std::shared_ptr<Appender>> appenders)
     {
         m_appenders = appenders;
+        return instance;
+    }
+
+    std::list<std::shared_ptr<Appender>> getAppenders() const
+    {
+        return m_appenders;
+    }
+
+    std::shared_ptr<Logger> addAppender(std::shared_ptr<Appender> appender)
+    {
+        m_appenders.push_front(appender);
         return instance;
     }
 

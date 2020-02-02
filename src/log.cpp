@@ -103,7 +103,7 @@ ConsoleAppender::ConsoleAppender(std::shared_ptr<Layout> layout)
 
 void ConsoleAppender::write(Level level, const Event::Information& information)
 {
-    std::cout << m_layout->formatter(level, information);
+    std::cout << m_layout->formatter(level, information) << std::endl;
 }
 
 FileAppender::FileAppender(std::string fileName, std::shared_ptr<Layout> layout)
