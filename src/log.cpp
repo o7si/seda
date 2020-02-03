@@ -109,7 +109,7 @@ void ConsoleAppender::write(Level level, const Event::Information& information)
 FileAppender::FileAppender(std::string fileName, std::shared_ptr<Layout> layout)
         : Appender(std::move(layout)), m_fileName(std::move(fileName))
 {
-    m_ofstream.open(m_fileName);
+    m_ofstream.open(m_fileName, std::ofstream::out | std::ofstream::app);
 }
 
 FileAppender::~FileAppender()
