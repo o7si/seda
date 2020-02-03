@@ -3,11 +3,14 @@
 1. 日志模块的配置
 ```
 log:
-    level: DEBUG
+    level: "DEBUG"
     appender:
-        - ConsoleAppender
-        - FileAppender
-            file: 1.log
-        - FileAppender
-            file: 2.log
+        - type: "ConsoleAppender"
+          pattern: "default"
+        - type: "FileAppender"
+          pattern: "default"
+          file: "/reps/seda/log/1.log"
+        - type: "FileAppender"
+          pattern: "default"
+          file: "/reps/seda/log/2.log"
 ```
