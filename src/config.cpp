@@ -16,6 +16,10 @@ void load(const std::string& filename)
     YAML::Node log_config = config["log"];
     log_config >> *o7si::log::Logger::getInstance();
 
+    // Stage 的配置
+    YAML::Node stage_config = config["stage"];
+    stage_config >> *o7si::seda::StageManager::getInstance();
+
     // 其它模块的配置
     // ...
 }
@@ -55,6 +59,18 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
         // 异常
         // throw
     } 
+}
+
+void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
+{
+    for (auto i_iter = yaml.begin(); i_iter != yaml.end(); ++ i_iter)
+    {
+        LOG_DEBUG << i_iter->first;
+        for (auto j_iter = i_iter->second.begin(); j_iter != i_iter->second.end(); ++ j_iter)
+        {
+            LOG_DEBUG << "\t" << j_iter->first << " :---: " << j_iter->second; 
+        }
+    }
 }
 
 // ------------------------------------------------------------------------------

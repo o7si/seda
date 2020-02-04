@@ -4,11 +4,11 @@
 
 #include "log.h"
 #include "config.h"
+#include "seda.h"
 
 int main(int argc, char* argv[])
 {
-    o7si::config::load("/reps/seda/conf/test.conf");
-
+    o7si::config::load("/root/reps/seda/conf/test.conf");
     int count = 5;
     while (count --)
     {
