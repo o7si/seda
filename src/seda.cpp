@@ -26,7 +26,7 @@ void StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> st
     // 名称为 name 的 Stage 没有被注册
     if (mapping.find(name) == mapping.end())
     {
-        LOG_INFO << "regLster success(" << name << ")";
+        LOG_INFO << "register success(" << name << ")";
         mapping[name] = stage;
         return;
     }

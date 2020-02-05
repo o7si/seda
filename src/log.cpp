@@ -127,6 +127,10 @@ void FileAppender::write(Level level, const Event::Information& information)
 Logger::Logger(Level level)
         : baseline(level)
 {
+    addAppender(
+        std::make_shared<ConsoleAppender>(
+            std::make_shared<Layout>()
+    ));
 }
 
 std::shared_ptr<Logger> Logger::instance(new Logger());

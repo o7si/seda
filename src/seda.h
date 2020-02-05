@@ -6,6 +6,17 @@
 
 #include "log.h"
 
+#define NAMESPACE_SEDA o7si::seda
+#define NAMESPACE_STAGE o7si::stage
+#define REGISTER_STAGE(stage) \
+    void* hide_##stage = [] \
+    { \
+        NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
+            #stage, std::make_shared<NAMESPACE_STAGE::stage>() \
+        ); \
+        return nullptr; \
+    }();
+
 namespace o7si
 {
 namespace seda
@@ -30,6 +41,12 @@ public:
     
     /// 从管理类中获取 Stage 
     std::shared_ptr<Stage> doLogin(const std::string& name);
+
+    /// 获取 Stage 的注册映射表
+    std::unordered_map<std::string, std::shared_ptr<Stage>> registerMapping() const
+    {
+        return mapping;
+    }
 
 public:
     /// 获取 StageManager 的单例对象

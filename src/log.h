@@ -124,7 +124,7 @@ private:
 class Layout
 {
 public:
-    explicit Layout(std::string pattern);
+    explicit Layout(std::string pattern = "");
     std::string formatter(Level level, const Event::Information& information);
 
 private:
