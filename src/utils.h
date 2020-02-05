@@ -1,7 +1,6 @@
 #pragma once
 
-#include <sstream>
-#include <thread>
+#include "pch.h"
 
 namespace o7si
 {

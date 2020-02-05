@@ -1,11 +1,7 @@
-#include <iostream>
-#include <memory>
-#include <thread>
-
+#include "pch.h"
+#include "stage.h"
 #include "log.h"
 #include "config.h"
-#include "seda.h"
-#include "stage.h"
 
 int main(int argc, char* argv[])
 {
