@@ -205,6 +205,11 @@ public:
         return instance;
     }
 
+    void clearAppenders()
+    {
+        m_appenders.clear();    
+    }
+
 public:
     /// 获取 Logger 的单例对象
     static std::shared_ptr<Logger> getInstance();

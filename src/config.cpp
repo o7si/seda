@@ -28,6 +28,9 @@ void load(const std::string& filename)
 
 void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 {
+    // 清空输出地
+    o7si::log::Logger::getInstance()->clearAppenders();
+
     YAML::Node level = yaml["level"];
     logger.setLevel(o7si::log::FromString(level.as<std::string>()));
 
@@ -65,12 +68,24 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
     for (auto i_iter = yaml.begin(); i_iter != yaml.end(); ++ i_iter)
     {
-        LOG_DEBUG << i_iter->first;
-        for (auto j_iter = i_iter->second.begin(); j_iter != i_iter->second.end(); ++ j_iter)
+        std::string stage_name = i_iter->first.as<std::string>();
+        auto stage = o7si::seda::StageManager::getInstance()->doLogin(stage_name); 
+
+        LOG_DEBUG << stage_name;
+
+        YAML::Node next = i_iter->second;
+        for (auto j_iter = next.begin(); j_iter != next.end(); ++ j_iter)
         {
-            LOG_DEBUG << "\t" << j_iter->first << " :---: " << j_iter->second; 
+            std::string state_name = j_iter->first.as<std::string>();
+            std::string next_stage = j_iter->second.as<std::string>();
+            
+            LOG_DEBUG << state_name << " " << next_stage;
+            stage->setNext(state_name, next_stage);
         }
     }
+
+    // 异常
+    // throw
 }
 
 // ------------------------------------------------------------------------------
