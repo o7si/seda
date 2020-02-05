@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "log.h"
-#include "seda.h"
+#include "seda/stage.h"
 
 namespace o7si
 {

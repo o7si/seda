@@ -1,7 +1,7 @@
 #pragma once
 
-#include "pch.h"
-#include "log.h"
+#include "../pch.h"
+#include "../log.h"
 
 #define NAMESPACE_SEDA o7si::seda
 #define NAMESPACE_STAGE o7si::stage
@@ -22,9 +22,15 @@ namespace seda
 class Stage
 {
 public:
+    /// 执行
+    /// 参数暂时设置为 std::string
+    virtual void run(std::string& task) = 0;
+    
     /// 设置 Stage 的后续状态
     void setNext(const std::string& state, const std::string& stage);
-
+    
+    /// 为纯虚基类提供析构函数
+    virtual ~Stage() = default;
 private:
     std::unordered_map<std::string, std::shared_ptr<Stage>> next;
 };
