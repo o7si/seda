@@ -1,18 +1,16 @@
-#pragma once
+#pragma once 
 
 #include "../pch.h"
 #include "../log.h"
 
-#define NAMESPACE_SEDA o7si::seda
-#define NAMESPACE_STAGE o7si::stage
-#define REGISTER_STAGE(stage) \
-    void* hide_##stage = [] \
-    { \
-        NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
-            #stage, std::make_shared<NAMESPACE_STAGE::stage>() \
-        ); \
-        return nullptr; \
-    }();
+#define REGISTER_STAGE(stage, number) \
+auto __##stage = [](size_t max_thread = number) \
+{ \
+    NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
+        #stage, \
+        std::make_shared<NAMESPACE_SEDA::stage>(#stage, max_thread)); \
+    return nullptr; \
+}();
 
 namespace o7si
 {
@@ -22,20 +20,37 @@ namespace seda
 class Stage
 {
 public:
-    /// 执行
-    /// 参数暂时设置为 std::string
-    virtual void run(std::string& task) = 0;
-    
+    Stage(std::string name, size_t max_thread);
+
+    std::string getName() const;
+    void setName(std::string name);
+
+    size_t getMaxThread() const;
+    void setMaxThread(size_t max_thread);
+
     /// 设置 Stage 的后续状态
-    void setNext(const std::string& state, const std::string& stage);
+    void next(const std::string& state, const std::string& stage);
+    /// 根据状态名称获取后续 Stage
+    std::shared_ptr<Stage> next(const std::string& state);
+    /// 获取整个状态转换表(不推荐使用，一般用于调试)
+    std::unordered_map<std::string, std::shared_ptr<Stage>> next() const;   
     
-    /// 为纯虚基类提供析构函数
+    /// 任务处理入口
+    virtual void call(std::vector<boost::any>&& args) = 0;
+
+    /// 为纯虚基类提供析构函数，使得派生类资源能够正常释放
     virtual ~Stage() = default;
-private:
-    std::unordered_map<std::string, std::shared_ptr<Stage>> next;
+
+protected:    
+    /// 名称
+    std::string m_name;
+    /// 最大允许线程数
+    size_t m_max_thread;
+    /// 状态转换表
+    std::unordered_map<std::string, std::shared_ptr<Stage>> m_conver_mapping;
 };
 
-/// Stage 的管理类
+/// Stage 的管理类(单例模式)
 class StageManager
 {
 public:
@@ -45,11 +60,8 @@ public:
     /// 从管理类中获取 Stage 
     std::shared_ptr<Stage> doLogin(const std::string& name);
 
-    /// 获取 Stage 的注册映射表
-    std::unordered_map<std::string, std::shared_ptr<Stage>> registerMapping() const
-    {
-        return mapping;
-    }
+    /// 获取 Stage 的注册映射表(不推荐使用，一般用于调试)
+    std::unordered_map<std::string, std::shared_ptr<Stage>> registerMapping() const;
 
 public:
     /// 获取 StageManager 的单例对象

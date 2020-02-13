@@ -66,6 +66,7 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 
 void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
+    /*
     for (auto i_iter = yaml.begin(); i_iter != yaml.end(); ++ i_iter)
     {
         std::string stage_name = i_iter->first.as<std::string>();
@@ -83,7 +84,7 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
             stage->setNext(state_name, next_stage);
         }
     }
-
+    */
     // 异常
     // throw
 }

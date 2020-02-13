@@ -2,12 +2,22 @@
 #include "log.h"
 #include "config.h"
 
+#include "seda/stage.h"
+#include "stage/TestStage.hpp"
+
+void reg()
+{
+    REGISTER_STAGE(CountStage, 1)
+    REGISTER_STAGE(MaxMinStage, 2)
+    REGISTER_STAGE(MultiStage, 3)
+    REGISTER_STAGE(BinaryStage, 4)
+}
+
 int main(int argc, char* argv[])
 {
     o7si::config::load("/root/reps/seda/conf/test.conf");
+    reg();
+    reg();
 
-    auto mapping = o7si::seda::StageManager::getInstance()->registerMapping();
-    for (auto iter = mapping.begin(); iter != mapping.end(); ++ iter)
-        LOG_DEBUG << iter->first << "#" << iter->second;     
     return 0;
 };
