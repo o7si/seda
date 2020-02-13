@@ -29,17 +29,25 @@ log:
 # 配置如下
 
 stage:
-    CountStage: 1
-        Success: MaxMinStage
-        Failure: CountStage
-        Waiting: CountStage
-    MaxMinStage: 3
-        Success: MultiStage
-        Failure: MaxMinStage
-        Waiting: MaxMinStage
-    MultiStage: 5
-        Success: BinaryStage
-        Failure: MultiStage
-        Waiting: MultiStage
-    BinaryStage: 7
+    CountStage: 
+        max_thread: 1
+        state:
+            success: MaxMinStage
+            failure: CountStage
+            waiting: CountStage
+    MaxMinStage: 
+        max_thread: 3 
+        state:
+            success: MultiStage
+            failure: MaxMinStage
+            waiting: MaxMinStage
+    MultiStage:
+        max_thread: 5
+        state:
+            success: BinaryStage
+            failure: MultiStage
+            waiting: MultiStage
+    BinaryStage: 
+        max_thread: 7
+        state: ~
 ```

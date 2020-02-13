@@ -28,18 +28,21 @@ void load(const std::string& filename)
 
 void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 {
-    // 清空输出地
+    // 清空输出地(默认有一个控制台输出地)
     o7si::log::Logger::getInstance()->clearAppenders();
 
+    // 设置全局日志级别
     YAML::Node level = yaml["level"];
     logger.setLevel(o7si::log::FromString(level.as<std::string>()));
 
+    // 设置日志输出地
     YAML::Node appender = yaml["appender"];
     for (auto iter = appender.begin(); iter != appender.end(); ++ iter)
     {
         std::string type = (*iter)["type"].as<std::string>();
         std::string pattern = (*iter)["pattern"].as<std::string>();
 
+        // 控制台输出地
         if (type == "ConsoleAppender")
         {
             logger.addAppender(
@@ -48,6 +51,8 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
             ));
             continue;
         }
+
+        // 文件输出地
         if (type == "FileAppender")
         {
             std::string file = (*iter)["file"].as<std::string>();
@@ -59,32 +64,39 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
             continue;
         }
 
-        // 异常
-        // throw
+        // other
     } 
+
+    // 异常
+    // throw
 }
 
 void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
-    /*
-    for (auto i_iter = yaml.begin(); i_iter != yaml.end(); ++ i_iter)
+    for (auto i = yaml.begin(); i != yaml.end(); ++ i)
     {
-        std::string stage_name = i_iter->first.as<std::string>();
-        auto stage = o7si::seda::StageManager::getInstance()->doLogin(stage_name); 
+        // Stage 的名称
+        std::string stage_name = i->first.as<std::string>();
+        // 登录
+        auto stage = o7si::seda::StageManager::getInstance()->doLogin(stage_name);
 
-        LOG_DEBUG << stage_name;
+        // Stage 的最大允许线程数
+        size_t stage_max_thread = i->second["max_thread"].as<size_t>();
+        stage->setMaxThread(stage_max_thread);
 
-        YAML::Node next = i_iter->second;
-        for (auto j_iter = next.begin(); j_iter != next.end(); ++ j_iter)
+        // Stage 的后续状态
+        YAML::Node state_table = i->second["state"];
+        for (auto j = state_table.begin(); j != state_table.end(); ++ j)
         {
-            std::string state_name = j_iter->first.as<std::string>();
-            std::string next_stage = j_iter->second.as<std::string>();
-            
-            LOG_DEBUG << state_name << " " << next_stage;
-            stage->setNext(state_name, next_stage);
+            // 状态名
+            std::string state_name = j->first.as<std::string>();
+            // 后续 Stage    
+            std::string next_stage = j->second.as<std::string>();
+
+            stage->next(state_name, next_stage);
         }
     }
-    */
+
     // 异常
     // throw
 }

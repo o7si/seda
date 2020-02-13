@@ -1,7 +1,10 @@
 aux_source_directory(. SRC)
 
-add_executable(seda ${SRC}
-    seda/stage.h seda/stage.cpp)
+add_executable(seda 
+    seda/stage.h seda/stage.cpp
+    stage/TestStage.hpp
+    ${SRC}
+)
 
 find_package(Boost REQUIRED)
 if (NOT Boost_FOUND)

@@ -9,23 +9,6 @@ namespace o7si
 namespace seda
 {
 
-/*    
-stage:
-    CountStage: 1
-        Success: MaxMinStage
-        Failure: CountStage
-        Waiting: CountStage
-    MaxMinStage: 3
-        Success: MultiStage
-        Failure: MaxMinStage
-        Waiting: MaxMinStage
-    MultiStage: 5
-        Success: BinaryStage
-        Failure: MultiStage
-        Waiting: MultiStage
-    BinaryStage: 7
-*/
-
 class CountStage : public Stage
 {
 public:

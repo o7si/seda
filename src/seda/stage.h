@@ -3,12 +3,12 @@
 #include "../pch.h"
 #include "../log.h"
 
-#define REGISTER_STAGE(stage, number) \
-auto __##stage = [](size_t max_thread = number) \
+#define REGISTER_STAGE(stage) \
+auto __##stage = [] \
 { \
     NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
         #stage, \
-        std::make_shared<NAMESPACE_SEDA::stage>(#stage, max_thread)); \
+        std::make_shared<NAMESPACE_SEDA::stage>(#stage, 0)); \
     return nullptr; \
 }();
 

@@ -12,22 +12,22 @@ Stage::Stage(std::string name, size_t max_thread)
 {
 }
 
-inline std::string Stage::getName() const
+std::string Stage::getName() const
 {
     return m_name;    
 } 
 
-inline void Stage::setName(std::string name)
+void Stage::setName(std::string name)
 {
     m_name = std::move(name);
 }
 
-inline size_t Stage::getMaxThread() const
+size_t Stage::getMaxThread() const
 {
     return m_max_thread;    
 }
 
-inline void Stage::setMaxThread(size_t max_thread)
+void Stage::setMaxThread(size_t max_thread)
 {
     m_max_thread = max_thread;
 }
@@ -67,7 +67,7 @@ std::unordered_map<std::string, std::shared_ptr<Stage>> Stage::next() const
 
 std::shared_ptr<StageManager> StageManager::instance(new StageManager);
 
-inline std::shared_ptr<StageManager> StageManager::getInstance()
+std::shared_ptr<StageManager> StageManager::getInstance()
 {
     return instance;    
 }
@@ -92,11 +92,11 @@ std::shared_ptr<Stage> StageManager::doLogin(const std::string& name)
     if (mapping.find(name) != mapping.end())
     {
         // 登录成功
-        LOG_INFO << "login success: " << name << ")";
+        LOG_INFO << "login success: " << name;
         return mapping[name];
     }
     // 登录失败
-    LOG_INFO << "login failure: " << name << ")";
+    LOG_INFO << "login failure: " << name;
     return nullptr;
 }
 
