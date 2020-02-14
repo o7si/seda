@@ -9,9 +9,13 @@
 #define REGISTER_STAGE(stage) \
 auto __##stage = [] \
 { \
-    NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
-        #stage, \
-        std::make_shared<NAMESPACE_SEDA::stage>(#stage, 0)); \
+    auto reg_stage = NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
+        #stage, std::make_shared<NAMESPACE_SEDA::stage>(#stage, 0) \
+    ); \
+    reg_stage->bind( \
+        std::bind(&NAMESPACE_SEDA::stage::handle, dynamic_cast<NAMESPACE_SEDA::stage*>(reg_stage.get()), \
+        std::placeholders::_1, std::placeholders::_2) \
+    ); \
     return nullptr; \
 }();
 
@@ -26,10 +30,16 @@ namespace seda
 /// 4. 性能监控器: 根据实际运行情况调整 Stage 的资源占用情况。
 class Stage
 {
-    using Args = std::unordered_map<std::string, boost::any>;
+//protected:
 public:
-    /// 返回 Stage 的内部状态(不推荐使用，一般用于调试)
-    std::unordered_map<std::string, std::string> internal_state() const;
+    /// 参数列表
+    using Args = std::unordered_map<std::string, boost::any>;
+    /// 事件处理器
+    using EventFunction = std::function<void(const Args&, std::promise<std::string>)>;
+
+public:
+    /// 输出 Stage 的内部状态(不推荐使用，一般用于调试)
+    void internal_state() const;
 
     Stage(std::string name, size_t max_thread);
 
@@ -46,11 +56,18 @@ public:
     /// 获取整个状态转换表(不推荐使用，一般用于调试)
     std::unordered_map<std::string, std::shared_ptr<Stage>> next() const;   
     
+    /// 绑定事件处理函数
+    void bind(EventFunction function);
+
     /// 任务处理入口
     void call(const Args& args);
 
     /// 为纯虚基类提供析构函数，使得派生类资源能够正常释放
     virtual ~Stage() = default;
+
+protected:
+    /// 事件处理函数
+    virtual void handle(const Args& args, std::promise<std::string> promise) = 0;  
 
 protected:    
     /// 名称
@@ -63,6 +80,7 @@ protected:
     /// 事件队列
     EventQueue<Args> event_queue;
     /// 事件处理器
+    EventFunction event_processor;
     /// 动态线程池
     // ThreadPool m_thread_pool;
     /// 性能监控器
@@ -74,7 +92,7 @@ class StageManager
 {
 public:
     /// 注册 Stage 到管理类
-    void doRegister(const std::string& name, std::shared_ptr<Stage> stage);
+    std::shared_ptr<Stage> doRegister(const std::string& name, std::shared_ptr<Stage> stage);
     
     /// 从管理类中获取 Stage 
     std::shared_ptr<Stage> doLogin(const std::string& name);

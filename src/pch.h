@@ -16,7 +16,9 @@
 
 #include <thread>
 #include <mutex>
+#include <future>
 #include <chrono>
+#include <condition_variable>
 
 #include <yaml-cpp/yaml.h>
 #include <boost/any.hpp>
