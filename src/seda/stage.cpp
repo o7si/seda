@@ -7,6 +7,16 @@ namespace seda
 
 // ------------------------------------------------------------------------------
 
+std::unordered_map<std::string, std::string> Stage::internal_state() const
+{
+    return {
+        // 事件队列长度
+        { "EventQueue.Size", std::to_string(event_queue.size()) },
+        // 后续状态数目
+        { "CoverMapping.Size", std::to_string(m_conver_mapping.size())}    
+    };
+}
+
 Stage::Stage(std::string name, size_t max_thread)
     : m_name(name), m_max_thread(max_thread)
 {
@@ -61,6 +71,11 @@ std::shared_ptr<Stage> Stage::next(const std::string& state)
 std::unordered_map<std::string, std::shared_ptr<Stage>> Stage::next() const
 {
     return m_conver_mapping;    
+}
+
+void Stage::call(const Args& args)
+{
+    event_queue.push(args);
 }
 
 // ------------------------------------------------------------------------------

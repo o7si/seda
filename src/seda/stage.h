@@ -3,6 +3,9 @@
 #include "../pch.h"
 #include "../log.h"
 
+
+#include "event_queue.hpp"
+
 #define REGISTER_STAGE(stage) \
 auto __##stage = [] \
 { \
@@ -16,10 +19,18 @@ namespace o7si
 {
 namespace seda
 {
-
+/// Stage 的重要组成
+/// 1. 事件队列:
+/// 2. 事件处理器:
+/// 3. 动态线程池: 
+/// 4. 性能监控器: 根据实际运行情况调整 Stage 的资源占用情况。
 class Stage
 {
+    using Args = std::unordered_map<std::string, boost::any>;
 public:
+    /// 返回 Stage 的内部状态(不推荐使用，一般用于调试)
+    std::unordered_map<std::string, std::string> internal_state() const;
+
     Stage(std::string name, size_t max_thread);
 
     std::string getName() const;
@@ -36,7 +47,7 @@ public:
     std::unordered_map<std::string, std::shared_ptr<Stage>> next() const;   
     
     /// 任务处理入口
-    virtual void call(std::vector<boost::any>&& args) = 0;
+    void call(const Args& args);
 
     /// 为纯虚基类提供析构函数，使得派生类资源能够正常释放
     virtual ~Stage() = default;
@@ -46,8 +57,16 @@ protected:
     std::string m_name;
     /// 最大允许线程数
     size_t m_max_thread;
+    
     /// 状态转换表
     std::unordered_map<std::string, std::shared_ptr<Stage>> m_conver_mapping;
+    /// 事件队列
+    EventQueue<Args> event_queue;
+    /// 事件处理器
+    /// 动态线程池
+    // ThreadPool m_thread_pool;
+    /// 性能监控器
+    // Performeter m_performeter;
 };
 
 /// Stage 的管理类(单例模式)

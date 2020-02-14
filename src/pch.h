@@ -7,11 +7,15 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <queue>
 #include <unordered_map>
 
 #include <memory>
 
+#include <functional>
+
 #include <thread>
+#include <mutex>
 #include <chrono>
 
 #include <yaml-cpp/yaml.h>

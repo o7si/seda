@@ -2,6 +2,7 @@ aux_source_directory(. SRC)
 
 add_executable(seda 
     seda/stage.h seda/stage.cpp
+    seda/event_queue.hpp
     stage/TestStage.hpp
     ${SRC}
 )

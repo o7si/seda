@@ -16,11 +16,6 @@ public:
         : Stage(std::move(name), max_thread) 
     {
     }
-    
-    void call(std::vector<boost::any>&& args) override
-    {
-        LOG_DEBUG << m_name << ".call";    
-    }  
 };
 
 class MaxMinStage : public Stage
@@ -30,11 +25,6 @@ public:
         : Stage(std::move(name), max_thread) 
     {
     }
-    
-    void call(std::vector<boost::any>&& args) override
-    {
-        LOG_DEBUG << m_name << ".call";    
-    }  
 };
 
 class MultiStage : public Stage
@@ -44,11 +34,6 @@ public:
         : Stage(std::move(name), max_thread) 
     {
     }
-    
-    void call(std::vector<boost::any>&& args) override
-    {
-        LOG_DEBUG << m_name << ".call";    
-    }  
 };
 
 class BinaryStage : public Stage
@@ -58,11 +43,6 @@ public:
         : Stage(std::move(name), max_thread) 
     {
     }
-    
-    void call(std::vector<boost::any>&& args) override
-    {
-        LOG_DEBUG << m_name << ".call";    
-    }  
 };
 
 }   // namespace seda    
