@@ -2,8 +2,6 @@
 
 #include "../pch.h"
 #include "../log.h"
-
-
 #include "event_queue.hpp"
 
 #define REGISTER_STAGE(stage) \

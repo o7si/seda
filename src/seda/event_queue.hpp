@@ -19,7 +19,7 @@ public:
         return m_container.front();
     }
 
-    /// 查看队列首部的元素并且移除
+    /// 查看队列首部的元素并且移除(使用前需要判断队列是否为空)
     Type pop()
     {
         std::unique_lock<std::mutex> ulock(m_mutex);

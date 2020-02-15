@@ -1,19 +1,18 @@
 #include "pch.h"
-#include "log.h"
 #include "config.h"
-
 #include "seda/stage.h"
-#include "stage/TestStage.hpp"
+#include "stage/test_stage.hpp"
 
 int main(int argc, char* argv[])
 {
+    // 注册 Stage
     REGISTER_STAGE(CountStage)
     REGISTER_STAGE(MaxMinStage)
     REGISTER_STAGE(MultiStage)
     REGISTER_STAGE(BinaryStage)
-    
+    // 载入配置
     o7si::config::load("/root/reps/seda/conf/test.conf");
-
+    // 模拟
     while (true)
     {
         auto count_stage = o7si::seda::StageManager::getInstance()->doLogin("CountStage");
