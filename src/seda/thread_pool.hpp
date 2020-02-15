@@ -8,6 +8,7 @@ namespace o7si
 namespace seda
 {
 
+/// 线程池
 class ThreadPool
 {
 public:
@@ -32,6 +33,10 @@ public:
     /// 初始化线程池(最大容量)
     void init()
     {
+        // 如果线程池已经被初始化
+        if (m_initialize)
+            return; 
+        // 如果线程池未被初始化
         for (size_t i = 0; i < m_capacity; ++ i)
             m_threads.emplace_back(ThreadWorker(this));
     }
@@ -39,6 +44,10 @@ public:
     /// 初始化线程池(指定数量，不能大于最大容量)
     void init(size_t number)
     {
+        // 如果线程池已经被初始化
+        if (m_initialize)
+            return;
+        // 如果线程池未被初始化
         number = std::min(number, m_capacity);
         for (size_t i = 0; i < number; ++ i)
             m_threads.emplace_back(ThreadWorker(this));
@@ -65,21 +74,21 @@ public:
         destory();
     }
 
-    template<typename Func, typename... Args>
-    auto call(Func&& func, Args&&... args) -> std::future<decltype(func(args...))>
+    template<typename Function, typename... Args>
+    auto call(Function&& function, Args&&... args) -> std::future<decltype(function(args...))>
     {
         // 绑定
-        std::function<decltype(func(args...))()> f = 
-            std::bind(std::forward<Func>(func), std::forward<Args>(args)...);
+        std::function<decltype(function(args...))()> func = 
+            std::bind(std::forward<Function>(function), std::forward<Args>(args)...);
         auto task = 
-            std::make_shared<std::packaged_task<decltype(func(args...))()>>(f);    
+            std::make_shared<std::packaged_task<decltype(function(args...))()>>(func);    
         // 函数包装器
-        std::function<void()> wrapper_func = [task]
+        std::function<void()> wrapper = [task]
         {
             (*task)();
         };
         // 将事件添加至队列
-        event_queue.push(wrapper_func);
+        event_queue.push(wrapper);
         // 随机唤醒一个线程
         m_condition.notify_one();
 
@@ -88,12 +97,11 @@ public:
 private:
     /// 线程池是否被关闭
     std::atomic_bool m_shutdown;
+    /// 线程池是否已被初始化
+    std::atomic_bool m_initialize;
+    
     /// 线程池容量
     size_t m_capacity;    
-
-    /// 事件队列
-    EventQueue<std::function<void()>> event_queue;
-
     /// 线程容器
     std::vector<std::thread> m_threads;
     /// 互斥量
@@ -101,9 +109,14 @@ private:
     /// 条件变量 
     std::condition_variable m_condition;
 
+    /// 事件队列
+    EventQueue<std::function<void()>> event_queue;
+
+    /// 线程工作类
     class ThreadWorker
     {
     public:
+        /// 构造函数
         ThreadWorker(ThreadPool* pool)
             : m_pool(pool)
         {
