@@ -3,7 +3,8 @@ aux_source_directory(. SRC)
 add_executable(seda 
     seda/stage.h seda/stage.cpp
     seda/event_queue.hpp
-    stage/TestStage.hpp
+    seda/thread_pool.hpp
+    stage/test_stage.hpp
     ${SRC}
 )
 
@@ -14,3 +15,4 @@ endif ()
 
 target_link_libraries(seda ${Boost_LIBRARIES})
 target_link_libraries(seda yaml-cpp)
+target_link_libraries(seda pthread)

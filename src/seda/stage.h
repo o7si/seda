@@ -28,8 +28,9 @@ namespace seda
 /// 4. 性能监控器: 根据实际运行情况调整 Stage 的资源占用情况。
 class Stage
 {
-//protected:
-public:
+    // 友元类
+    friend class ThreadPool;
+protected:
     /// 参数列表
     using Args = std::unordered_map<std::string, boost::any>;
     /// 事件处理器

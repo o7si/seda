@@ -19,14 +19,16 @@ public:
         return m_container.front();
     }
 
-    /// 查看队列首部的元素并且移除(使用前需要判断队列是否为空)
-    Type pop()
+    /// 获取队列首部的元素并且移除
+    bool pop(Type& elem)
     {
         std::unique_lock<std::mutex> ulock(m_mutex);
-        Type elem = m_container.front(); 
+        if (m_container.empty())
+            return false;
+        
+        elem = std::move(m_container.front());
         m_container.pop();
-        ulock.unlock();
-        return elem;
+        return true;    
     }
 
     /// 向队列尾部添加元素
@@ -40,18 +42,14 @@ public:
     size_t size() const
     {
         std::unique_lock<std::mutex> ulock(m_mutex);
-        size_t ret = m_container.size();
-        ulock.unlock();
-        return ret;
+        return m_container.size();
     }
 
     /// 查看队列是否为空
     bool empty() const
     {
         std::unique_lock<std::mutex> ulock(m_mutex);
-        bool ret = m_container.empty();
-        ulock.unlock();
-        return ret;
+        return m_container.empty();
     }
 
 private:

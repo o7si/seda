@@ -17,11 +17,6 @@ public:
 
     virtual void handle(const std::unordered_map<std::string, boost::any>& args, std::promise<std::string> promise) override
     {
-        for (int i = 0; i < 3; ++ i)
-        {
-            if (!event_queue.empty())
-                event_queue.pop();
-        }
         std::cout << "CountStage.Handle" << std::endl;    
     }  
 };
