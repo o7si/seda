@@ -5,128 +5,57 @@ namespace o7si
 namespace seda
 {
 
-// ------------------------------------------------------------------------------
-
-void Stage::internal_state() const
+/// 构造函数
+Stage::Stage(std::string name, size_t capacity = 1)
+    : m_name(std::move(name)), m_thread_pool(capacity)
 {
-    // 状态转换表信息
-    for (auto iter = m_conver_mapping.begin(); iter != m_conver_mapping.end(); ++ iter)
-        LOG_DEBUG << iter->first << " -> " << iter->second->getName();
-
-    // 事件队列信息
-    LOG_DEBUG << "EventQueue.Size = " << event_queue.size();
-
-    // 尝试调用事件处理器
-    event_processor({}, std::promise<std::string>());
-
-    // ...
+    // 初始化线程池
+    m_thread_pool.init();
 }
 
-Stage::Stage(std::string name, size_t max_thread)
-    : m_name(name), m_max_thread(max_thread)
-{
-}
-
+/// 获取 stage 的名称
 std::string Stage::getName() const
 {
-    return m_name;    
-} 
+    return m_name;
+}
 
-void Stage::setName(std::string name)
+/// 设置 stage 的名称  
+std::string Stage::setName(std::string name) 
 {
     m_name = std::move(name);
+    return m_name;    
 }
 
-size_t Stage::getMaxThread() const
-{
-    return m_max_thread;    
-}
-
-void Stage::setMaxThread(size_t max_thread)
-{
-    m_max_thread = max_thread;
-}
-
+/// 设置 stage 的后续状态
 void Stage::next(const std::string& state, const std::string& stage)
 {
-    // 状态被重复设置
-    if (m_conver_mapping.find(state) != m_conver_mapping.end())    
+    // 该状态已经被设置过
+    if (m_conver_mapping.find(state) != m_conver_mapping.end())
     {
-        m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);       
-        LOG_WARN << "status set repeat: " << stage << "." << state; 
+        m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage); 
+        LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(repeat)";
     }
     // 首次设置该状态
-    m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);       
-    LOG_INFO << "status set success: " << stage << "." << state;
+    m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);
+    LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(first)";
 }
 
-std::shared_ptr<Stage> Stage::next(const std::string& state) 
+/// 绑定事件处理器的内部函数
+void Stage::bind(EHFunction&& function)
 {
-    // 该状态不存在
-    if (m_conver_mapping.find(state) == m_conver_mapping.end())
-    {
-        LOG_WARN << "status get failure: " << m_name << "." << state;
-        return nullptr;
-    }
-    // 状态存在
-    LOG_INFO << "status get success: " << m_name << "." << state;
-    return m_conver_mapping[state];
+    m_event_handler.setHandler(std::forward<EHFunction>(function));
 }
 
-std::unordered_map<std::string, std::shared_ptr<Stage>> Stage::next() const
+/// 执行
+void Stage::call(boost::any&& args)
 {
-    return m_conver_mapping;    
+    std::future<boost::any> future = m_thread_pool.call(
+            m_event_handler.getHandler(), 15 
+            //std::bind(m_event_handler.gethandler(), std::forward<boost::any>(args))
+            );
+
+    LOG_DEBUG << boost::any_cast<std::string>(future.get());
 }
 
-void Stage::bind(EventFunction function)
-{
-    event_processor = function;    
-}
-
-void Stage::call(const Args& args)
-{
-    event_queue.push(args);
-}
-
-// ------------------------------------------------------------------------------
-
-std::shared_ptr<StageManager> StageManager::instance(new StageManager);
-
-std::shared_ptr<StageManager> StageManager::getInstance()
-{
-    return instance;    
-}
-
-std::shared_ptr<Stage> StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> stage)
-{
-    // 名称为 name 的 Stage 没有被注册
-    if (mapping.find(name) == mapping.end())
-    {
-        // 注册成功
-        mapping[name] = stage;
-        LOG_INFO << "register success: " << name;
-        return stage;
-    }
-    // 注册失败
-    LOG_INFO << "register failure: " << name;
-    return nullptr;
-}
-
-std::shared_ptr<Stage> StageManager::doLogin(const std::string& name)
-{
-    // 名称为 name 的 Stage 已经被注册
-    if (mapping.find(name) != mapping.end())
-    {
-        // 登录成功
-        LOG_INFO << "login success: " << name;
-        return mapping[name];
-    }
-    // 登录失败
-    LOG_INFO << "login failure: " << name;
-    return nullptr;
-}
-
-// ------------------------------------------------------------------------------
-
-}   // namespace seda
+}   // namespace seda    
 }   // namespace o7si

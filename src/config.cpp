@@ -9,6 +9,7 @@ namespace config
 
 void load(const std::string& filename)
 {
+    /*
     // 载入配置文件
     YAML::Node config = YAML::LoadFile(filename);    
     
@@ -22,12 +23,14 @@ void load(const std::string& filename)
 
     // 其它模块的配置
     // ...
+    */
 }
 
 // ------------------------------------------------------------------------------
 
 void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 {
+    /*
     // 清空输出地(默认有一个控制台输出地)
     o7si::log::Logger::getInstance()->clearAppenders();
 
@@ -69,10 +72,12 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 
     // 异常
     // throw
+    */
 }
 
 void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
+    /*
     for (auto i = yaml.begin(); i != yaml.end(); ++ i)
     {
         // Stage 的名称
@@ -99,6 +104,7 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 
     // 异常
     // throw
+    */
 }
 
 // ------------------------------------------------------------------------------
