@@ -4,6 +4,7 @@
 #include "seda/thread_pool.hpp"
 #include "seda/stage_manager.h"
 #include "stage/test_stage.hpp"
+#include "seda/macro.hpp"
 
 int main()
 {
@@ -12,14 +13,16 @@ int main()
 
     auto login_stage = StageManager::getInstance()->doLogin("StageOne");
     LOG_DEBUG << login_stage->getName();
-
+/*
     std::function<boost::any(boost::any&&)> func = [login_stage](boost::any&& args)
     {
         return login_stage->handler(std::forward<boost::any>(args));    
     };
-
     login_stage->bind(std::move(func));
+*/
 
-    login_stage->call(1);
+    login_stage->call(10);
+    login_stage->call(15);
+    login_stage->call(20);
     return 0;    
 }

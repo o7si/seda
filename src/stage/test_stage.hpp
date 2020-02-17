@@ -15,7 +15,7 @@ public:
     {
     }
 
-    boost::any handler(boost::any&& args)
+    boost::any handler(boost::any& args)
     {
         int count = boost::any_cast<int>(args);
         return std::string(count, 'a');    
