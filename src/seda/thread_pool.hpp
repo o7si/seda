@@ -13,11 +13,25 @@ class ThreadPool
 {
 public:
     /// 构造函数
-    explicit ThreadPool(EventQueue<std::function<void()>>* event_queue, size_t capacity)
-        : m_event_queue(event_queue), m_capacity(capacity), m_shutdown(false)
+    explicit ThreadPool(EventQueue<std::function<void()>>* event_queue)
+        : m_event_queue(event_queue)
     {
+        m_shutdown = false;
     }
     
+    /// 获取线程池名称
+    std::string getName() const
+    {
+        return m_name;    
+    }
+
+    /// 设置线程池名称
+    std::string setName(std::string name) 
+    {
+        m_name = std::move(name);
+        return m_name;    
+    }
+
     /// 设置线程池最大容量
     void setCapacity(size_t capacity)
     {
@@ -92,6 +106,8 @@ private:
     /// 线程池是否已被初始化
     std::atomic_bool m_initialize;
     
+    /// 线程池名称
+    std::string m_name;
     /// 线程池容量
     size_t m_capacity;    
     /// 线程容器
@@ -133,7 +149,7 @@ private:
                 // 所以需要再次进行判断
                 if (success)
                 {
-                    LOG_DEBUG << "pool." << m_id << " call function";
+                    LOG_DEBUG << m_pool->m_name << "." << m_id << " call function";
                     func();   
                 }
             }

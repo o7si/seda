@@ -5,12 +5,17 @@ namespace o7si
 namespace seda
 {
 
-Stage::Stage(std::string name, size_t capacity)
+Stage::Stage(std::string name)
     : m_name(std::move(name)), 
-      m_thread_pool(&m_event_queue, capacity)
+      m_thread_pool(&m_event_queue)
+{
+    m_thread_pool.setName(m_name + "_ThreadPool");
+}
+
+void Stage::init()
 {
     // 初始化线程池
-    m_thread_pool.init();
+    m_thread_pool.init();    
 }
 
 std::string Stage::getName() const
@@ -47,6 +52,17 @@ std::shared_ptr<Stage> Stage::next(const std::string& state)
     return m_conver_mapping[state];
 }
 
+size_t Stage::getThreadPoolCapacity() const
+{
+    return m_thread_pool.getCapacity();
+}
+
+size_t Stage::setThreadPoolCapacity(size_t capacity)
+{
+    m_thread_pool.setCapacity(capacity);
+    return capacity;    
+}
+
 void Stage::bind(EHF&& function)
 {
     m_event_handler.setHandler(std::forward<EHF>(function));
@@ -55,12 +71,20 @@ void Stage::bind(EHF&& function)
 /// 执行
 void Stage::call(boost::any&& args)
 {
+    // 提交事件
     auto future = commit(
         m_event_handler.getHandler(),
         std::forward<boost::any>(args)
     );
+
     auto ret = future.get();
-    LOG_DEBUG << ret.first << " " << boost::any_cast<std::string>(ret.second);
+
+    auto next = m_conver_mapping[ret.first];
+    // 如果不存在后续状态
+    if (next == nullptr)
+        return;
+    // 如果存在后续状态
+    next->call(std::forward<boost::any>(ret.second));
 }
 
 }   // namespace seda    

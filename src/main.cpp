@@ -8,12 +8,13 @@
 
 int main()
 {
-    REGISTER_STAGE(StageOne)
+    o7si::config::load("/root/reps/seda/conf/test.conf");
 
-    auto stage = LOGIN_STAGE(StageOne) 
+    srand(time(nullptr));
+    auto stage = LOGIN_STAGE(CountStage);
     for (int i = 0; i < 100; ++ i)
     {
-        stage->call(i);
+        stage->call(std::string("aaaabbbccd"));
         std::this_thread::sleep_for(std::chrono::seconds(1));    
     }
     return 0;    

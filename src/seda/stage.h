@@ -36,10 +36,13 @@ public:
 
 public:
     /// 构造函数
-    Stage(std::string name, size_t capacity);
+    explicit Stage(std::string name);
     
     /// 为基类提供虚析构函数，保证派生类对象能够正常释放资源
     virtual ~Stage() = default;
+
+    /// 初始化 Stage 需要使用的数据
+    void init();
 
     /// 获取 stage 的名称
     std::string getName() const;
@@ -56,6 +59,12 @@ public:
     /// 根据状态名称获取 Stage 的后续状态
     std::shared_ptr<Stage> next(const std::string& state); 
     
+    /// 获取线程池的最大容量
+    size_t getThreadPoolCapacity() const;
+
+    /// 设置线程池的最大容量
+    size_t setThreadPoolCapacity(size_t capacity);
+
 public:
     /// 事件处理函数
     virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;

@@ -9,7 +9,6 @@ namespace config
 
 void load(const std::string& filename)
 {
-    /*
     // 载入配置文件
     YAML::Node config = YAML::LoadFile(filename);    
     
@@ -23,14 +22,12 @@ void load(const std::string& filename)
 
     // 其它模块的配置
     // ...
-    */
 }
 
 // ------------------------------------------------------------------------------
 
 void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 {
-    /*
     // 清空输出地(默认有一个控制台输出地)
     o7si::log::Logger::getInstance()->clearAppenders();
 
@@ -72,12 +69,10 @@ void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
 
     // 异常
     // throw
-    */
 }
 
 void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
-    /*
     for (auto i = yaml.begin(); i != yaml.end(); ++ i)
     {
         // Stage 的名称
@@ -86,8 +81,9 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
         auto stage = o7si::seda::StageManager::getInstance()->doLogin(stage_name);
 
         // Stage 的最大允许线程数
-        size_t stage_max_thread = i->second["max_thread"].as<size_t>();
-        stage->setMaxThread(stage_max_thread);
+        size_t thread_pool_capacity = i->second["max_thread"].as<size_t>();
+        stage->setThreadPoolCapacity(thread_pool_capacity);
+        stage->init();
 
         // Stage 的后续状态
         YAML::Node state_table = i->second["state"];
@@ -104,7 +100,6 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 
     // 异常
     // throw
-    */
 }
 
 // ------------------------------------------------------------------------------
