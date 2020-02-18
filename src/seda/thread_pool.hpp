@@ -13,8 +13,8 @@ class ThreadPool
 {
 public:
     /// 构造函数
-    explicit ThreadPool(size_t capacity)
-        : m_capacity(capacity), m_shutdown(false)
+    explicit ThreadPool(EventQueue<std::function<void()>>* event_queue, size_t capacity)
+        : m_event_queue(event_queue), m_capacity(capacity), m_shutdown(false)
     {
     }
     
@@ -38,7 +38,7 @@ public:
             return; 
         // 如果线程池未被初始化
         for (size_t i = 0; i < m_capacity; ++ i)
-            m_threads.emplace_back(ThreadWorker(this));
+            m_threads.emplace_back(ThreadWorker(this, i));
     }
 
     /// 初始化线程池(指定数量，不能大于最大容量)
@@ -50,7 +50,7 @@ public:
         // 如果线程池未被初始化
         number = std::min(number, m_capacity);
         for (size_t i = 0; i < number; ++ i)
-            m_threads.emplace_back(ThreadWorker(this));
+            m_threads.emplace_back(ThreadWorker(this, i));
     }
 
     /// 销毁线程池
@@ -68,32 +68,24 @@ public:
         }
     }
 
+    /// 唤醒一个随机线程
+    void notify_one()
+    {
+        m_condition.notify_one();
+    }
+
+    /// 唤醒所有线程
+    void notify_all()
+    {
+        m_condition.notify_all();    
+    }
+    
     /// 析构函数
     ~ThreadPool()
     {
         destory();
     }
 
-    template<typename Function, typename... Args>
-    auto call(Function&& function, Args&&... args) -> std::future<decltype(function(args...))>
-    {
-        // 绑定
-        std::function<decltype(function(args...))()> func = 
-            std::bind(std::forward<Function>(function), std::forward<Args>(args)...);
-        auto task = 
-            std::make_shared<std::packaged_task<decltype(function(args...))()>>(func);    
-        // 函数包装器
-        std::function<void()> wrapper = [task]
-        {
-            (*task)();
-        };
-        // 将事件添加至队列
-        event_queue.push(wrapper);
-        // 随机唤醒一个线程
-        m_condition.notify_one();
-
-        return task->get_future();
-    }
 private:
     /// 线程池是否被关闭
     std::atomic_bool m_shutdown;
@@ -110,15 +102,15 @@ private:
     std::condition_variable m_condition;
 
     /// 事件队列
-    EventQueue<std::function<void()>> event_queue;
+    EventQueue<std::function<void()>>* m_event_queue;
 
     /// 线程工作类
     class ThreadWorker
     {
     public:
         /// 构造函数
-        ThreadWorker(ThreadPool* pool)
-            : m_pool(pool)
+        ThreadWorker(ThreadPool* pool, size_t id)
+            : m_pool(pool), m_id(id)
         {
         }
          
@@ -132,19 +124,23 @@ private:
                 {
                     std::unique_lock<std::mutex> ulock(m_pool->m_mutex);
                     // 如果事件队列为空，则进行等待
-                    if (m_pool->event_queue.empty())
+                    if (m_pool->m_event_queue->empty())
                         m_pool->m_condition.wait(ulock);
-                    success = m_pool->event_queue.pop(func);
+                    success = m_pool->m_event_queue->pop(func);
                 }
                 // 如果能够取出任务才执行
                 // 虽然上面的代码进行过非空判断，但是在线程池销毁时会调用 notify_all 函数 
                 // 所以需要再次进行判断
                 if (success)
+                {
+                    LOG_DEBUG << "pool." << m_id << " call function";
                     func();   
+                }
             }
         }
     private:    
         ThreadPool* m_pool;
+        size_t m_id;
     };
 };
 

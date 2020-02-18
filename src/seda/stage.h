@@ -57,14 +57,37 @@ public:
     std::shared_ptr<Stage> next(const std::string& state); 
     
 public:
+    /// 事件处理函数
+    virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;
+
     /// 绑定事件处理器的内部函数
     void bind(EHF&& function);
 
     /// 执行
     void call(boost::any&& args);
 
-    /// 事件处理函数
-    virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;
+    /// 向事件队列中提交一个任务
+    template<typename Function, typename... Args>
+    auto commit(Function&& func, Args&&... args) -> std::future<decltype(func(args...))>
+    {
+        // 参数绑定
+        std::function<decltype(func(args...))()> f = 
+            std::bind(std::forward<Function>(func), std::forward<Args>(args)...);
+        // 包装
+        auto packaged = 
+            std::make_shared<std::packaged_task<decltype(func(args...))()>>(f);     
+        // 包装器
+        std::function<void()> wrapper = [packaged]
+        {
+            (*packaged)();
+        };
+        // 将事件添加至队列
+        m_event_queue.push(wrapper);
+        // 随机唤醒一个线程
+        m_thread_pool.notify_one();
+
+        return packaged->get_future();
+    }
 
 protected:
     /// Stage 的名称
@@ -76,7 +99,7 @@ protected:
     std::string state;
 
     /// 事件队列
-    /// EventQueue m_event_queue;
+    EventQueue<std::function<void()>> m_event_queue;
     /// 事件处理器
     EventHandler<EHF> m_event_handler;
     /// 线程池

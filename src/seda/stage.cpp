@@ -6,7 +6,8 @@ namespace seda
 {
 
 Stage::Stage(std::string name, size_t capacity)
-    : m_name(std::move(name)), m_thread_pool(capacity)
+    : m_name(std::move(name)), 
+      m_thread_pool(&m_event_queue, capacity)
 {
     // 初始化线程池
     m_thread_pool.init();
@@ -54,8 +55,9 @@ void Stage::bind(EHF&& function)
 /// 执行
 void Stage::call(boost::any&& args)
 {
-    auto future = m_thread_pool.call(
-        m_event_handler.getHandler(), std::forward<boost::any>(args)
+    auto future = commit(
+        m_event_handler.getHandler(),
+        std::forward<boost::any>(args)
     );
     auto ret = future.get();
     LOG_DEBUG << ret.first << " " << boost::any_cast<std::string>(ret.second);
