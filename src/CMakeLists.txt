@@ -8,6 +8,7 @@ add_executable(seda
     seda/stage_manager.cpp
     seda/event_queue.hpp
     seda/thread_pool.hpp
+    seda/performeter.hpp
     stage/test_stage.hpp
     ${SRC}
 )

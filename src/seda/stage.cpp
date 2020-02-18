@@ -10,6 +10,7 @@ Stage::Stage(std::string name)
       m_thread_pool(&m_event_queue)
 {
     m_thread_pool.setName(m_name + "_ThreadPool");
+    m_performeter.setName(m_name + "_Performeter");
 }
 
 void Stage::init()
@@ -63,6 +64,27 @@ size_t Stage::setThreadPoolCapacity(size_t capacity)
     return capacity;    
 }
 
+size_t Stage::getPerformeterCapacity() const
+{
+    return m_performeter.getCapacity();
+}
+
+size_t Stage::setPerformeterCapacity(size_t capacity)
+{
+    m_performeter.setCapacity(capacity);
+    return capacity;    
+}
+
+void Stage::performeter_internal_state() const
+{
+    LOG_INFO << "name = " << m_performeter.getName();
+    LOG_INFO << "capacity = " << m_performeter.getCapacity();
+    LOG_INFO << "longest = " << m_performeter.longest().count() << " s";
+    LOG_INFO << "sum = " << m_performeter.sum().count() << " s";
+    LOG_INFO << "average = " << m_performeter.average().count() << " s";
+    LOG_INFO << "counter = " << m_performeter.counter();
+}
+
 void Stage::bind(EHF&& function)
 {
     m_event_handler.setHandler(std::forward<EHF>(function));
@@ -71,13 +93,22 @@ void Stage::bind(EHF&& function)
 /// 执行
 void Stage::call(boost::any&& args)
 {
+    // 开始时间
+    auto begin = std::chrono::system_clock::now();
+
     // 提交事件
     auto future = commit(
         m_event_handler.getHandler(),
         std::forward<boost::any>(args)
     );
-
+    LOG_INFO << "call.begin";
     auto ret = future.get();
+    LOG_INFO << "call.end";
+    
+    // 结束时间
+    auto end = std::chrono::system_clock::now();
+    // 消耗时间(线程调度时间 + 执行时间)
+    m_performeter.commit(end - begin);
 
     auto next = m_conver_mapping[ret.first];
     // 如果不存在后续状态

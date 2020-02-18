@@ -6,6 +6,7 @@
 #include "event_queue.hpp"
 #include "thread_pool.hpp"
 #include "stage_manager.h"
+#include "performeter.hpp"
 
 namespace o7si
 {
@@ -65,6 +66,15 @@ public:
     /// 设置线程池的最大容量
     size_t setThreadPoolCapacity(size_t capacity);
 
+    /// 获取性能监控器的容量
+    size_t getPerformeterCapacity() const;
+
+    /// 设置性能监控器的容量
+    size_t setPerformeterCapacity(size_t capacity);
+
+    /// 输出性能监控器的内部信息(用于调试)
+    void performeter_internal_state() const;
+
 public:
     /// 事件处理函数
     virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;
@@ -114,7 +124,7 @@ protected:
     /// 线程池
     ThreadPool m_thread_pool;
     /// 性能监控器
-    /// Performeter m_performeter;
+    Performeter m_performeter;
 };
 
 }   // namespace seda
