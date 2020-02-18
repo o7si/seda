@@ -54,10 +54,11 @@ void Stage::bind(EHF&& function)
 /// 执行
 void Stage::call(boost::any&& args)
 {
-    std::future<boost::any> future = m_thread_pool.call(
+    auto future = m_thread_pool.call(
         m_event_handler.getHandler(), std::forward<boost::any>(args)
     );
-    LOG_DEBUG << boost::any_cast<std::string>(future.get());
+    auto ret = future.get();
+    LOG_DEBUG << ret.first << " " << boost::any_cast<std::string>(ret.second);
 }
 
 }   // namespace seda    

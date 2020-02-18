@@ -8,21 +8,13 @@
 
 int main()
 {
-    using namespace o7si::seda;
     REGISTER_STAGE(StageOne)
 
-    auto login_stage = StageManager::getInstance()->doLogin("StageOne");
-    LOG_DEBUG << login_stage->getName();
-/*
-    std::function<boost::any(boost::any&&)> func = [login_stage](boost::any&& args)
+    auto stage = LOGIN_STAGE(StageOne) 
+    for (int i = 0; i < 100; ++ i)
     {
-        return login_stage->handler(std::forward<boost::any>(args));    
-    };
-    login_stage->bind(std::move(func));
-*/
-
-    login_stage->call(10);
-    login_stage->call(15);
-    login_stage->call(20);
+        stage->call(i);
+        std::this_thread::sleep_for(std::chrono::seconds(1));    
+    }
     return 0;    
 }

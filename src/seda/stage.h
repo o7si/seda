@@ -26,7 +26,9 @@ class Stage
 {
 public:
     /// 事件处理函数的接口
-    using EventHandlerFunction = std::function<boost::any(boost::any&)>;
+    /// pair.first  -> 处理状态
+    /// pair.second -> 处理结果
+    using EventHandlerFunction = std::function<std::pair<std::string, boost::any>(boost::any&)>;
     using EHF = EventHandlerFunction;
 
     /// 状态转换表
@@ -62,7 +64,7 @@ public:
     void call(boost::any&& args);
 
     /// 事件处理函数
-    virtual boost::any handler(boost::any& args) = 0;
+    virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;
 
 protected:
     /// Stage 的名称

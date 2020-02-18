@@ -15,10 +15,13 @@ public:
     {
     }
 
-    boost::any handler(boost::any& args)
+    std::pair<std::string, boost::any> handler(boost::any& args)
     {
         int count = boost::any_cast<int>(args);
-        return std::string(count, 'a');    
+        
+        if (rand() & 1)
+            return { "success", std::string(count, 'a')};
+        return { "failure", std::string(count, 'b')};
     }
 };
 
