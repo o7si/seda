@@ -21,6 +21,8 @@
 #include <chrono>
 #include <condition_variable>
 
+#include <sys/syscall.h>
+
 #include <yaml-cpp/yaml.h>
 #include <boost/any.hpp>
 

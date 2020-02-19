@@ -9,8 +9,8 @@
             o7si::log::FromString(#level), \
             o7si::log::Event::Information( \
                 std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), \
-                o7si::utils::convertThreadId(std::this_thread::get_id()), \
-                "()", \
+                o7si::utils::get_thread_id(), \
+                o7si::utils::get_thread_name(), \
                 __FILE__, \
                 __FUNCTION__, \
                 __LINE__ \
@@ -33,21 +33,21 @@ namespace log
 enum class Level
 {
     /// 未知类型
-            UNKNOWN = 0,
+    UNKNOWN = 0,
     /// 打开所有日志记录
-            ALL,
+    ALL,
     /// 调试信息
-            DEBUG,
+    DEBUG,
     /// 运行信息
-            INFO,
+    INFO,
     /// 警告信息
-            WARN,
+    WARN,
     /// 错误信息
-            ERROR,
+    ERROR,
     /// 严重错误信息
-            FATAL,
+    FATAL,
     /// 关闭所有日志记录
-            OFF
+    OFF
 };
 
 /// 获取日志级别对应的文本

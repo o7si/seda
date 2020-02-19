@@ -9,8 +9,8 @@ Stage::Stage(std::string name)
     : m_name(std::move(name)), 
       m_thread_pool(&m_event_queue)
 {
-    m_thread_pool.setName(m_name + "_ThreadPool");
-    m_performeter.setName(m_name + "_Performeter");
+    m_thread_pool.setName(getShortName());
+    m_performeter.setName(getShortName());
 }
 
 void Stage::init()
@@ -22,6 +22,16 @@ void Stage::init()
 std::string Stage::getName() const
 {
     return m_name;
+}
+
+std::string Stage::getShortName() const
+{
+    // 名称中的每一个大写字母
+    std::string short_name;
+    for (const auto& ch : m_name)
+        if (isupper(ch))
+            short_name += ch;
+    return short_name;    
 }
 
 std::string Stage::setName(std::string name) 

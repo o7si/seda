@@ -128,6 +128,7 @@ private:
         ThreadWorker(ThreadPool* pool, size_t id)
             : m_pool(pool), m_id(id)
         {
+            o7si::utils::set_thread_name(pool->m_name + "_" + std::to_string(id));
         }
          
         void operator()()

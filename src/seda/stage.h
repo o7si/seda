@@ -45,13 +45,16 @@ public:
     /// 初始化 Stage 需要使用的数据
     void init();
 
-    /// 获取 stage 的名称
+    /// 获取 Stage 的名称
     std::string getName() const;
     
-    /// 设置 stage 的名称  
+    /// 获取 Stage 的短名称
+    std::string getShortName() const;
+
+    /// 设置 Stage 的名称  
     std::string setName(std::string name); 
 
-    /// 设置 stage 的后续状态
+    /// 设置 Stage 的后续状态
     void next(const std::string& state, const std::string& stage);
 
     /// 获取 Stage 的状态转换表
