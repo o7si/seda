@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../pch.h"
-#include "../seda/macro.hpp"
+#include "pch.h"
+#include "seda/macro.hpp"
 
 namespace o7si
 {
