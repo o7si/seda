@@ -92,30 +92,35 @@ void Stage::bind(EHF&& function)
 
 /// 执行
 void Stage::call(boost::any&& args)
-{
-    // 开始时间
-    auto begin = std::chrono::system_clock::now();
-
-    // 提交事件
-    auto future = commit(
-        m_event_handler.getHandler(),
-        std::forward<boost::any>(args)
-    );
-    LOG_INFO << "call.begin";
-    auto ret = future.get();
-    LOG_INFO << "call.end";
-    
-    // 结束时间
-    auto end = std::chrono::system_clock::now();
-    // 消耗时间(线程调度时间 + 执行时间)
-    m_performeter.commit(end - begin);
-
-    auto next = m_conver_mapping[ret.first];
-    // 如果不存在后续状态
-    if (next == nullptr)
-        return;
-    // 如果存在后续状态
-    next->call(std::forward<boost::any>(ret.second));
+{        
+    // 将任务进行一层包装，将 future 的 get 方法加入到线程中执行，防止在此处阻塞
+    std::function<void(boost::any&)> wrapper = [this](boost::any& args)
+    {
+        // 使用 packaged_task 进行一层包装
+        std::packaged_task<std::pair<std::string, boost::any>(boost::any&)> packaged(m_event_handler.getHandler());
+        // 获取 future 对象
+        auto future = packaged.get_future();
+        // 记录起始时间
+        auto begin = std::chrono::system_clock::now();
+        // 执行函数
+        packaged(args);
+        // 等待函数执行完毕，获取返回值
+        auto ret = future.get();
+        // 记录结束时间
+        auto end = std::chrono::system_clock::now();
+        // 函数执行消耗时间
+        m_performeter.commit(end - begin);
+        
+        // 根据返回值决定后续状态
+        auto next = m_conver_mapping[ret.first];
+        // 如果不存在后续状态
+        if (next == nullptr)
+            return;
+        // 如果存在后续状态
+        next->call(std::forward<boost::any>(ret.second));
+    };
+    // 提交任务
+    commit(std::move(wrapper), std::forward<boost::any>(args));
 }
 
 }   // namespace seda    

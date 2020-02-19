@@ -13,12 +13,13 @@ int main()
     srand(time(nullptr));
     auto stage = LOGIN_STAGE(CountStage);
     LOG_INFO << stage->getThreadPoolCapacity();
-    for (int i = 0; i < 1000; ++ i)
+    for (int i = 0; i < 300; ++ i)
     {
         stage->call(std::string("aaaabbbccd"));
-        if (i % 3 == 0)
-            stage->performeter_internal_state();
     }
+
+    LOG_FATAL << "wait...";
+    std::this_thread::sleep_for(std::chrono::seconds(15));
     stage->performeter_internal_state();
     
     return 0;    
