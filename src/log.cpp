@@ -1,4 +1,3 @@
-#include <iomanip>
 #include "log.h"
 
 namespace o7si

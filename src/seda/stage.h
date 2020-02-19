@@ -2,10 +2,10 @@
 
 #include "../pch.h"
 #include "../log.h"
+#include "stage_manager.h"
 #include "event_handler.hpp"
 #include "event_queue.hpp"
 #include "thread_pool.hpp"
-#include "stage_manager.h"
 #include "performeter.hpp"
 
 namespace o7si

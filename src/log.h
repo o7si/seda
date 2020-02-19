@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "utils.h"
 
+/// 打印对应级别的日志
 #define LOG(level) \
     o7si::log::Event( \
             o7si::log::Logger::getInstance(), \
@@ -16,10 +17,15 @@
                 __LINE__ \
     )).stream()
 
+/// 打印 DEBUG 级别的日志
 #define LOG_DEBUG LOG(DEBUG)
+/// 打印 INFO 级别的日志
 #define LOG_INFO LOG(INFO)
+/// 打印 WARN 级别的日志
 #define LOG_WARN LOG(WARN)
+/// 打印 ERROR 级别的日志
 #define LOG_ERROR LOG(ERROR)
+/// 打印 FATAL 级别的日志
 #define LOG_FATAL LOG(FATAL)
 
 namespace o7si
