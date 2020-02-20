@@ -2,6 +2,7 @@
 
 #include "../pch.h"
 #include "../log.h"
+#include "macro.hpp"
 #include "stage_manager.h"
 #include "event_handler.hpp"
 #include "event_queue.hpp"
@@ -104,7 +105,7 @@ public:
             (*packaged)();
         };
         // 将事件添加至队列
-        m_event_queue.push(wrapper);
+        m_event_queue.push(std::make_pair(std::chrono::system_clock::now(), wrapper));
         // 随机唤醒一个线程
         m_thread_pool.notify_one();
 
@@ -121,7 +122,7 @@ protected:
     std::string state;
 
     /// 事件队列
-    EventQueue<std::function<void()>> m_event_queue;
+    EventQueue<TypeDef::EventQueueElem> m_event_queue;
     /// 事件处理器
     EventHandler<EHF> m_event_handler;
     /// 线程池

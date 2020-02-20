@@ -7,7 +7,7 @@ namespace seda
 
 Stage::Stage(std::string name)
     : m_name(std::move(name)), 
-      m_thread_pool(&m_event_queue)
+      m_thread_pool(&m_event_queue, &m_performeter)
 {
     m_thread_pool.setName(getShortName());
     m_performeter.setName(getShortName());
@@ -89,10 +89,20 @@ void Stage::performeter_internal_state() const
 {
     LOG_INFO << "name = " << m_performeter.getName();
     LOG_INFO << "capacity = " << m_performeter.getCapacity();
-    LOG_INFO << "longest = " << m_performeter.longest().count() << " s";
-    LOG_INFO << "sum = " << m_performeter.sum().count() << " s";
-    LOG_INFO << "average = " << m_performeter.average().count() << " s";
-    LOG_INFO << "counter = " << m_performeter.counter();
+
+    LOG_INFO << "longest = " << m_performeter.longest_dura().count() << " s";
+    LOG_INFO << "longest(wait) = " << m_performeter.longest_wait_dura().count() << " s";
+    LOG_INFO << "longest(exec) = " << m_performeter.longest_exec_dura().count() << " s";
+
+    LOG_INFO << "sum = " << m_performeter.sum_dura().count() << " s";
+    LOG_INFO << "sum(wait) = " << m_performeter.sum_wait_dura().count() << " s";
+    LOG_INFO << "sum(exec) = " << m_performeter.sum_exec_dura().count() << " s";
+
+    LOG_INFO << "average = " << m_performeter.avg_dura().count() << " s";
+    LOG_INFO << "average(wait) = " << m_performeter.avg_wait_dura().count() << " s";
+    LOG_INFO << "average(exec) = " << m_performeter.avg_exec_dura().count() << " s";
+
+    LOG_INFO << "counter = " << m_performeter.count();
 }
 
 void Stage::bind(EHF&& function)
@@ -110,16 +120,10 @@ void Stage::call(boost::any&& args)
         std::packaged_task<std::pair<std::string, boost::any>(boost::any&)> packaged(m_event_handler.getHandler());
         // 获取 future 对象
         auto future = packaged.get_future();
-        // 记录起始时间
-        auto begin = std::chrono::system_clock::now();
         // 执行函数
         packaged(args);
         // 等待函数执行完毕，获取返回值
         auto ret = future.get();
-        // 记录结束时间
-        auto end = std::chrono::system_clock::now();
-        // 函数执行消耗时间
-        m_performeter.commit(end - begin);
         
         // 根据返回值决定后续状态
         auto next = m_conver_mapping[ret.first];

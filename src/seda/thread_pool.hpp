@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../pch.h"
+#include "macro.hpp"
 #include "event_queue.hpp"
+#include "performeter.hpp"
 
 namespace o7si
 {
@@ -13,8 +15,9 @@ class ThreadPool
 {
 public:
     /// 构造函数
-    explicit ThreadPool(EventQueue<std::function<void()>>* event_queue)
-        : m_event_queue(event_queue)
+    ThreadPool(EventQueue<TypeDef::EventQueueElem>* event_queue, Performeter* performeter)
+        : m_event_queue(event_queue),
+          m_performeter(performeter)
     {
         m_shutdown = false;
     }
@@ -118,7 +121,9 @@ private:
     std::condition_variable m_condition;
 
     /// 事件队列
-    EventQueue<std::function<void()>>* m_event_queue;
+    EventQueue<TypeDef::EventQueueElem>* m_event_queue;
+    /// 性能监控器
+    Performeter* m_performeter;
 
     /// 线程工作类
     class ThreadWorker
@@ -136,22 +141,31 @@ private:
             // 循环执行，直到线程池被关闭
             while (!m_pool->m_shutdown) 
             {
-                std::function<void()> func;
+                TypeDef::EventQueueElem elem;
                 bool success;
                 {
                     std::unique_lock<std::mutex> ulock(m_pool->m_mutex);
                     // 如果事件队列为空，则进行等待
                     if (m_pool->m_event_queue->empty())
                         m_pool->m_condition.wait(ulock);
-                    success = m_pool->m_event_queue->pop(func);
+                    success = m_pool->m_event_queue->pop(elem);
                 }
                 // 如果能够取出任务才执行
                 // 虽然上面的代码进行过非空判断，但是在线程池销毁时会调用 notify_all 函数 
                 // 所以需要再次进行判断
                 if (success)
                 {
-                    LOG_DEBUG << m_pool->m_name << "." << m_id << " call function";
-                    func();   
+                    // 纪录时间点(任务开始执行)
+                    auto begin = std::chrono::system_clock::now(); 
+                    // 执行任务
+                    (elem.second)();   
+                    // 纪录时间点(任务执行结束)
+                    auto end = std::chrono::system_clock::now();
+
+                    // wait_dura = begin - elem.first
+                    // exec_dura = end - begin
+                    Performeter::NoteElem note(begin - elem.first, end - begin);
+                    m_pool->m_performeter->commit(note); 
                 }
             }
         }

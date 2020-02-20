@@ -11,8 +11,53 @@ namespace seda
 class Performeter
 {
 public:
-    /// 时间类型
-    using Timer = std::chrono::duration<double>;
+    /// 耗时(类型)
+    using Duration = std::chrono::duration<double>;
+
+public:
+    /// 纪录的内容
+    class NoteElem
+    {
+    public:
+        /// 构造函数
+        NoteElem(const Duration& wait_dura, const Duration& exec_dura)
+            : m_wait_dura(wait_dura), m_exec_dura(exec_dura)
+        {
+        }
+        
+        /// 获取线程等待耗时
+        Duration wait_dura() const
+        {
+            return m_wait_dura;    
+        }
+
+        /// 获取任务执行耗时
+        Duration exec_dura() const
+        {
+            return m_exec_dura;    
+        }
+
+        /// 设置描述信息
+        std::string setDesc(std::string desc)
+        {
+            m_desc = std::move(desc);
+            return m_desc;    
+        }
+
+        /// 获取描述信息
+        std::string getDesc() const
+        {
+            return m_desc;    
+        }
+
+    private:     
+        /// 线程等待耗时
+        Duration m_wait_dura;
+        /// 任务执行耗时
+        Duration m_exec_dura;
+        /// 额外的描述
+        std::string m_desc;  
+    };
 
 public:
     /// 构造函数
@@ -51,74 +96,118 @@ public:
         return m_capacity;    
     }
 
-    /// 获取最长的执行耗时
-    Timer longest() const
+    /// 获取最长耗时(线程等待 + 任务执行)
+    Duration longest_dura() const
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        return m_longest_timer;    
+        return m_longest_wait_dura + m_longest_exec_dura;    
     }
 
-    /// 获取总耗时
-    Timer sum() const
+    /// 获取最长耗时(线程等待)
+    Duration longest_wait_dura() const
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        return m_sum_timer;    
+        return m_longest_wait_dura;    
     }
 
-    /// 获取平均耗时
-    Timer average() const
+    /// 获取最长耗时(任务执行耗时)
+    Duration longest_exec_dura() const
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
+        return m_longest_exec_dura;    
+    }
+
+    /// 获取总耗时(线程等待 + 任务执行)
+    Duration sum_dura() const
+    {
+        return m_sum_wait_dura + m_sum_exec_dura;    
+    }
+
+    /// 获取总耗时(线程等待)
+    Duration sum_wait_dura() const
+    {
+        return m_sum_wait_dura;    
+    }
+
+    /// 获取总耗时(任务执行)
+    Duration sum_exec_dura() const
+    {
+        return m_sum_exec_dura;    
+    }
+
+    /// 获取平均耗时(线程等待 + 任务执行)
+    Duration avg_dura() const
+    {
         if (m_counter == 0)
-            return Timer(0);
-        return m_sum_timer / m_counter;    
+            return Duration(0);
+        return (m_sum_wait_dura + m_sum_exec_dura) / m_counter;    
+    }
+
+    /// 获取平均耗时(线程等待)
+    Duration avg_wait_dura() const
+    {
+        if (m_counter == 0)
+            return Duration(0);
+        return m_sum_wait_dura / m_counter;    
+    } 
+
+    /// 获取平均耗时(任务执行)
+    Duration avg_exec_dura() const
+    {
+        if (m_counter == 0)
+            return Duration(0);
+        return m_sum_exec_dura / m_counter;    
     }
 
     /// 获取总执行次数
-    size_t counter() const
+    size_t count() const
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
         return m_counter;    
     }
 
-    /// 获取执行列表
-    std::list<Timer> notes() const
-    {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        return m_notes;    
-    }
-    
     /// 提交一次纪录
-    void commit(const Timer& note)
+    void commit(const NoteElem& elem)
     {
-        std::lock_guard<std::mutex> glock(m_mutex);
-        // 如果已经达到容量上限，则删除第一个元素
+        std::lock_guard<std::mutex> lock(m_mutex);
+        // 如果已经到达容量上限，则删除第一个元素
         if (m_notes.size() >= m_capacity)
             m_notes.erase(m_notes.begin());
-        m_notes.push_back(note);
 
-        // 更新相关值
-        m_longest_timer = std::max(m_longest_timer, note);
-        m_sum_timer += note;
-        ++ m_counter; 
+        // 更新相关的成员变量
+        m_longest_wait_dura = std::max(m_longest_wait_dura, elem.wait_dura());
+        m_longest_exec_dura = std::max(m_longest_exec_dura, elem.exec_dura());
+        m_sum_wait_dura += elem.wait_dura();
+        m_sum_exec_dura += elem.exec_dura();
+        ++ m_counter;
+        
+        m_notes.push_back(elem); 
     }
+
+    void commit(const Duration& wait_dura, const Duration& exec_dura)
+    {
+        commit(NoteElem(wait_dura, exec_dura));   
+    }
+
 private:
     /// 监控器名称
     std::string m_name;
     /// 监控器容量 
     size_t m_capacity;
-    /// 每一次执行的耗时
-    std::list<Timer> m_notes;
+
+    /// 纪录
+    std::list<NoteElem> m_notes; 
     
-    /// 最长耗时
-    Timer m_longest_timer;
-    /// 总耗时
-    Timer m_sum_timer;
-    /// 执行次数
+    /// 最长耗时(线程等待)
+    Duration m_longest_wait_dura;
+    /// 最长耗时(任务执行)
+    Duration m_longest_exec_dura;
+    /// 总耗时(线程等待)
+    Duration m_sum_wait_dura;
+    /// 总耗时(线程执行)
+    Duration m_sum_exec_dura;
+    /// 总执行次数
     size_t m_counter;
 
     /// 互斥量
     mutable std::mutex m_mutex;
+
 };
 
 }   // namespace seda   
