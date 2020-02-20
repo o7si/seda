@@ -53,7 +53,7 @@ void Stage::next(const std::string& state, const std::string& stage)
     LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(first)";
 }
 
-Stage::ConverMapping Stage::next() const
+ConverMapping Stage::next() const
 {
     return m_conver_mapping;    
 }
@@ -105,9 +105,9 @@ void Stage::performeter_internal_state() const
     LOG_INFO << "counter = " << m_performeter.count();
 }
 
-void Stage::bind(EHF&& function)
+void Stage::bind(EventHandlerFunc&& function)
 {
-    m_event_handler.setHandler(std::forward<EHF>(function));
+    m_event_handler.setHandler(std::forward<EventHandlerFunc>(function));
 }
 
 /// 执行

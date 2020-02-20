@@ -15,7 +15,7 @@ class ThreadPool
 {
 public:
     /// 构造函数
-    ThreadPool(EventQueue<TypeDef::EventQueueElem>* event_queue, Performeter* performeter)
+    ThreadPool(EventQueue<EventQueueElem>* event_queue, Performeter* performeter)
         : m_event_queue(event_queue),
           m_performeter(performeter)
     {
@@ -121,7 +121,7 @@ private:
     std::condition_variable m_condition;
 
     /// 事件队列
-    EventQueue<TypeDef::EventQueueElem>* m_event_queue;
+    EventQueue<EventQueueElem>* m_event_queue;
     /// 性能监控器
     Performeter* m_performeter;
 
@@ -141,7 +141,7 @@ private:
             // 循环执行，直到线程池被关闭
             while (!m_pool->m_shutdown) 
             {
-                TypeDef::EventQueueElem elem;
+                EventQueueElem elem;
                 bool success;
                 {
                     std::unique_lock<std::mutex> ulock(m_pool->m_mutex);

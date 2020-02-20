@@ -27,16 +27,6 @@ namespace seda
 class Stage
 {
 public:
-    /// 事件处理函数的接口
-    /// pair.first  -> 处理状态
-    /// pair.second -> 处理结果
-    using EventHandlerFunction = std::function<std::pair<std::string, boost::any>(boost::any&)>;
-    using EHF = EventHandlerFunction;
-
-    /// 状态转换表
-    using ConverMapping = std::unordered_map<std::string, std::shared_ptr<Stage>>;
-
-public:
     /// 构造函数
     explicit Stage(std::string name);
     
@@ -84,7 +74,7 @@ public:
     virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;
 
     /// 绑定事件处理器的内部函数
-    void bind(EHF&& function);
+    void bind(EventHandlerFunc&& function);
 
     /// 执行
     void call(boost::any&& args);
@@ -122,9 +112,9 @@ protected:
     std::string state;
 
     /// 事件队列
-    EventQueue<TypeDef::EventQueueElem> m_event_queue;
+    EventQueue<EventQueueElem> m_event_queue;
     /// 事件处理器
-    EventHandler<EHF> m_event_handler;
+    EventHandler<EventHandlerFunc> m_event_handler;
     /// 线程池
     ThreadPool m_thread_pool;
     /// 性能监控器

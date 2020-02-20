@@ -17,10 +17,15 @@ auto __reg_##stage = [] \
 /// 登录(Stage)
 #define LOGIN_STAGE(name) NAMESPACE_SEDA::StageManager::getInstance()->doLogin(#name);
 
-/// Stage 内部模版成员的类型定义
-class TypeDef
-{
-public:
-    /// 事件队列的元素类型
-    using EventQueueElem = std::pair<std::chrono::time_point<std::chrono::system_clock>, std::function<void()>>;   
-};
+/// 状态转换表
+#define ConverMapping std::unordered_map<std::string, std::shared_ptr<Stage>>
+
+/// 事件队列元素类型
+/// pair.first  -> 进入队列的时间点
+/// pair.second -> 任务
+#define EventQueueElem std::pair<std::chrono::time_point<std::chrono::system_clock>, std::function<void()>>   
+
+/// 事件处理函数的接口
+/// pair.first  -> 处理状态
+/// pair.second -> 处理结果
+#define EventHandlerFunc std::function<std::pair<std::string, boost::any>(boost::any&)>
