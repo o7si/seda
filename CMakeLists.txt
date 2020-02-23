@@ -10,6 +10,8 @@ set(SRCS
     src/config.cpp
     src/utils.h
     src/utils.cpp
+    src/net/http.h
+    src/net/http.cpp
     src/seda/macro.hpp
     src/seda/event_queue.hpp     
     src/seda/event_handler.hpp
@@ -31,5 +33,7 @@ set(LIBS
 
 include_directories(src)
 
-add_executable(test01 example/main.cpp example/stage/test_stage.hpp)
-target_link_libraries(test01 ${LIBS})
+add_executable(test_seda test/test_seda.cpp test/stage/test_stage.hpp)
+target_link_libraries(test_seda ${LIBS})
+add_executable(test_net test/test_net.cpp)
+target_link_libraries(test_net ${LIBS})
