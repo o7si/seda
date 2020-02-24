@@ -12,6 +12,13 @@ set(SRCS
     src/utils.cpp
     src/net/http.h
     src/net/http.cpp
+    src/net/http11_common.h
+    src/net/http11_parser.h
+    src/net/http11_parser.cpp
+    src/net/httpclient_parser.h
+    src/net/httpclient_parser.cpp
+    src/net/http_parser.h
+    src/net/http_parser.cpp
     src/seda/macro.hpp
     src/seda/event_queue.hpp     
     src/seda/event_handler.hpp
@@ -37,3 +44,5 @@ add_executable(test_seda test/test_seda.cpp test/stage/test_stage.hpp)
 target_link_libraries(test_seda ${LIBS})
 add_executable(test_net test/test_net.cpp)
 target_link_libraries(test_net ${LIBS})
+add_executable(test_parser test/test_parser.cpp)
+target_link_libraries(test_parser ${LIBS})

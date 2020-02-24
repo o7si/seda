@@ -146,9 +146,9 @@ enum class HttpMethod
 
 /// HTTP 版本 
 #define HTTP_VERSION_MAP(XX)        \
-    XX(10, HTTP1_0, HTTP1_0)        \
-    XX(11, HTTP1_1, HTTP1_1)        \
-    XX(20, HTTP2_0, HTTP2_0)        \
+    XX(10, HTTP1_0, HTTP/1.0)       \
+    XX(11, HTTP1_1, HTTP/1.1)       \
+    XX(20, HTTP2_0, HTTP/2.0)       \
 
 
 enum class HttpVersion
@@ -212,6 +212,47 @@ public:
     {
         m_version = version;    
     }
+
+    std::string getPath() const
+    {
+        return m_path;    
+    }
+
+    void setPath(std::string path)
+    {
+        m_path = std::move(path);    
+    }
+
+    std::string getQuery() const
+    {
+        return m_query;    
+    }
+
+    void setQuery(std::string query)
+    {
+        m_query = std::move(query);
+    }
+    
+    std::string getFragment() const
+    {
+        return m_fragment;    
+    }
+
+    void setFragment(std::string fragment)
+    {
+        m_fragment = std::move(fragment);
+    }
+
+    std::string getBody() const
+    {
+        return m_body;   
+    }
+
+    void setBody(std::string body)
+    {
+        m_body = std::move(body);    
+    }
+
 private:
     /// HTTP 方法
     HttpMethod m_method;
