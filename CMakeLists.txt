@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.0)
 
 project(seda)
 
+add_compile_options(-g)
+
+# HTTP 协议解析源码
+set(HTTP_ANALYSIS_SRCS
+    src/net/analysis/http11_common.h
+    src/net/analysis/http11_parser.h
+    src/net/analysis/http11_parser.cpp
+    src/net/analysis/httpclient_parser.h
+    src/net/analysis/httpclient_parser.cpp
+)
+add_library(http-analysis SHARED ${HTTP_ANALYSIS_SRCS})
+
 set(SRCS
     src/pch.h
     src/log.h
@@ -12,11 +24,6 @@ set(SRCS
     src/utils.cpp
     src/net/http.h
     src/net/http.cpp
-    src/net/http11_common.h
-    src/net/http11_parser.h
-    src/net/http11_parser.cpp
-    src/net/httpclient_parser.h
-    src/net/httpclient_parser.cpp
     src/net/http_parser.h
     src/net/http_parser.cpp
     src/seda/macro.hpp
@@ -36,6 +43,7 @@ set(LIBS
     seda
     pthread
     yaml-cpp
+    http-analysis
 )
 
 include_directories(src)

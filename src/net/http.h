@@ -330,5 +330,13 @@ private:
     std::map<std::string, std::string> m_fields;
 };
 
+/// HTTP 响应报文
+class HttpResponse
+{
+public:
+
+private:    
+};
+
 }   // namespace net   
 }   // namespace o7si
