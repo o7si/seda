@@ -8,46 +8,69 @@ namespace net
 void request_field_cb(void *data, const char* field, size_t flen, const char* value, size_t vlen)
 {
     LOG_DEBUG << std::string(field, flen) << " " << std::string(value, vlen);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->set_field(std::string(field, flen), std::string(value, vlen));
 }
    
 void request_method_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->method(GenMethodFrom(std::string(at, length)));
 }
 
 void request_uri_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->uri(std::string(at, length));
 }
 
 
 void request_fragment_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->fragment(std::string(at, length));
 }
 
 void request_path_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->path(std::string(at, length));
 }
 
 void request_query_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->query(std::string(at, length));
 }
 
 void request_version_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->data()->version(GenVersionFrom(std::string(at, length)));
 }
 
 void request_header_done_cb(void* data, const char* at, size_t length)
 {
     LOG_DEBUG << std::string(at, length);
+    HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
 }
 
 HttpRequestParser::HttpRequestParser()
 {
+    m_request = std::make_shared<HttpRequest>();
     // 初始化解析器
     http_parser_init(&m_parser);
     // 绑定回调函数
@@ -59,6 +82,8 @@ HttpRequestParser::HttpRequestParser()
     m_parser.query_string = request_query_cb;
     m_parser.http_version = request_version_cb;
     m_parser.header_done = request_header_done_cb;
+
+    m_parser.data = this;
 }
 
 size_t HttpRequestParser::execute(const char* data, size_t len, size_t off)

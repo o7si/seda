@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <map>
 #include <strings.h>
 
@@ -178,6 +180,11 @@ HttpVersion GenVersionFrom(const std::string& str);
 HttpVersion GenVersionFrom(const char* str);
 HttpVersion GenVersionFrom(int number);
 
+/// 将数据转换为字符串
+std::string HttpStatusToString(const HttpStatus& status);
+std::string HttpMethodToString(const HttpMethod& method);
+std::string HttpVersionToString(const HttpVersion& version);
+
 /// 输出相关的描述
 std::ostream& operator<<(std::ostream& stream, const HttpStatus& status);
 std::ostream& operator<<(std::ostream& stream, const HttpMethod& method);
@@ -189,84 +196,138 @@ std::ostream& operator<<(std::ostream& string, const HttpVersion& version);
 class HttpRequest
 {
 public:
-    /// 获取 HTTP 方法
-    HttpMethod getMethod() const
+    using MapType = std::map<std::string, std::string>;
+public:
+    HttpMethod method() const
     {
         return m_method;    
     }
 
-    /// 设置 HTTP 方法
-    void setMethod(const HttpMethod& method)
+    void method(const HttpMethod& value)
     {
-        m_method = method;   
+        m_method = value;    
     }
 
-    /// 获取 HTTP 版本
-    HttpVersion getVersion() const
+    HttpVersion version() const
     {
         return m_version;    
     }
 
-    /// 设置 HTTP 版本
-    void setVersion(const HttpVersion& version)
+    void version(const HttpVersion& value)
     {
-        m_version = version;    
+        m_version = value;
+    }
+    
+    std::string uri() const
+    {
+        return m_uri; 
     }
 
-    std::string getPath() const
+    void uri(const std::string& value)
+    {
+        m_uri = value;
+    }
+
+    std::string path() const
     {
         return m_path;    
     }
 
-    void setPath(std::string path)
+    void path(const std::string& value)
     {
-        m_path = std::move(path);    
+        m_path = value;
     }
 
-    std::string getQuery() const
+    std::string query() const
     {
         return m_query;    
     }
 
-    void setQuery(std::string query)
+    void query(const std::string& value)
     {
-        m_query = std::move(query);
-    }
-    
-    std::string getFragment() const
+        m_query = value;
+    } 
+
+    std::string fragment() const
     {
         return m_fragment;    
     }
 
-    void setFragment(std::string fragment)
+    void fragment(const std::string& value)
     {
-        m_fragment = std::move(fragment);
+        m_fragment = value;
     }
 
-    std::string getBody() const
+    std::string body() const
     {
-        return m_body;   
+        return m_body;    
     }
 
-    void setBody(std::string body)
+    void body(const std::string& value)
     {
-        m_body = std::move(body);    
+        m_body = value;
     }
+    
+    /// 获取字段
+    MapType fields() const
+    {
+        return m_fields;    
+    }
+
+    /// 设置字段
+    void fields(const MapType& value)
+    {
+        m_fields = value;    
+    }
+
+    /// 判断字段是否存在
+    bool has_field(const std::string& key)
+    {
+        return m_fields.find(key) != m_fields.end();    
+    }
+
+    /// 获取字段，若字段不存在则返回默认值
+    std::string get_field(const std::string& key, const std::string& def = "")
+    {
+        // 字段不存在
+        if (!has_field(key))
+            return def;
+        // 字段存在
+        return m_fields[key]; 
+    }
+
+    /// 设置一个字段
+    void set_field(const std::string& key, const std::string& value)
+    {
+        m_fields[key] = value;
+    }
+
+    /// 移除一个字段
+    void remove_field(const std::string& key)
+    {
+        // 字段不存在
+        if (!has_field(key))
+            return;
+        m_fields.erase(m_fields.find(key));
+    }
+    
+    /// 格式化数据
+    std::string format();
+
+    /// 将数据格式化并输出至流
+    std::ostream& dump(std::ostream& stream);
 
 private:
-    /// HTTP 方法
     HttpMethod m_method;
-    /// HTTP 协议
     HttpVersion m_version;
     
+    std::string m_uri;
     std::string m_path;
     std::string m_query;
     std::string m_fragment;
     std::string m_body;
     
-    std::map<std::string, std::string> m_heads;
-    std::map<std::string, std::string> m_params;
-    std::map<std::string, std::string> m_cookies;  
+    std::map<std::string, std::string> m_fields;
 };
 
 }   // namespace net   
