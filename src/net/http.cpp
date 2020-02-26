@@ -175,6 +175,35 @@ std::ostream& HttpRequest::dump(std::ostream& stream)
     return stream;
 }
 
+std::string HttpResponse::format()
+{
+    std::stringstream stream;
+    dump(stream);
+    return stream.str();    
+}
+
+std::ostream& HttpResponse::dump(std::ostream& stream)
+{
+    // 请求头
+    stream << HttpVersionToString(m_version)
+           << " "
+           << static_cast<int>(m_status)
+           << " "
+           << m_reason_phrase
+           << "\r\n";
+    // 字段
+    for (const auto& elem : m_fields)
+    {
+        stream << elem.first << ": " << elem.second << "\r\n";     
+    }
+    // 空行
+    stream << "\r\n";
+    // 主体
+    stream << (m_body.empty() ? "" : m_body);
+
+    return stream;
+}
+
 //-------------------------------------------------------------------------------    
 
 }   // namespace net

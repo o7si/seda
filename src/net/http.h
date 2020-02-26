@@ -327,15 +327,113 @@ private:
     std::string m_fragment;
     std::string m_body;
     
-    std::map<std::string, std::string> m_fields;
+    MapType m_fields;
 };
 
 /// HTTP 响应报文
 class HttpResponse
 {
 public:
+    using MapType = std::map<std::string, std::string>;
 
+public:
+
+    HttpStatus status() const
+    {
+        return m_status;    
+    }
+
+    void status(const HttpStatus& status)
+    {
+        m_status = status;    
+    }
+
+    HttpVersion version() const
+    {
+        return m_version;    
+    } 
+
+    void version(const HttpVersion& version)
+    {
+        m_version = version;    
+    }
+
+    std::string reason_phrase() const
+    {
+        return m_reason_phrase;
+    }
+
+    void reason_phrase(const std::string& value)
+    {
+        m_reason_phrase = value;
+    }
+
+    std::string body() const
+    {
+        return m_body;    
+    }
+
+    void body(const std::string& value)
+    {
+        m_body = value;
+    }
+    
+    /// 获取字段
+    MapType fields() const
+    {
+        return m_fields;    
+    }
+
+    /// 设置字段
+    void fields(const MapType& value)
+    {
+        m_fields = value;    
+    }
+
+    /// 判断字段是否存在
+    bool has_field(const std::string& key)
+    {
+        return m_fields.find(key) != m_fields.end();    
+    }
+
+    /// 获取字段，若字段不存在则返回默认值
+    std::string get_field(const std::string& key, const std::string& def = "")
+    {
+        // 字段不存在
+        if (!has_field(key))
+            return def;
+        // 字段存在
+        return m_fields[key]; 
+    }
+
+    /// 设置一个字段
+    void set_field(const std::string& key, const std::string& value)
+    {
+        m_fields[key] = value;
+    }
+
+    /// 移除一个字段
+    void remove_field(const std::string& key)
+    {
+        // 字段不存在
+        if (!has_field(key))
+            return;
+        m_fields.erase(m_fields.find(key));
+    }
+    
+    /// 格式化数据
+    std::string format();
+
+    /// 将数据格式化并输出至流
+    std::ostream& dump(std::ostream& stream);
 private:    
+    HttpStatus m_status;
+    HttpVersion m_version;
+
+    std::string m_reason_phrase;
+    std::string m_body;
+
+    MapType m_fields;
 };
 
 }   // namespace net   

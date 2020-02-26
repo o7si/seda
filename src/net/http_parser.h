@@ -10,7 +10,9 @@ namespace o7si
 {
 namespace net
 {
-    
+
+//--------------------------------------------------------------------------    
+
 void request_field_cb(void* data, const char* field, size_t flen, 
                                   const char* value, size_t vlen);
 void request_method_cb(void* data, const char* at, size_t length);
@@ -30,37 +32,59 @@ void response_version_cb(void* data, const char* at, size_t length);
 void response_header_done_cb(void* data, const char* at, size_t length);
 void response_last_chunk_cb(void* data, const char* at, size_t length);
 
-/// HTTP 请求解析器
-class HttpRequestParser
+//--------------------------------------------------------------------------    
+
+class HttpParser
 {
 public:
-    /// 构造函数
+    virtual int parser_init() = 0;
+    virtual int parser_finish() = 0;
+    virtual int parser_has_error() = 0;
+    virtual int parser_is_finished() = 0;
+    virtual size_t parser_execute(const char* data, size_t len, size_t off) = 0;
+
+    virtual ~HttpParser() = default;    
+};
+
+/// HTTP 请求解析器
+class HttpRequestParser : public HttpParser
+{
+public:
     HttpRequestParser();
 
-    /// 执行
-    size_t execute(const char* data, size_t len, size_t off = 0);
+    int parser_init() override;
+    int parser_finish() override;
+    int parser_has_error() override;
+    int parser_is_finished() override;
+    size_t parser_execute(const char* data, size_t len, size_t off = 0) override;
 
-    std::shared_ptr<HttpRequest> data()
+    std::shared_ptr<HttpRequest> inner_request()
     {
         return m_request;    
     }
+
 private:    
     http_parser m_parser;
     std::shared_ptr<HttpRequest> m_request;
 };
 
 /// HTTP 响应解析器
-class HttpResponseParser
+class HttpResponseParser : public HttpParser
 {
 public:
     HttpResponseParser();
-    /// 执行
-    size_t execute(const char* data, size_t len, size_t off = 0);
 
-    std::shared_ptr<HttpResponse> data()
+    int parser_init() override;
+    int parser_finish() override;
+    int parser_has_error() override;
+    int parser_is_finished() override;
+    size_t parser_execute(const char* data, size_t len, size_t off = 0) override;
+
+    std::shared_ptr<HttpResponse> inner_response()
     {
-        return m_response;    
+        return m_response;
     }
+
 private:
     httpclient_parser m_parser;
     std::shared_ptr<HttpResponse> m_response;

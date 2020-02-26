@@ -48,9 +48,5 @@ set(LIBS
 
 include_directories(src)
 
-add_executable(test_seda test/test_seda.cpp test/stage/test_stage.hpp)
-target_link_libraries(test_seda ${LIBS})
-add_executable(test_net test/test_net.cpp)
-target_link_libraries(test_net ${LIBS})
-add_executable(test_parser test/test_parser.cpp)
+add_executable(test_parser tests/test_parser.cpp)
 target_link_libraries(test_parser ${LIBS})
