@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 #include <string>
 #include <vector>
@@ -12,11 +13,9 @@
 #include <map>
 #include <unordered_map>
 
-#include <iomanip>
+#include <functional>
 
 #include <memory>
-
-#include <functional>
 
 #include <thread>
 #include <mutex>
@@ -25,6 +24,9 @@
 #include <condition_variable>
 
 #include <sys/syscall.h>
+
+#include <net/analysis/http11_parser.h>
+#include <net/analysis/httpclient_parser.h>
 
 #include <yaml-cpp/yaml.h>
 #include <boost/any.hpp>

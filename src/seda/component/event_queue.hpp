@@ -1,13 +1,16 @@
 #pragma once
 
-#include "../pch.h"
+#include <mutex>
+#include <queue>
+
+#include "../macro.h"
 
 namespace o7si
 {
 namespace seda
 {
 
-/// 事件队列
+/// 事件队列：管理事件（线程安全）
 template<typename Type>
 class EventQueue
 {

@@ -26,15 +26,15 @@ set(SRCS
     src/net/http.cpp
     src/net/http_parser.h
     src/net/http_parser.cpp
-    src/seda/macro.hpp
-    src/seda/event_queue.hpp     
-    src/seda/event_handler.hpp
-    src/seda/performeter.hpp
-    src/seda/thread_pool.hpp
+    src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp
     src/seda/stage_manager.h
     src/seda/stage_manager.cpp
+    src/seda/component/event_queue.hpp     
+    src/seda/component/event_handler.hpp
+    src/seda/component/performeter.hpp
+    src/seda/component/thread_pool.hpp
 )
 
 add_library(seda SHARED ${SRCS})
@@ -50,3 +50,5 @@ include_directories(src)
 
 add_executable(test_parser tests/test_parser.cpp)
 target_link_libraries(test_parser ${LIBS})
+add_executable(test_log tests/test_log.cpp)
+target_link_libraries(test_log ${LIBS})

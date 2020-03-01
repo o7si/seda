@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../pch.h"
+#include <chrono>
 
 namespace o7si
 {
 namespace seda
 {
     
-/// 性能监控器(默认容量为 100)
+/// 性能监控器：记录各项指标，默认容量为 100
 class Performeter
 {
 public:

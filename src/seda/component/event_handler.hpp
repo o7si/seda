@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../macro.h"
+
 namespace o7si
 {
 namespace seda
 {
 
-/// 事件处理器
+/// 事件处理器：存放事件处理函数
 template<typename Function>
 class EventHandler
 {

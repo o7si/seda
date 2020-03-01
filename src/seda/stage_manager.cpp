@@ -5,8 +5,8 @@ namespace o7si
 namespace seda
 {
 
+/// 饿汉式
 std::shared_ptr<StageManager> StageManager::instance(new StageManager);
-
 
 /// 注册 Stage 到管理类
 std::shared_ptr<Stage> StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> stage)
@@ -16,11 +16,11 @@ std::shared_ptr<Stage> StageManager::doRegister(const std::string& name, std::sh
     {
         // 注册成功
         mapping[name] = stage;
-        LOG_INFO << "register success: " << name;
+        //LOG_INFO << "register success: " << name;
         return stage;
     }
     // 注册失败
-    LOG_INFO << "register failure: " << name;
+    //LOG_INFO << "register failure: " << name;
     return nullptr;
 }
 
@@ -31,11 +31,11 @@ std::shared_ptr<Stage> StageManager::doLogin(const std::string& name)
     if (mapping.find(name) != mapping.end())
     {
         // 登录成功
-        LOG_INFO << "login success: " << name;
+        //LOG_INFO << "login success: " << name;
         return mapping[name];
     }
     // 登录失败
-    LOG_INFO << "login failure: " << name;
+    //LOG_INFO << "login failure: " << name;
     return nullptr;
 }
 

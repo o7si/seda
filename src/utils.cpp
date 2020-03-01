@@ -31,5 +31,33 @@ std::string get_thread_name()
     );    
     return std::string(buffer);
 }
+
+std::string to_upper(const std::string& str)
+{
+    std::string ret;
+    ret.resize(str.size());
+    std::transform(str.cbegin(), str.cend(), ret.begin(), ::toupper); 
+    return ret;
+}
+
+std::string to_lower(const std::string& str)
+{
+    std::string ret;
+    ret.resize(str.size());
+    std::transform(str.cbegin(), str.cend(), ret.begin(), ::tolower); 
+    return ret;
+}
+
+std::string load_file(const std::string& filename)
+{
+    std::ifstream stream(filename, std::ifstream::in);
+    std::string ret = {
+        std::istreambuf_iterator<char>(stream),
+        std::istreambuf_iterator<char>(), 
+    };
+    stream.close();
+    return ret;
+}
+
 }   // namespace utils
 }   // namespace o7si

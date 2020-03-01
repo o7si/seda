@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../pch.h"
-#include "macro.hpp"
+#include "../macro.h"
 #include "event_queue.hpp"
 #include "performeter.hpp"
 
@@ -10,7 +9,7 @@ namespace o7si
 namespace seda
 {
 
-/// 线程池
+/// 线程池：并行处理任务
 class ThreadPool
 {
 public:

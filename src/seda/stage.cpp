@@ -46,11 +46,11 @@ void Stage::next(const std::string& state, const std::string& stage)
     if (m_conver_mapping.find(state) != m_conver_mapping.end())
     {
         m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage); 
-        LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(repeat)";
+        //LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(repeat)";
     }
     // 首次设置该状态
     m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);
-    LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(first)";
+    //LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(first)";
 }
 
 ConverMapping Stage::next() const
@@ -87,22 +87,22 @@ size_t Stage::setPerformeterCapacity(size_t capacity)
 
 void Stage::performeter_internal_state() const
 {
-    LOG_INFO << "name = " << m_performeter.getName();
-    LOG_INFO << "capacity = " << m_performeter.getCapacity();
+    //LOG_INFO << "name = " << m_performeter.getName();
+    //LOG_INFO << "capacity = " << m_performeter.getCapacity();
 
-    LOG_INFO << "longest = " << m_performeter.longest_dura().count() << " s";
-    LOG_INFO << "longest(wait) = " << m_performeter.longest_wait_dura().count() << " s";
-    LOG_INFO << "longest(exec) = " << m_performeter.longest_exec_dura().count() << " s";
+    //LOG_INFO << "longest = " << m_performeter.longest_dura().count() << " s";
+    //LOG_INFO << "longest(wait) = " << m_performeter.longest_wait_dura().count() << " s";
+    //LOG_INFO << "longest(exec) = " << m_performeter.longest_exec_dura().count() << " s";
 
-    LOG_INFO << "sum = " << m_performeter.sum_dura().count() << " s";
-    LOG_INFO << "sum(wait) = " << m_performeter.sum_wait_dura().count() << " s";
-    LOG_INFO << "sum(exec) = " << m_performeter.sum_exec_dura().count() << " s";
+    //LOG_INFO << "sum = " << m_performeter.sum_dura().count() << " s";
+    //LOG_INFO << "sum(wait) = " << m_performeter.sum_wait_dura().count() << " s";
+    //LOG_INFO << "sum(exec) = " << m_performeter.sum_exec_dura().count() << " s";
 
-    LOG_INFO << "average = " << m_performeter.avg_dura().count() << " s";
-    LOG_INFO << "average(wait) = " << m_performeter.avg_wait_dura().count() << " s";
-    LOG_INFO << "average(exec) = " << m_performeter.avg_exec_dura().count() << " s";
+    //LOG_INFO << "average = " << m_performeter.avg_dura().count() << " s";
+    //LOG_INFO << "average(wait) = " << m_performeter.avg_wait_dura().count() << " s";
+    //LOG_INFO << "average(exec) = " << m_performeter.avg_exec_dura().count() << " s";
 
-    LOG_INFO << "counter = " << m_performeter.count();
+    //LOG_INFO << "counter = " << m_performeter.count();
 }
 
 void Stage::bind(EventHandlerFunc&& function)
