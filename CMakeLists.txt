@@ -48,7 +48,7 @@ set(LIBS
 
 include_directories(src)
 
-add_executable(test_parser tests/test_parser.cpp)
-target_link_libraries(test_parser ${LIBS})
 add_executable(test_log tests/test_log.cpp)
 target_link_libraries(test_log ${LIBS})
+add_executable(test_config tests/test_config.cpp)
+target_link_libraries(test_config ${LIBS})

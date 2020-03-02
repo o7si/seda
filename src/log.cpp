@@ -120,6 +120,9 @@ FileAppender::FileAppender(std::string filename, std::shared_ptr<Layout> layout)
         : Appender(std::move(layout)), m_filename(std::move(filename))
 {
     m_ofstream.open(m_filename, std::ofstream::out | std::ofstream::app);
+    // 如果无法打开目标文件
+    if (!m_ofstream.is_open())
+        throw std::logic_error("No such file: " + m_filename); 
 }
 
 FileAppender::~FileAppender()

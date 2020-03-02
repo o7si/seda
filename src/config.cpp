@@ -7,17 +7,63 @@ namespace config
 
 // ------------------------------------------------------------------------------
 
+std::shared_ptr<PathManager> PathManager::instance(new PathManager());
+
+std::shared_ptr<PathManager> PathManager::Instance()
+{
+    return instance;    
+}
+
+void PathManager::set(const std::string& key, const std::string& value)
+{
+    m_paths[key] = value;    
+}
+
+std::string PathManager::get(const std::string& key, const std::string& def)
+{
+    if (!exist(key))
+        return def + "/";
+    return m_paths[key]; 
+}
+
+void PathManager::remove(const std::string& key)
+{
+    if (!exist(key))
+        return;    
+    m_paths.erase(m_paths.find(key));
+}
+
+bool PathManager::exist(const std::string& key)
+{
+    return has(key); 
+}
+
+bool PathManager::has(const std::string& key)
+{
+    return m_paths.find(key) != m_paths.end(); 
+}
+
+// ------------------------------------------------------------------------------
+
 void load(const std::string& filename)
 {
     // 载入配置文件
-    //LOG_INFO << "Loading...(config)";
+    LOG_INFO_SYS << "Loading...(config)";
     YAML::Node config = YAML::LoadFile(filename);    
     
+    // 载入路径配置
+    LOG_INFO_SYS << "Loading...(config.path)";
+    YAML::Node path_config = config["path"];
+    path_config >> *o7si::config::PathManager::Instance();
+    LOG_INFO_SYS << "Complete(config.path)";
+
     // 日志模块的配置
-    //LOG_INFO << "Loading...(config.log)";
+    LOG_INFO_SYS << "Loading...(config.log)";
     YAML::Node log_config = config["log"];
-    //log_config >> *o7si::log::Logger::getInstance();
-    //LOG_INFO << "Load complete(config.log)";
+    log_config >> *o7si::log::LoggerManager::Instance();
+    LOG_INFO_SYS << "Complete(config.log)";
+
+    return;
 
     // Stage 的配置
     //LOG_INFO << "Loading...(config.stage)";
@@ -33,50 +79,64 @@ void load(const std::string& filename)
 
 // ------------------------------------------------------------------------------
 
-void operator>>(const YAML::Node& yaml, o7si::log::Logger& logger)
+void operator>>(const YAML::Node& yaml, o7si::config::PathManager& manager)
 {
-    /*
-    // 清空输出地(默认有一个控制台输出地)
-    o7si::log::Logger::getInstance()->clearAppenders();
-
-    // 设置全局日志级别
-    YAML::Node level = yaml["level"];
-    logger.setLevel(o7si::log::FromString(level.as<std::string>()));
-
-    // 设置日志输出地
-    YAML::Node appender = yaml["appender"];
-    for (auto iter = appender.begin(); iter != appender.end(); ++ iter)
+    // 读取每一组键值对
+    for (auto iter = yaml.begin(); iter != yaml.end(); ++ iter)
     {
-        std::string type = (*iter)["type"].as<std::string>();
-        std::string pattern = (*iter)["pattern"].as<std::string>();
+        std::string key = iter->first.as<std::string>();
+        std::string value = iter->second.as<std::string>();
+        
+        manager.set(key, value);   
+    }
+}
 
-        // 控制台输出地
-        if (type == "ConsoleAppender")
+void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
+{
+    for (auto i = yaml.begin(); i != yaml.end(); ++ i)
+    {
+        // 日志名称
+        std::string name = i->first.as<std::string>();
+        // 日志级别
+        std::string level = i->second["level"].as<std::string>();
+        // 注册一个日志用户
+        manager.doRegister(name, o7si::log::GenLevelFrom(level));
+
+        auto user = manager.doLogin(name);
+        YAML::Node appenders = i->second["appender"];
+        for (auto j = appenders.begin(); j != appenders.end(); ++ j)
         {
-            logger.addAppender(
-                std::make_shared<o7si::log::ConsoleAppender>(
-                    std::make_shared<o7si::log::Layout>(std::move(pattern))      
-            ));
-            continue;
-        }
+            // 输出地类型
+            std::string type = o7si::utils::to_lower((*j)["type"].as<std::string>());
+            // 日志输出格式
+            std::string pattern = (*j)["pattern"].as<std::string>();
 
-        // 文件输出地
-        if (type == "FileAppender")
-        {
-            std::string file = (*iter)["file"].as<std::string>();
-            logger.addAppender(
-                std::make_shared<o7si::log::FileAppender>(
-                    std::move(file), 
-                    std::make_shared<o7si::log::Layout>(std::move(pattern))
-            ));
-            continue;
+            // 控制台输出地
+            if (type == "consoleappender")
+            {
+                user->add_appender(
+                    std::make_shared<o7si::log::ConsoleAppender>(
+                        std::make_shared<o7si::log::Layout>(pattern)  
+                    )
+                ); 
+            }
+            // 文件输出地
+            else if (type == "fileappender")
+            {
+                std::string path = PathManager::Instance()->get("log", "/tmp/");
+                std::string file = path + (*j)["file"].as<std::string>();
+                user->add_appender(
+                    std::make_shared<o7si::log::FileAppender>(
+                        file, std::make_shared<o7si::log::Layout>(pattern) 
+                    )
+                );     
+            }
+            // 其它输出地
+            else
+            {
+            } 
         }
-
-        // other
-    } 
-    */
-    // 异常
-    // throw
+    }
 }
 
 void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
