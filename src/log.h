@@ -4,15 +4,18 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+#include <vector>
 #include <string>
 #include <list>
 #include <unordered_map>
 #include <memory>
 #include <chrono>
+#include <functional>
 
 #include "utils.h"
 
-#define LOG(level, user) \
+/// 日志的宏定义模板
+#define LOG_TEMPLATE(level, user, check) \
     o7si::log::Event( \
             o7si::log::LoggerManager::Instance()->doLogin(#user), \
             o7si::log::GenLevelFrom(#level), \
@@ -23,22 +26,99 @@
                 __FILE__, \
                 __FUNCTION__, \
                 __LINE__, \
-                o7si::utils::to_lower(#user) \
-    )).stream()
+                o7si::utils::to_lower(#user)), \
+            check \
+        ).stream()
 
-/// 用户输出
+/// 普通日志
+#define LOG(level, user) LOG_TEMPLATE(level, user, true)
+
 #define LOG_DEBUG(user) LOG(DEBUG, user)
 #define LOG_INFO(user) LOG(INFO, user)
 #define LOG_WARN(user) LOG(WARN, user)
 #define LOG_ERROR(user) LOG(ERROR, user)
-#define LOG_FATAL(user) LOG(TATAL, user)
+#define LOG_FATAL(user) LOG(FATAL, user)
 
-/// 系统输出
-#define LOG_DEBUG_SYS LOG(DEBUG, SYS)
-#define LOG_INFO_SYS LOG(INFO, SYS)
-#define LOG_WARN_SYS LOG(WARN, SYS)
-#define LOG_ERROR_SYS LOG(ERROR, SYS)
-#define LOG_FATAL_SYS LOG(FATAL, SYS)
+#define LOG_DEBUG_SYS LOG_DEBUG(SYSTEM)
+#define LOG_INFO_SYS LOG_INFO(SYSTEM)
+#define LOG_WARN_SYS LOG_WARN(SYSTEM)
+#define LOG_ERROR_SYS LOG_ERROR(SYSTEM)
+#define LOG_FATAL_SYS LOG_FATAL(SYSTEM)
+
+/// 带检查的日志，当 check 与 target 的值相同时才输出日志
+#define LOG_CHECK(level, user, check, target) LOG_TEMPLATE(level, user, (check) == target)
+
+#define LOG_CHECK_SYS(level, check, target) LOG_CHECK(level, SYSTEM, check, target)
+
+#define LOG_DEBUG_CHECK(user, check, target) LOG_CHECK(DEBUG, user, check, target)
+#define LOG_INFO_CHECK(user, check, target) LOG_CHECK(INFO, user, check, target)
+#define LOG_WARN_CHECK(user, check, target) LOG_CHECK(WARN, user, check, target)
+#define LOG_ERROR_CHECK(user, check, target) LOG_CHECK(ERROR, user, check, target)
+#define LOG_FATAL_CHECK(user, check, target) LOG_CHECK(FATAL, user, check, target)
+
+#define LOG_DEBUG_CHECK_SYS(check, target) LOG_DEBUG_CHECK(SYSTEM, check, target)
+#define LOG_INFO_CHECK_SYS(check, target) LOG_INFO_CHECK(SYSTEM, check, target)
+#define LOG_WARN_CHECK_SYS(check, target) LOG_WARN_CHECK(SYSTEM, check, target)
+#define LOG_ERROR_CHECK_SYS(check, target) LOG_ERROR_CHECK(SYSTEM, check, target)
+#define LOG_FATAL_CHECK_SYS(check, target) LOG_FATAL_CHECK(SYSTEM, check, target)
+
+#define LOG_SYS_CHECK LOG_CHECK_SYS
+
+#define LOG_DEBUG_SYS_CHECK LOG_DEBUG_CHECK_SYS
+#define LOG_INFO_SYS_CHECK LOG_INFO_CHECK_SYS
+#define LOG_WARN_SYS_CHECK LOG_WARN_CHECK_SYS
+#define LOG_ERROR_SYS_CHECK LOG_ERROR_CHECK_SYS
+#define LOG_FATAL_SYS_CHECK LOG_FATAL_CHECK_SYS
+
+/// 带检查的日志，当 check 值为真时才输出日志
+#define LOG_CHECK_TRUE(level, user, check) LOG_TEMPLATE(level, user, (check) == true)
+
+#define LOG_CHECK_TRUE_SYS(level, check) LOG_CHECK_TRUE(level, SYSTEM, check)
+
+#define LOG_DEBUG_CHECK_TRUE(user, check) LOG_CHECK_TRUE(DEBUG, user, check)
+#define LOG_INFO_CHECK_TRUE(user, check) LOG_CHECK_TRUE(INFO, user, check)
+#define LOG_WARN_CHECK_TRUE(user, check) LOG_CHECK_TRUE(WARN, user, check)
+#define LOG_ERROR_CHECK_TRUE(user, check) LOG_CHECK_TRUE(ERROR, user, check)
+#define LOG_FATAL_CHECK_TRUE(user, check) LOG_CHECK_TRUE(FATAL, user, check)
+
+#define LOG_DEBUG_CHECK_TRUE_SYS(check) LOG_DEBUG_CHECK_TRUE(SYSTEM, check)
+#define LOG_INFO_CHECK_TRUE_SYS(check) LOG_INFO_CHECK_TRUE(SYSTEM, check)
+#define LOG_WARN_CHECK_TRUE_SYS(check) LOG_WARN_CHECK_TRUE(SYSTEM, check)
+#define LOG_ERROR_CHECK_TRUE_SYS(check) LOG_ERROR_CHECK_TRUE(SYSTEM, check)
+#define LOG_FATAL_CHECK_TRUE_SYS(check) LOG_FATAL_CHECK_TRUE(SYSTEM, check)
+
+#define LOG_SYS_CHECK_TRUE LOG_CHECK_TRUE_SYS
+
+#define LOG_DEBUG_SYS_CHECK_TRUE LOG_DEBUG_CHECK_TRUE_SYS
+#define LOG_INFO_SYS_CHECK_TRUE LOG_INFO_CHECK_TRUE_SYS
+#define LOG_WARN_SYS_CHECK_TRUE LOG_WARN_CHECK_TRUE_SYS
+#define LOG_ERROR_SYS_CHECK_TRUE LOG_ERROR_CHECK_TRUE_SYS
+#define LOG_FATAL_SYS_CHECK_TRUE LOG_FATAL_CHECK_TRUE_SYS
+
+/// 带检查的日志，当 check 值为假时才输出日志
+#define LOG_CHECK_FALSE(level, user, check) LOG_TEMPLATE(level, user, (check) == false)
+
+#define LOG_CHECK_FALSE_SYS(level, check) LOG_CHECK_FALSE(level, SYSTEM, check)
+
+#define LOG_DEBUG_CHECK_FALSE(user, check) LOG_CHECK_FALSE(DEBUG, user, check)
+#define LOG_INFO_CHECK_FALSE(user, check) LOG_CHECK_FALSE(INFO, user, check)
+#define LOG_WARN_CHECK_FALSE(user, check) LOG_CHECK_FALSE(WARN, user, check)
+#define LOG_ERROR_CHECK_FALSE(user, check) LOG_CHECK_FALSE(ERROR, user, check)
+#define LOG_FATAL_CHECK_FALSE(user, check) LOG_CHECK_FALSE(FATAL, user, check)
+
+#define LOG_DEBUG_CHECK_FALSE_SYS(check) LOG_DEBUG_CHECK_FALSE(SYSTEM, check)
+#define LOG_INFO_CHECK_FALSE_SYS(check) LOG_INFO_CHECK_FALSE(SYSTEM, check)
+#define LOG_WARN_CHECK_FALSE_SYS(check) LOG_WARN_CHECK_FALSE(SYSTEM, check)
+#define LOG_ERROR_CHECK_FALSE_SYS(check) LOG_ERROR_CHECK_FALSE(SYSTEM, check)
+#define LOG_FATAL_CHECK_FALSE_SYS(check) LOG_FATAL_CHECK_FALSE(SYSTEM, check)
+
+#define LOG_SYS_CHECK_FALSE LOG_CHECK_FALSE_SYS
+
+#define LOG_DEBUG_SYS_CHECK_FALSE LOG_DEBUG_CHECK_FALSE_SYS
+#define LOG_INFO_SYS_CHECK_FALSE LOG_INFO_CHECK_FALSE_SYS
+#define LOG_WARN_SYS_CHECK_FALSE LOG_WARN_CHECK_FALSE_SYS
+#define LOG_ERROR_SYS_CHECK_FALSE LOG_ERROR_CHECK_FALSE_SYS
+#define LOG_FATAL_SYS_CHECK_FALSE LOG_FATAL_CHECK_FALSE_SYS
 
 namespace o7si
 {
@@ -116,7 +196,7 @@ public:
     };
 
     /// 构造函数
-    Event(std::shared_ptr<Logger> logger, Level level, Information information);
+    Event(std::shared_ptr<Logger> logger, Level level, Information information, bool condition = true);
 
     /// 析构函数
     ~Event();
@@ -130,6 +210,8 @@ public:
 private:
     /// 日志事件信息
     Information m_information;
+    /// 条件检查
+    bool m_condition;
     /// 日志级别
     Level m_level;
     /// 日志器
@@ -272,6 +354,18 @@ public:
 
     /// 登录
     std::shared_ptr<Logger> doLogin(const std::string& user);
+    
+    /// 注册时的行为定义
+    void register_behavior(int behavior)
+    {
+        m_register_behavior = behavior;    
+    }
+
+    /// 登录时的行为定义
+    void login_behavior(int behavior)
+    {
+        m_login_behavior = behavior;    
+    } 
 
 public:
     /// 获取 LoggerManager 的单例对象
@@ -283,9 +377,60 @@ public:
     /// 删除移动构造函数，防止用户使用移动语义
     LoggerManager(LoggerManager&& other) = delete;
 
+private:
+    /// 注册行为：0
+    std::shared_ptr<Logger> register_behavior_0(const std::string& user, Level level);
+
+    /// 注册行为：1
+    std::shared_ptr<Logger> register_behavior_1(const std::string& user, Level level);
+
+    /// 注册行为：2
+    std::shared_ptr<Logger> register_behavior_2(const std::string& user, Level level);
+
+    /// 登录行为：0
+    std::shared_ptr<Logger> login_behavior_0(const std::string& user);
+
+    /// 登录行为：1
+    std::shared_ptr<Logger> login_behavior_1(const std::string& user);
+
+    /// 登录行为：2
+    std::shared_ptr<Logger> login_behavior_2(const std::string& user);
+
+    /// 登录行为：3
+    std::shared_ptr<Logger> login_behavior_3(const std::string& user);
+
 private: 
     /// 将构造函数修饰为私有，防止用户擅自实例化对象
     LoggerManager();   
+
+    /// 注册行为
+    /// 0：
+    ///     用户未被注册，正常注册并返回对应指针
+    ///     用户已被注册，返回对应指针
+    /// 1：
+    ///     用户未被注册，正常注册并返回对应指针
+    ///     用户已被注册，返回空指针
+    /// 2：
+    ///     禁止注册，返回空指针
+    int m_register_behavior;
+    using RegisterBehavior = std::function<std::shared_ptr<Logger>(const std::string&, Level)>;
+    std::vector<RegisterBehavior> m_register_behavior_list;
+
+    /// 登录行为
+    /// 0：
+    ///     用户已被注册，返回对应指针
+    ///     用户未被注册，帮助其完成注册，返回对应指针
+    /// 1：
+    ///     用户已被注册，返回对应指针
+    ///     用户未被注册，帮助其完成注册，并添加一个默认的控制台输出地，返回对应指针
+    /// 2：
+    ///     用户已被注册，返回对应指针
+    ///     用户未被注册，返回空指针
+    /// 3：
+    ///     禁止登录，返回空指针
+    int m_login_behavior;
+    using LoginBehavior = std::function<std::shared_ptr<Logger>(const std::string&)>;
+    std::vector<LoginBehavior> m_login_behavior_list;
 
     /// 映射表
     std::unordered_map<std::string, std::shared_ptr<Logger>> m_table;
