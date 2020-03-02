@@ -63,13 +63,11 @@ void load(const std::string& filename)
     log_config >> *o7si::log::LoggerManager::Instance();
     LOG_INFO_SYS << "Complete(config.log)";
 
-    return;
-
     // Stage 的配置
-    //LOG_INFO << "Loading...(config.stage)";
+    LOG_INFO_SYS << "Loading...(config.stage)";
     YAML::Node stage_config = config["stage"];
     stage_config >> *o7si::seda::StageManager::getInstance();
-    //LOG_INFO << "Load complete(config.stage)";
+    LOG_INFO_SYS << "Complete(config.stage)";
 
     // 其它模块的配置
     // ...

@@ -1,5 +1,7 @@
-#include "config.h"
-#include "log.h"
+#include <config.h>
+#include <log.h>
+
+#include "stage/test01.h"
 
 void test_config_path()
 {
@@ -29,10 +31,33 @@ void test_config_log()
     LOG_FATAL(my-log-2) << "fatal"; 
 }
 
+void test_config_stage()
+{
+    using namespace o7si::seda;
+    auto stage1 = StageManager::getInstance()->doLogin("Stage1");
+    auto stage2 = StageManager::getInstance()->doLogin("Stage2");
+    auto stage3 = StageManager::getInstance()->doLogin("Stage3");
+    auto stage4 = StageManager::getInstance()->doLogin("Stage4");
+
+    auto stage1_mapping = stage1->next(); 
+    for (const auto& item : stage1_mapping)
+        LOG_INFO_SYS << item.first << " " << item.second->getName();
+    auto stage2_mapping = stage2->next(); 
+    for (const auto& item : stage2_mapping)
+        LOG_INFO_SYS << item.first << " " << item.second->getName();
+    auto stage3_mapping = stage3->next(); 
+    for (const auto& item : stage3_mapping)
+        LOG_INFO_SYS << item.first << " " << item.second->getName();
+    auto stage4_mapping = stage4->next(); 
+    for (const auto& item : stage4_mapping)
+        LOG_INFO_SYS << item.first << " " << item.second->getName();
+}
+
 int main(int argc, char* argv[])
 {
     o7si::config::load("/root/reps/seda/conf/test.conf");
     test_config_path();    
     test_config_log();
+    test_config_stage();
     return 0;   
 }

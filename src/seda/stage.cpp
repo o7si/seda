@@ -29,7 +29,7 @@ std::string Stage::getShortName() const
     // 名称中的每一个大写字母
     std::string short_name;
     for (const auto& ch : m_name)
-        if (isupper(ch))
+        if (isupper(ch) || isdigit(ch))
             short_name += ch;
     return short_name;    
 }
@@ -46,11 +46,11 @@ void Stage::next(const std::string& state, const std::string& stage)
     if (m_conver_mapping.find(state) != m_conver_mapping.end())
     {
         m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage); 
-        //LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(repeat)";
+        LOG_WARN_SYS << m_name << " set state: " << state << " -> " << stage << "(repeat)";
     }
     // 首次设置该状态
     m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);
-    //LOG_INFO << m_name << " set state: " << state << " -> " << stage << "(first)";
+    LOG_INFO_SYS << m_name << " set state: " << state << " -> " << stage << "(first)";
 }
 
 ConverMapping Stage::next() const

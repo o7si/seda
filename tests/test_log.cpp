@@ -1,4 +1,4 @@
-#include "log.h"
+#include <log.h>
 
 void test_log_print()
 {    

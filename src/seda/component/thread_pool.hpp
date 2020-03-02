@@ -52,6 +52,8 @@ public:
         // 如果线程池已经被初始化
         if (m_initialize)
             return; 
+        m_initialize = true;
+
         // 如果线程池未被初始化
         for (size_t i = 0; i < m_capacity; ++ i)
             m_threads.emplace_back(ThreadWorker(this, i));
@@ -63,6 +65,8 @@ public:
         // 如果线程池已经被初始化
         if (m_initialize)
             return;
+        m_initialize = true;
+
         // 如果线程池未被初始化
         number = std::min(number, m_capacity);
         for (size_t i = 0; i < number; ++ i)
@@ -132,11 +136,12 @@ private:
         ThreadWorker(ThreadPool* pool, size_t id)
             : m_pool(pool), m_id(id)
         {
-            o7si::utils::set_thread_name(pool->m_name + "_" + std::to_string(id));
+            m_thread_name = pool->m_name + "_" + std::to_string(id);
         }
          
         void operator()()
         {
+            o7si::utils::set_thread_name(m_thread_name);
             // 循环执行，直到线程池被关闭
             while (!m_pool->m_shutdown) 
             {
@@ -171,6 +176,9 @@ private:
     private:    
         ThreadPool* m_pool;
         size_t m_id;
+
+        /// 线程名称
+        std::string m_thread_name;
     };
 };
 
