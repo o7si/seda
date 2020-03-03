@@ -4,6 +4,10 @@
 #include "event_queue.hpp"
 #include "performeter.hpp"
 
+#include <atomic>
+#include <thread>
+#include <condition_variable>
+
 namespace o7si
 {
 namespace seda

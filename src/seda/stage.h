@@ -1,6 +1,5 @@
 #pragma once 
 
-#include "../pch.h"
 #include "../log.h"
 
 #include "macro.h"
@@ -10,6 +9,10 @@
 #include "component/event_handler.hpp"
 #include "component/thread_pool.hpp"
 #include "component/performeter.hpp"
+
+#include <future>
+#include <functional>
+#include <boost/any.hpp>
 
 namespace o7si
 {

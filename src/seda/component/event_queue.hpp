@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../macro.h"
+
 #include <mutex>
 #include <queue>
-
-#include "../macro.h"
 
 namespace o7si
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../macro.h"
+
 #include <chrono>
 
 namespace o7si

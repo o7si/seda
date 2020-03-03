@@ -15,7 +15,6 @@ set(HTTP_ANALYSIS_SRCS
 add_library(http-analysis SHARED ${HTTP_ANALYSIS_SRCS})
 
 set(SRCS
-    src/pch.h
     src/log.h
     src/log.cpp
     src/config.h 

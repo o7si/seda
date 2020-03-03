@@ -4,8 +4,8 @@
 #define REGISTER_STAGE(stage) \
 auto __reg_##stage = [] \
 { \
-    auto reg_stage = NAMESPACE_SEDA::StageManager::getInstance()->doRegister( \
-        #stage, std::make_shared<NAMESPACE_SEDA::stage>(#stage) \
+    auto reg_stage = o7si::seda::StageManager::getInstance()->doRegister( \
+        #stage, std::make_shared<o7si::seda::stage>(#stage) \
     ); \
     reg_stage->bind([reg_stage](boost::any& args) \
     { \
@@ -15,7 +15,7 @@ auto __reg_##stage = [] \
 }();
 
 /// 登录(Stage)
-#define LOGIN_STAGE(name) NAMESPACE_SEDA::StageManager::getInstance()->doLogin(#name);
+#define LOGIN_STAGE(name) o7si::seda::StageManager::getInstance()->doLogin(#name);
 
 /// 状态转换表
 #define ConverMapping std::unordered_map<std::string, std::shared_ptr<Stage>>
