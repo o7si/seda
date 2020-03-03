@@ -23,7 +23,7 @@ std::string PathManager::get(const std::string& key, const std::string& def)
 {
     if (!exist(key))
         return def + "/";
-    return m_paths[key]; 
+    return m_paths[key] + "/"; 
 }
 
 void PathManager::remove(const std::string& key)
@@ -72,7 +72,7 @@ void load(const std::string& filename)
     // 其它模块的配置
     // ...
 
-    //LOG_INFO << "Load complete(config)";
+    LOG_INFO_SYS << "Complete(config)";
 }
 
 // ------------------------------------------------------------------------------

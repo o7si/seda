@@ -18,8 +18,13 @@ void test_stage()
     while (true)
     {
         stage1->call(0);   
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         stage1->call(0);   
+        stage1->call(0);   
+        stage1->call(0);   
+        stage1->call(0);   
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+
+        stage1->performeter_internal_state();
     }
 }
 

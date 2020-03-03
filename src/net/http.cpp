@@ -196,6 +196,8 @@ std::ostream& HttpResponse::dump(std::ostream& stream)
     {
         stream << elem.first << ": " << elem.second << "\r\n";     
     }
+    stream << "Content-Length: " << m_body.size() << "\r\n";
+
     // 空行
     stream << "\r\n";
     // 主体

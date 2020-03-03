@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include <yaml-cpp/yaml.h>
 
 #include "log.h"

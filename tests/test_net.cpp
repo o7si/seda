@@ -1,4 +1,5 @@
 #include <net/http.h>
+#include <net/http_parser.h>
 #include <arpa/inet.h>
 #include <cstring>
 #include <unistd.h>
@@ -12,7 +13,16 @@ HttpResponse make_response()
     //response.reason_phrase(HttpStatusToString(response.status()));
     response.reason_phrase("test");
     response.version(GenVersionFrom("HTTP/1.1"));
-    response.body("<html><head></head><body>seda</body></html>");
+    response.body(R"+(
+    <html>
+    <head>
+        <link rel="icon" href="data:;base64,=">
+    </head>
+    <body>
+        <a href="test.html">test</a>
+    </body>
+    </html>
+    )+");
 
     return response;
 }
@@ -39,9 +49,25 @@ int main(int argc, char* argv[])
     
     HttpResponse response = make_response();
     std::string format = response.format();
-    std::cout << format << std::endl;
+    // 发送网页数据
     write(client_fd, format.data(), format.size());
     
+    while (true)
+    {
+        char buffer[BUFSIZ];
+        int len = read(client_fd, buffer, BUFSIZ);
+        //if (len == 0)
+          //  break;
+        std::cout << buffer << std::endl;    
+        continue;
+        HttpRequestParser parser;
+        parser.parser_execute(buffer, len); 
+        auto req = parser.inner_request();
+        std::cout << "发送数据" << std::endl;
+        std::cout << req->format() << std::endl;
+
+    }
+
     close(client_fd);
     close(server_fd);  
     return 0;

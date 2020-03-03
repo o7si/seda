@@ -5,6 +5,14 @@ namespace o7si
 namespace utils
 {
 
+
+time_t get_timestamp()
+{
+    return std::chrono::system_clock::to_time_t(
+        std::chrono::system_clock::now()
+    );    
+}
+
 uint64_t get_thread_id()
 {
     // C

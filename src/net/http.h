@@ -426,6 +426,7 @@ public:
 
     /// 将数据格式化并输出至流
     std::ostream& dump(std::ostream& stream);
+
 private:    
     HttpStatus m_status;
     HttpVersion m_version;
