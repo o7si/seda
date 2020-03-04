@@ -53,11 +53,23 @@ void test_config_stage()
         LOG_INFO_SYS << item.first << " " << item.second->getName();
 }
 
+void test_replace_layout()
+{
+    using namespace o7si::log;
+    auto user = LoggerManager::Instance()->doLogin("system");
+    LOG_INFO_SYS << "before";
+    std::list<std::shared_ptr<Appender>> apps = user->appenders();
+    std::shared_ptr<Appender> app = *apps.begin();
+    app->layout(std::make_shared<Layout>("%u|%u|%u %c")); 
+    LOG_INFO_SYS << "end";
+}
+
 int main(int argc, char* argv[])
 {
     o7si::config::load("/root/reps/seda/conf/test.conf");
-    test_config_path();    
+    //test_config_path();    
     test_config_log();
-    test_config_stage();
+    //test_config_stage();
+    test_replace_layout();
     return 0;   
 }

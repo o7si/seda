@@ -102,26 +102,96 @@ Layout::Layout(std::string pattern)
 std::string Layout::formatter(Level level, 
                               const Event::Information& information)
 {
-    // 说明使用者指定了输出格式
-    if (!m_pattern.empty())
-    {
-        // 暂不支持
-        // TODO：支持格式设定
-        return "";    
-    }
-
-    // 当未指定输出格式时，输出默认格式
     std::ostringstream stream;
-    stream << "[" << std::put_time(std::localtime(&information.m_time), 
+    // 使用默认格式进行输出
+    if (m_pattern == "default")
+    {
+        stream << "[" << std::put_time(std::localtime(&information.m_time), 
                                    "%Y-%m-%d %H:%M:%S") << "]"
-           << "[" << information.m_threadId << ":" 
-           << information.m_threadName << "]"
-           << "[" << information.m_fileName << ":" 
-           << information.m_funcName << ":" << information.m_line << "]"
-           << "[" << level << "]" 
-           << "[" << information.m_user << "]"
-           << " "
-           << information.m_stream.str();
+               << "[" << information.m_threadId << ":" 
+               << information.m_threadName << "]"
+               << "[" << information.m_fileName << ":" 
+               << information.m_funcName << ":" << information.m_line << "]"
+               << "[" << level << "]" 
+               << "[" << information.m_user << "]"
+               << " "
+               << information.m_stream.str();
+        return stream.str();
+    }
+    // 格式化日志
+    // 为效率考虑，仅作简单的解析，不进行错误处理
+    for (int i = 0; i < m_pattern.size(); ++ i)
+    {
+        // 非占位符
+        if (m_pattern[i] != '%')    
+        {
+            stream << m_pattern[i];
+            continue;
+        }
+        // 末尾
+        if (++ i >= m_pattern.size())
+        {
+            stream << '%';
+            continue;
+        }
+        // 日期时间
+        if (m_pattern[i] == 'd')
+        {
+            stream << std::put_time(std::localtime(&information.m_time), 
+                                   "%Y-%m-%d %H:%M:%S");
+            continue;
+        }
+        // 线程 ID
+        if (m_pattern[i] == 'i')
+        {
+            stream << information.m_threadId;
+            continue;    
+        }
+        // 线程名称
+        if (m_pattern[i] == 't')
+        {
+            stream << information.m_threadName;
+            continue;    
+        }
+        // 文件名称
+        if (m_pattern[i] == 'f')
+        {
+            stream << information.m_fileName;
+            continue;    
+        }
+        // 函数名称
+        if (m_pattern[i] == 'm')
+        {
+            stream << information.m_funcName;
+            continue;    
+        }
+        // 行号
+        if (m_pattern[i] == 'l')
+        {
+            stream << information.m_line;
+            continue;    
+        }
+        // 日志级别
+        if (m_pattern[i] == 'v')
+        {
+            stream << level;
+            continue;
+        }
+        // 用户
+        if (m_pattern[i] == 'u')
+        {
+            stream << information.m_user;    
+            continue;
+        }
+        // 内容
+        if (m_pattern[i] == 'c')
+        {
+            stream << information.m_stream.str();    
+            continue;
+        }
+        // 未定义占位符 
+        stream << '%' << m_pattern[i];
+    }
     return stream.str();
 }
 
@@ -202,9 +272,9 @@ std::shared_ptr<LoggerManager> LoggerManager::Instance()
 LoggerManager::LoggerManager()
 {
     // 默认有一个系统用户，日志级别为 INFO
-    m_table["system"] = std::make_shared<Logger>(Level::INFO);    
+    m_table[LOG_SYSTEM_USER] = std::make_shared<Logger>(Level::INFO);    
     // 给系统用户添加一个默认的控制台输出地
-    m_table["system"]->add_appender(
+    m_table[LOG_SYSTEM_USER]->add_appender(
         std::make_shared<ConsoleAppender>(
             std::make_shared<Layout>()
         )

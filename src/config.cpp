@@ -98,9 +98,8 @@ void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
         // 日志级别
         std::string level = i->second["level"].as<std::string>();
         // 注册一个日志用户
-        manager.doRegister(name, o7si::log::GenLevelFrom(level));
-
-        auto user = manager.doLogin(name);
+        auto user = manager.doRegister(name, o7si::log::GenLevelFrom(level));
+        // 日志的输出地
         YAML::Node appenders = i->second["appender"];
         for (auto j = appenders.begin(); j != appenders.end(); ++ j)
         {

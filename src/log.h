@@ -19,6 +19,10 @@
 
 #include "utils.h"
 
+
+// 日志的系统用户，用于框架的内部输出
+#define LOG_SYSTEM_USER "system"
+
 // 为实用性和灵活性考虑，定义了多组日志宏
 // 宏定义中出现 DEBUG/INFO/WARN/ERROR/FATAL 表示日志的输出级别
 // 宏定义中出现 CHECK 时，表示输出日志时会进行条件判断
@@ -217,6 +221,7 @@ std::ostream& operator<<(std::ostream& stream, const Level& level);
 // ----------------------------------------------------------------------------
 
 class Logger;
+
 // 日志事件
 // 存储日志信息，析构时将日志输出至输出地
 class Event
@@ -225,6 +230,11 @@ public:
     // 日志事件信息
     struct Information
     {
+        Information(time_t time,
+                    uint32_t threadId, std::string threadName,
+                    std::string fileName, std::string funcName, uint32_t line,
+                    std::string user);
+
         // 时间戳
         time_t m_time;
         // 线程 ID
@@ -241,16 +251,6 @@ public:
         std::string m_user;
         // 内容
         std::ostringstream m_stream;
-
-        std::ostringstream& stream()
-        {
-            return m_stream;
-        }
-
-        Information(time_t time,
-                    uint32_t threadId, std::string threadName,
-                    std::string fileName, std::string funcName, uint32_t line,
-                    std::string user);
     };
 
     Event(std::shared_ptr<Logger> logger, 
@@ -262,7 +262,7 @@ public:
 
     std::ostringstream& stream()
     {
-        return m_information.stream();
+        return m_information.m_stream;
     }
 
 private:
@@ -280,15 +280,36 @@ private:
 
 // 日志格式控制器
 // 调整日志的输出格式
+// 由于格式化时需要消耗一定的资源，建议使用默认格式
+// 即"[%d][%i:%t][%f:%m:%l][%v][%u] %c"
 class Layout
 {
 public:
-    explicit Layout(std::string pattern = "");
+    explicit Layout(std::string pattern = "default");
     
+    std::string pattern() const
+    {
+        return m_pattern;
+    }
+
+    void pattern(std::string pattern)
+    {
+        m_pattern = std::move(pattern);
+    }
+
     std::string formatter(Level level, const Event::Information& information);
 
 private:
     // 格式约定
+    // %d   日期时间
+    // %i   线程 ID
+    // %t   线程名称
+    // %f   文件名称
+    // %m   函数名称
+    // %l   行号
+    // %v   日志级别
+    // %u   用户
+    // %c   内容
     std::string m_pattern;
 };
 
@@ -301,6 +322,16 @@ public:
     explicit Appender(std::shared_ptr<Layout> layout);
 
     virtual ~Appender() = default;
+    
+    std::shared_ptr<Layout> layout()
+    {
+        return m_layout;    
+    } 
+
+    void layout(std::shared_ptr<Layout> layout)
+    {
+        m_layout = layout;
+    }
 
     virtual void write(Level level, const Event::Information& information) = 0;
 
@@ -324,9 +355,19 @@ public:
 class FileAppender : public Appender
 {
 public:
-    explicit FileAppender(std::string fileName, std::shared_ptr<Layout> layout);
+    explicit FileAppender(std::string filename, std::shared_ptr<Layout> layout);
 
     ~FileAppender();
+
+    std::string filename() const
+    {
+        return m_filename; 
+    }
+    
+    void filename(std::string filename)
+    {
+        m_filename = std::move(filename);    
+    }
 
     void write(Level level, const Event::Information& information) override;
 
@@ -347,14 +388,14 @@ public:
 
     ~Logger();
 
-    void level(Level value)
-    {
-        m_baseline = value;
-    }
-
     Level level() const
     {
         return m_baseline;    
+    }
+    
+    void level(Level value)
+    {
+        m_baseline = value;
     }
 
     void appenders(std::initializer_list<std::shared_ptr<Appender>> appenders)
@@ -362,7 +403,7 @@ public:
         m_appenders = appenders;
     }
 
-    std::list<std::shared_ptr<Appender>> appenders() const
+    std::list<std::shared_ptr<Appender>> appenders()
     {
         return m_appenders;
     }
@@ -400,25 +441,25 @@ public:
     // 登录
     std::shared_ptr<Logger> doLogin(const std::string& user);
     
+    int register_behavior() const
+    {
+        return m_register_behavior;    
+    }
+
     void register_behavior(int behavior)
     {
         m_register_behavior = behavior;    
     }
 
-    int register_behavior() const
+    int login_behavior() const
     {
-        return m_register_behavior;    
+        return m_login_behavior;    
     }
 
     void login_behavior(int behavior)
     {
         m_login_behavior = behavior;    
     } 
-
-    int login_behavior() const
-    {
-        return m_login_behavior;    
-    }
 
 public:
     // 获取 LoggerManager 的单例对象
