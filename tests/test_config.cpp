@@ -34,10 +34,10 @@ void test_config_log()
 void test_config_stage()
 {
     using namespace o7si::seda;
-    auto stage1 = StageManager::getInstance()->doLogin("Stage1");
-    auto stage2 = StageManager::getInstance()->doLogin("Stage2");
-    auto stage3 = StageManager::getInstance()->doLogin("Stage3");
-    auto stage4 = StageManager::getInstance()->doLogin("Stage4");
+    auto stage1 = StageManager::Instance()->doLogin("Stage1");
+    auto stage2 = StageManager::Instance()->doLogin("Stage2");
+    auto stage3 = StageManager::Instance()->doLogin("Stage3");
+    auto stage4 = StageManager::Instance()->doLogin("Stage4");
 
     auto stage1_mapping = stage1->next(); 
     for (const auto& item : stage1_mapping)

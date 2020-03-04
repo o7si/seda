@@ -5,113 +5,119 @@ namespace o7si
 namespace net
 {
 
-//--------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
 void request_field_cb(void* data, const char* field, size_t flen, 
                                   const char* value, size_t vlen)
 {
-    //LOG_DEBUG << std::string(field, flen) << " " << std::string(value, vlen);
+    LOG_INFO_SYS << std::string(field, flen) << " " 
+                 << std::string(value, vlen);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
-    parser->inner_request()->set_field(std::string(field, flen), std::string(value, vlen));    
+    parser->inner_request()->set_field(std::string(field, flen), 
+                                       std::string(value, vlen));    
 }
 
 void request_method_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->method(GenMethodFrom(std::string(at, length)));
 }
 
 void request_uri_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->uri(std::string(at, length));
 }
 
 void request_fragment_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->fragment(std::string(at, length));
 }
 
 void request_path_cb(void* data, const char* at, size_t length) 
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->path(std::string(at, length));
 }
 
 void request_query_cb(void* data, const char* at, size_t length) 
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->query(std::string(at, length));
 }
 
 void request_version_cb(void* data, const char* at, size_t length) 
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->version(GenVersionFrom(std::string(at, length)));
 }
 
 void request_header_done_cb(void* data, const char* at, size_t length) 
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
 }
 
 void response_field_cb(void* data, const char* field, size_t flen,
                                    const char* value, size_t vlen)
 {
-    //LOG_DEBUG << std::string(field, flen) << " " << std::string(value, vlen);
+    LOG_INFO_SYS << std::string(field, flen) << " " 
+                 << std::string(value, vlen);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
-    parser->inner_response()->set_field(std::string(field, flen), std::string(value, vlen));
+    parser->inner_response()->set_field(std::string(field, flen), 
+                                        std::string(value, vlen));
 }
 
 void response_reason_phrase_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->reason_phrase(std::string(at, length));
 }
 
 void response_status_code_cb(void* data, const char* at, size_t length)
 {
+    LOG_INFO_SYS << std::string(at, length);
     //LOG_DEBUG << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
-    parser->inner_response()->status(GenStatusFrom(std::stoi(std::string(at, length))));
+    parser->inner_response()->status(
+        GenStatusFrom(std::stoi(std::string(at, length))));
 }
 
 void response_chunk_size_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
 }
 
 void response_version_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->version(GenVersionFrom(std::string(at, length)));
 }
 
 void response_header_done_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
 }
 
 
 void response_last_chunk_cb(void* data, const char* at, size_t length)
 {
-    //LOG_DEBUG << std::string(at, length);
+    LOG_INFO_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
 }
 
-//--------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
 
 HttpRequestParser::HttpRequestParser()
@@ -152,7 +158,8 @@ int HttpRequestParser::parser_is_finished()
     return http_parser_is_finished(&m_parser);
 }
 
-size_t HttpRequestParser::parser_execute(const char* data, size_t len, size_t off)
+size_t HttpRequestParser::parser_execute(const char* data, 
+                                         size_t len, size_t off)
 {
     return http_parser_execute(&m_parser, data, len, off);
 }
@@ -194,7 +201,8 @@ int HttpResponseParser::parser_is_finished()
     return httpclient_parser_is_finished(&m_parser);
 }
 
-size_t HttpResponseParser::parser_execute(const char* data, size_t len, size_t off)
+size_t HttpResponseParser::parser_execute(const char* data, 
+                                          size_t len, size_t off)
 {
     return httpclient_parser_execute(&m_parser, data, len, off);
 }

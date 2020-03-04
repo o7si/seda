@@ -9,6 +9,13 @@ Stage::Stage(std::string name)
     : m_name(std::move(name)), 
       m_thread_pool(&m_event_queue, &m_performeter)
 {
+    // 生成 Stage 的短名称
+    std::string short_name;
+    for (const auto& ch : m_name)
+        if (isupper(ch) || isdigit(ch))
+            short_name += ch;
+    m_short_name = short_name;
+
     m_thread_pool.setName(getShortName());
     m_performeter.setName(getShortName());
 }
@@ -19,38 +26,19 @@ void Stage::init()
     m_thread_pool.init();    
 }
 
-std::string Stage::getName() const
-{
-    return m_name;
-}
-
-std::string Stage::getShortName() const
-{
-    // 名称中的每一个大写字母
-    std::string short_name;
-    for (const auto& ch : m_name)
-        if (isupper(ch) || isdigit(ch))
-            short_name += ch;
-    return short_name;    
-}
-
-std::string Stage::setName(std::string name) 
-{
-    m_name = std::move(name);
-    return m_name;    
-}
-
 void Stage::next(const std::string& state, const std::string& stage)
 {
     // 该状态已经被设置过
     if (m_conver_mapping.find(state) != m_conver_mapping.end())
     {
-        m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage); 
-        LOG_WARN_SYS << m_name << " set state: " << state << " -> " << stage << "(repeat)";
+        m_conver_mapping[state] = StageManager::Instance()->doLogin(stage); 
+        LOG_WARN_SYS << m_name << " set state: " << state << " -> " << stage 
+                     << "(repeat)";
     }
     // 首次设置该状态
-    m_conver_mapping[state] = StageManager::getInstance()->doLogin(stage);
-    LOG_INFO_SYS << m_name << " set state: " << state << " -> " << stage << "(first)";
+    m_conver_mapping[state] = StageManager::Instance()->doLogin(stage);
+    LOG_INFO_SYS << m_name << " set state: " << state << " -> " << stage 
+                 << "(first)";
 }
 
 ConverMapping Stage::next() const
@@ -60,33 +48,14 @@ ConverMapping Stage::next() const
 
 std::shared_ptr<Stage> Stage::next(const std::string& state)
 {
+    if (m_conver_mapping.find(state) == m_conver_mapping.end())
+        return nullptr;
     return m_conver_mapping[state];
-}
-
-size_t Stage::getThreadPoolCapacity() const
-{
-    return m_thread_pool.getCapacity();
-}
-
-size_t Stage::setThreadPoolCapacity(size_t capacity)
-{
-    m_thread_pool.setCapacity(capacity);
-    return capacity;    
-}
-
-size_t Stage::getPerformeterCapacity() const
-{
-    return m_performeter.getCapacity();
-}
-
-size_t Stage::setPerformeterCapacity(size_t capacity)
-{
-    m_performeter.setCapacity(capacity);
-    return capacity;    
 }
 
 void Stage::performeter_internal_state() const
 {
+    // 调试性代码
     LOG_INFO_SYS << "name = " << m_performeter.getName();
     LOG_INFO_SYS << "capacity = " << m_performeter.getCapacity();
 
@@ -110,14 +79,14 @@ void Stage::bind(EventHandlerFunc&& function)
     m_event_handler.setHandler(std::forward<EventHandlerFunc>(function));
 }
 
-/// 执行
 void Stage::call(boost::any&& args)
 {        
-    // 将任务进行一层包装，将 future 的 get 方法加入到线程中执行，防止在此处阻塞
+    // 进行一层包装，将 future 的 get 方法加入到线程中执行，防止在此处阻塞
     std::function<void(boost::any&)> wrapper = [this](boost::any& args)
     {
         // 使用 packaged_task 进行一层包装
-        std::packaged_task<std::pair<std::string, boost::any>(boost::any&)> packaged(m_event_handler.getHandler());
+        std::packaged_task<std::pair<std::string, boost::any>(boost::any&)> 
+            packaged(m_event_handler.getHandler());
         // 获取 future 对象
         auto future = packaged.get_future();
         // 执行函数

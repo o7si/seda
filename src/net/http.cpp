@@ -1,11 +1,12 @@
 #include "http.h"
 
+
 namespace o7si
 {
 namespace net
 {
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
 HttpStatus GenStatusFrom(const std::string& str)
 {
@@ -116,7 +117,7 @@ std::ostream& operator<<(std::ostream& stream, const HttpStatus& status)
 {
 #define XX(num, name, string) \
     if (status == HttpStatus::HTTP_STATUS_##name) \
-        return stream << num << " " << #name << " " << #string;
+        return stream << "|" << num << "|" << #name << "|" << #string << "|";
     HTTP_STATUS_MAP(XX);
 #undef XX
     return stream << "HTTP_STATUS_UNDEFINE";
@@ -126,7 +127,7 @@ std::ostream& operator<<(std::ostream& stream, const HttpMethod& method)
 {
 #define XX(num, name, string) \
     if (method == HttpMethod::HTTP_METHOD_##name) \
-        return stream << num << " " << #name << " " << #string;    
+        return stream << "|" << num << "|" << #name << "|" << #string << "|";
     HTTP_METHOD_MAP(XX)
 #undef XX
     return stream << "HTTP_METHOD_UNDEFINE";
@@ -136,13 +137,13 @@ std::ostream& operator<<(std::ostream& stream, const HttpVersion& version)
 {
 #define XX(num, name, string) \
     if (version == HttpVersion::HTTP_VERSION_##name) \
-        return stream << num << " " << #name << " " << #string;    
+        return stream << "|" << num << "|" << #name << "|" << #string << "|";
     HTTP_VERSION_MAP(XX)
 #undef XX
     return stream << "HTTP_VERSION_UNDEFINE";
 }
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
 std::string HttpRequest::format()
 {
@@ -153,6 +154,7 @@ std::string HttpRequest::format()
 
 std::ostream& HttpRequest::dump(std::ostream& stream)
 {
+    // TODO: 调整输出
     // 请求头
     stream << HttpMethodToString(m_method) 
            << " "
@@ -184,6 +186,7 @@ std::string HttpResponse::format()
 
 std::ostream& HttpResponse::dump(std::ostream& stream)
 {
+    // TODO: 调整输出
     // 请求头
     stream << HttpVersionToString(m_version)
            << " "

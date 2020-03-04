@@ -1,18 +1,25 @@
+/******************************************************************************
+ * File: http_parser.h
+ * Description: 负责解析 HTTP 报文。 
+ * Author: o7si
+ *****************************************************************************/
 #pragma once
 
 #include <net/analysis/http11_parser.h>
 #include <net/analysis/httpclient_parser.h>
 
-#include "http.h"
 #include "../log.h"
+#include "http.h"
+
 
 namespace o7si
 {
 namespace net
 {
 
-//--------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
+// 解析请求报文时的回调函数
 void request_field_cb(void* data, const char* field, size_t flen, 
                                   const char* value, size_t vlen);
 void request_method_cb(void* data, const char* at, size_t length);
@@ -23,6 +30,7 @@ void request_query_cb(void* data, const char* at, size_t length);
 void request_version_cb(void* data, const char* at, size_t length); 
 void request_header_done_cb(void* data, const char* at, size_t length); 
 
+// 解析响应报文时的回调函数
 void response_field_cb(void* data, const char* field, size_t flen,
                                    const char* value, size_t vlen);
 void response_reason_phrase_cb(void* data, const char* at, size_t length);
@@ -32,7 +40,7 @@ void response_version_cb(void* data, const char* at, size_t length);
 void response_header_done_cb(void* data, const char* at, size_t length);
 void response_last_chunk_cb(void* data, const char* at, size_t length);
 
-//--------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
 class HttpParser
 {
@@ -41,12 +49,13 @@ public:
     virtual int parser_finish() = 0;
     virtual int parser_has_error() = 0;
     virtual int parser_is_finished() = 0;
-    virtual size_t parser_execute(const char* data, size_t len, size_t off) = 0;
+    virtual size_t parser_execute(const char* data, 
+                                  size_t len, size_t off) = 0;
 
     virtual ~HttpParser() = default;    
 };
 
-/// HTTP 请求解析器
+// HTTP 请求解析器
 class HttpRequestParser : public HttpParser
 {
 public:
@@ -56,7 +65,8 @@ public:
     int parser_finish() override;
     int parser_has_error() override;
     int parser_is_finished() override;
-    size_t parser_execute(const char* data, size_t len, size_t off = 0) override;
+    size_t parser_execute(const char* data, 
+                          size_t len, size_t off = 0) override;
 
     std::shared_ptr<HttpRequest> inner_request()
     {
@@ -68,7 +78,7 @@ private:
     std::shared_ptr<HttpRequest> m_request;
 };
 
-/// HTTP 响应解析器
+// HTTP 响应解析器
 class HttpResponseParser : public HttpParser
 {
 public:
@@ -78,7 +88,8 @@ public:
     int parser_finish() override;
     int parser_has_error() override;
     int parser_is_finished() override;
-    size_t parser_execute(const char* data, size_t len, size_t off = 0) override;
+    size_t parser_execute(const char* data,
+                          size_t len, size_t off = 0) override;
 
     std::shared_ptr<HttpResponse> inner_response()
     {

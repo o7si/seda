@@ -1,4 +1,9 @@
-#pragma once
+/******************************************************************************
+ * File: config.h
+ * Description: 载入配置。
+ * Author: o7si
+ *****************************************************************************/
+#pragma once 
 
 #include <string>
 
@@ -16,19 +21,21 @@ class PathManager
 {
 public:
     /// 添加一组映射
-    void set(const std::string& key, const std::string& value);
+    void set(const std::string& key, 
+             const std::string& value);
 
     /// 获取 key 对应的 value
-    std::string get(const std::string& key, const std::string& def);
+    std::string get(const std::string& key, 
+                    const std::string& def);
 
     /// 移除一组映射
     void remove(const std::string& key);
     
     /// 判定 key 是否存在
-    bool exist(const std::string& key);
+    bool exist(const std::string& key) const;
 
     /// 判定 key 是否存在
-    bool has(const std::string& key);
+    bool has(const std::string& key) const;
 
 public:
     /// 获取 PathManager 的单例对象

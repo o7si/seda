@@ -1,19 +1,26 @@
+/******************************************************************************
+ * File: http.h
+ * Description: Http 请求以及响应的定义。
+ * Author: o7si
+ *****************************************************************************/
 #pragma once
 
+#include <strings.h>
+
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
-#include <strings.h>
+
 
 namespace o7si
 {
 namespace net
 {
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
-/// HTTP 状态
+// HTTP 状态
 #define HTTP_STATUS_MAP(XX)                                                     \
     XX(100, CONTINUE,                        Continue)                          \
     XX(101, SWITCHING_PROTOCOLS,             Switching Protocols)               \
@@ -86,9 +93,9 @@ enum class HttpStatus
     HTTP_STATUS_UNDEFINE
 };
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
-/// HTTP 方法 
+// HTTP 方法 
 #define HTTP_METHOD_MAP(XX)             \
     XX(0,  DELETE,      DELETE)         \
     XX(1,  GET,         GET)            \
@@ -136,7 +143,7 @@ enum class HttpStatus
 
 enum class HttpMethod 
 {
-// e.g. HTTP_METHOD_GET_DELETE = 0
+// e.g. HTTP_METHOD_DELETE = 0
 #define XX(num, name, string) HTTP_METHOD_##name = num,
     HTTP_METHOD_MAP(XX)
 #undef XX
@@ -144,13 +151,13 @@ enum class HttpMethod
     HTTP_METHOD_UNDEFINE
 };
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
-/// HTTP 版本 
-#define HTTP_VERSION_MAP(XX)        \
-    XX(10, HTTP1_0, HTTP/1.0)       \
-    XX(11, HTTP1_1, HTTP/1.1)       \
-    XX(20, HTTP2_0, HTTP/2.0)       \
+// HTTP 版本 
+#define HTTP_VERSION_MAP(XX)    \
+    XX(10, 1_0, HTTP/1.0)       \
+    XX(11, 1_1, HTTP/1.1)       \
+    XX(20, 2_0, HTTP/2.0)       \
 
 
 enum class HttpVersion
@@ -163,36 +170,36 @@ enum class HttpVersion
     HTTP_VERSION_UNDEFINE
 };
 
-//-------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------    
 
-/// 根据 XX  生成对应的 HTTP Status
+// 根据 XX 生成对应的 HTTP Status
 HttpStatus GenStatusFrom(const std::string& str);
 HttpStatus GenStatusFrom(const char* str);
 HttpStatus GenStatusFrom(int number);
 
-/// 根据 XX 生成对应的 HTTP Method
+// 根据 XX 生成对应的 HTTP Method
 HttpMethod GenMethodFrom(const std::string& str);
 HttpMethod GenMethodFrom(const char* str);
 HttpMethod GenMethodFrom(int number);
 
-/// 根据 XX 生成对应的 HTTP Version
+// 根据 XX 生成对应的 HTTP Version
 HttpVersion GenVersionFrom(const std::string& str);
 HttpVersion GenVersionFrom(const char* str);
 HttpVersion GenVersionFrom(int number);
 
-/// 将数据转换为字符串
+// 将数据转换为字符串
 std::string HttpStatusToString(const HttpStatus& status);
 std::string HttpMethodToString(const HttpMethod& method);
 std::string HttpVersionToString(const HttpVersion& version);
 
-/// 输出相关的描述
+// 输出相关的描述(用作调试)
 std::ostream& operator<<(std::ostream& stream, const HttpStatus& status);
 std::ostream& operator<<(std::ostream& stream, const HttpMethod& method);
 std::ostream& operator<<(std::ostream& string, const HttpVersion& version);
 
 //-------------------------------------------------------------------------------    
 
-/// HTTP 请求
+// HTTP 请求
 class HttpRequest
 {
 public:
@@ -268,25 +275,25 @@ public:
         m_body = value;
     }
     
-    /// 获取字段
+    // 获取字段
     MapType fields() const
     {
         return m_fields;    
     }
 
-    /// 设置字段
+    // 设置字段
     void fields(const MapType& value)
     {
         m_fields = value;    
     }
 
-    /// 判断字段是否存在
+    // 判断字段是否存在
     bool has_field(const std::string& key)
     {
         return m_fields.find(key) != m_fields.end();    
     }
 
-    /// 获取字段，若字段不存在则返回默认值
+    // 获取字段，若字段不存在则返回默认值
     std::string get_field(const std::string& key, const std::string& def = "")
     {
         // 字段不存在
@@ -296,13 +303,13 @@ public:
         return m_fields[key]; 
     }
 
-    /// 设置一个字段
+    // 设置一个字段
     void set_field(const std::string& key, const std::string& value)
     {
         m_fields[key] = value;
     }
 
-    /// 移除一个字段
+    // 移除一个字段
     void remove_field(const std::string& key)
     {
         // 字段不存在
@@ -311,10 +318,10 @@ public:
         m_fields.erase(m_fields.find(key));
     }
     
-    /// 格式化数据
+    // 格式化数据
     std::string format();
 
-    /// 将数据格式化并输出至流
+    // 将数据格式化并输出至流
     std::ostream& dump(std::ostream& stream);
 
 private:
@@ -330,7 +337,7 @@ private:
     MapType m_fields;
 };
 
-/// HTTP 响应报文
+// HTTP 响应报文
 class HttpResponse
 {
 public:
@@ -378,25 +385,25 @@ public:
         m_body = value;
     }
     
-    /// 获取字段
+    // 获取字段
     MapType fields() const
     {
         return m_fields;    
     }
 
-    /// 设置字段
+    // 设置字段
     void fields(const MapType& value)
     {
         m_fields = value;    
     }
 
-    /// 判断字段是否存在
+    // 判断字段是否存在
     bool has_field(const std::string& key)
     {
         return m_fields.find(key) != m_fields.end();    
     }
 
-    /// 获取字段，若字段不存在则返回默认值
+    // 获取字段，若字段不存在则返回默认值
     std::string get_field(const std::string& key, const std::string& def = "")
     {
         // 字段不存在
@@ -406,13 +413,13 @@ public:
         return m_fields[key]; 
     }
 
-    /// 设置一个字段
+    // 设置一个字段
     void set_field(const std::string& key, const std::string& value)
     {
         m_fields[key] = value;
     }
 
-    /// 移除一个字段
+    // 移除一个字段
     void remove_field(const std::string& key)
     {
         // 字段不存在
@@ -421,10 +428,10 @@ public:
         m_fields.erase(m_fields.find(key));
     }
     
-    /// 格式化数据
+    // 格式化数据
     std::string format();
 
-    /// 将数据格式化并输出至流
+    // 将数据格式化并输出至流
     std::ostream& dump(std::ostream& stream);
 
 private:    

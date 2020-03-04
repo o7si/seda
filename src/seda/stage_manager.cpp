@@ -1,5 +1,6 @@
 #include "stage_manager.h"
 
+
 namespace o7si
 {
 namespace seda
@@ -7,8 +8,8 @@ namespace seda
 
 std::shared_ptr<StageManager> StageManager::instance(new StageManager());
 
-/// 注册 Stage 到管理类
-std::shared_ptr<Stage> StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> stage)
+std::shared_ptr<Stage> 
+StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> stage)
 {
     // 名称为 name 的 Stage 没有被注册
     if (mapping.find(name) == mapping.end())
@@ -23,8 +24,8 @@ std::shared_ptr<Stage> StageManager::doRegister(const std::string& name, std::sh
     return nullptr;
 }
 
-/// 从管理类中获取 Stage 
-std::shared_ptr<Stage> StageManager::doLogin(const std::string& name)
+std::shared_ptr<Stage> 
+StageManager::doLogin(const std::string& name)
 {
     // 名称为 name 的 Stage 已经被注册
     if (mapping.find(name) != mapping.end())

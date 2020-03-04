@@ -1,11 +1,12 @@
 #include "config.h"
 
+
 namespace o7si
 {
 namespace config
 {
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 std::shared_ptr<PathManager> PathManager::instance(new PathManager());
 
@@ -14,12 +15,14 @@ std::shared_ptr<PathManager> PathManager::Instance()
     return instance;    
 }
 
-void PathManager::set(const std::string& key, const std::string& value)
+void PathManager::set(const std::string& key, 
+                      const std::string& value)
 {
-    m_paths[key] = value;    
+    m_paths[key] = value + "/";    
 }
 
-std::string PathManager::get(const std::string& key, const std::string& def)
+std::string PathManager::get(const std::string& key, 
+                             const std::string& def)
 {
     if (!exist(key))
         return def + "/";
@@ -33,17 +36,17 @@ void PathManager::remove(const std::string& key)
     m_paths.erase(m_paths.find(key));
 }
 
-bool PathManager::exist(const std::string& key)
+bool PathManager::exist(const std::string& key) const
 {
     return has(key); 
 }
 
-bool PathManager::has(const std::string& key)
+bool PathManager::has(const std::string& key) const
 {
     return m_paths.find(key) != m_paths.end(); 
 }
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void load(const std::string& filename)
 {
@@ -66,7 +69,7 @@ void load(const std::string& filename)
     // Stage 的配置
     LOG_INFO_SYS << "Loading...(config.stage)";
     YAML::Node stage_config = config["stage"];
-    stage_config >> *o7si::seda::StageManager::getInstance();
+    stage_config >> *o7si::seda::StageManager::Instance();
     LOG_INFO_SYS << "Complete(config.stage)";
 
     // 其它模块的配置
@@ -75,7 +78,7 @@ void load(const std::string& filename)
     LOG_INFO_SYS << "Complete(config)";
 }
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void operator>>(const YAML::Node& yaml, o7si::config::PathManager& manager)
 {
@@ -93,19 +96,25 @@ void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
 {
     for (auto i = yaml.begin(); i != yaml.end(); ++ i)
     {
-        // 日志名称
+        // 日志的用户名称
         std::string name = i->first.as<std::string>();
+        // 禁止调整系统用户
+        if (name == LOG_SYSTEM_USER)
+            continue;
+
         // 日志级别
         std::string level = i->second["level"].as<std::string>();
-        // 注册一个日志用户
+        // 注册
         auto user = manager.doRegister(name, o7si::log::GenLevelFrom(level));
-        // 日志的输出地
+
+        // 输出地
         YAML::Node appenders = i->second["appender"];
         for (auto j = appenders.begin(); j != appenders.end(); ++ j)
         {
             // 输出地类型
-            std::string type = o7si::utils::to_lower((*j)["type"].as<std::string>());
-            // 日志输出格式
+            std::string type = 
+                o7si::utils::to_lower((*j)["type"].as<std::string>());
+            // 输出格式
             std::string pattern = (*j)["pattern"].as<std::string>();
 
             // 控制台输出地
@@ -120,7 +129,10 @@ void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
             // 文件输出地
             else if (type == "fileappender")
             {
-                std::string path = PathManager::Instance()->get("log", "/tmp/");
+                // 如果未指定路径，则默认将日志输出至 "/tmp/" 目录下
+                std::string path = 
+                    PathManager::Instance()->get("log", "/tmp/");
+
                 std::string file = path + (*j)["file"].as<std::string>();
                 user->add_appender(
                     std::make_shared<o7si::log::FileAppender>(
@@ -129,9 +141,7 @@ void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
                 );     
             }
             // 其它输出地
-            else
-            {
-            } 
+            // ...
         }
     }
 }
@@ -140,17 +150,20 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
 {
     for (auto i = yaml.begin(); i != yaml.end(); ++ i)
     {
-        // Stage 的名称
-        std::string stage_name = i->first.as<std::string>();
         // 登录
-        auto stage = o7si::seda::StageManager::getInstance()->doLogin(stage_name);
+        std::string stage_name = i->first.as<std::string>();
+        auto stage = 
+            o7si::seda::StageManager::Instance()->doLogin(stage_name);
 
-        // Stage 的最大允许线程数
-        size_t thread_pool_capacity = i->second["max_thread"].as<size_t>();
+        // 线程池容量
+        size_t thread_pool_capacity = 
+            i->second["thread_capacity"].as<size_t>();
         stage->setThreadPoolCapacity(thread_pool_capacity);
+
+        // 初始化
         stage->init();
 
-        // Stage 的后续状态
+        // 后续状态
         YAML::Node state_table = i->second["state"];
         for (auto j = state_table.begin(); j != state_table.end(); ++ j)
         {
@@ -162,12 +175,9 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
             stage->next(state_name, next_stage);
         }
     }
-
-    // 异常
-    // throw
 }
 
-// ------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 }   // namespace config
 }   // namespace o7si

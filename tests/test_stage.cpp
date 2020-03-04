@@ -4,10 +4,10 @@
 void test_stage()
 {
     using namespace o7si::seda;
-    auto stage1 = StageManager::getInstance()->doLogin("Stage1");
-    auto stage2 = StageManager::getInstance()->doLogin("Stage2");
-    auto stage3 = StageManager::getInstance()->doLogin("Stage3");
-    auto stage4 = StageManager::getInstance()->doLogin("Stage4");
+    auto stage1 = StageManager::Instance()->doLogin("Stage1");
+    auto stage2 = StageManager::Instance()->doLogin("Stage2");
+    auto stage3 = StageManager::Instance()->doLogin("Stage3");
+    auto stage4 = StageManager::Instance()->doLogin("Stage4");
     
     o7si::log::LoggerManager::Instance()->login_behavior(1);
     LOG_DEBUG(test) << stage1->getThreadPoolCapacity();
