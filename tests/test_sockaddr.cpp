@@ -1,49 +1,38 @@
 #include <net/sockaddr.h>
 #include <log.h>
 
-#include <climits>
-
-void test01()
+void test01(const char* addr, const char* port)
 {
-    using namespace o7si::net;
-    SockAddrIn sockaddr("", 0);
+    o7si::net::Lookup lookup;
+    lookup.lookup(addr);
 
-    // 正常情况
-    sockaddr.setPort(12345);
-    LOG_DEBUG_SYS << sockaddr.getPort();
-    sockaddr.setPort("54321");
-    LOG_DEBUG_SYS << sockaddr.getPort();
+    if (lookup.has4())
+    {
+        LOG_DEBUG_SYS << "IPv4 Test";
+        o7si::net::SockAddrIn in4(lookup.get4()[0].getAddr(), port);    
+        LOG_DEBUG_SYS << "addr = " << in4.getAddr();
+        LOG_DEBUG_SYS << "port = " << in4.getPort();
+    }
 
-    sockaddr.setAddr(INADDR_ANY);
-    LOG_DEBUG_SYS << sockaddr.getAddr();
-    sockaddr.setAddrDot("116.62.15.145");
-    LOG_DEBUG_SYS << sockaddr.getAddr();
-    sockaddr.setAddrDomain("www.baidu.com");
-    LOG_DEBUG_SYS << sockaddr.getAddr();
-
-    // 异常情况
-    sockaddr.setPort(123456);
-    LOG_WARN_SYS << sockaddr.getPort();
-
-    sockaddr.setAddr(INT_MAX);
-    LOG_WARN_SYS << sockaddr.getAddr();
-    sockaddr.setAddrDot("256.62.15.145");
-    LOG_WARN_SYS << sockaddr.getAddr();
-    sockaddr.setAddrDomain("www.o7si.com");
-    LOG_WARN_SYS << sockaddr.getAddr();
-}
-
-void test02()
-{
-    using namespace o7si::net;
-    SockAddrIn sockaddr("www.baidu.com", 80, 1);
-    
-    LOG_DEBUG_SYS << sockaddr.getAddr();
-    LOG_DEBUG_SYS << sockaddr.getPort();    
+    if (lookup.has6())
+    {
+        LOG_DEBUG_SYS << "IPv6 Test";
+        o7si::net::SockAddrIn6 in6(lookup.get6()[0].getAddr(), port);    
+        LOG_DEBUG_SYS << "addr = " << in6.getAddr();
+        LOG_DEBUG_SYS << "port = " << in6.getPort();
+    }
 }
 
 int main(int argc, char* argv[])
 {
-    test02();
-    return 0;    
+    if (argc < 3)
+    {
+        LOG_ERROR_SYS << "please input address and port.";
+        LOG_ERROR_SYS << "e.g.";
+        LOG_ERROR_SYS << argv[0] << " " << "www.google.com 80";
+        return EXIT_FAILURE;
+    }
+       
+    test01(argv[1], argv[2]);
+    return EXIT_SUCCESS;    
 }
