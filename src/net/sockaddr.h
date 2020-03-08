@@ -22,17 +22,17 @@
 
 /******************************************************************************
  *
- *           [SockAddr]
- *               /\
- *             /    \
- *           /        \
- *         /            \
- *   [SockAddrUn]  [SockAddrInet]
- *                       /\
- *                     /    \
- *                   /        \
- *                 /            \
- *           [SockAddrIn]  [SockAddrIn6]
+ *                         [SockAddr]
+ *                             /\
+ *                           /    \
+ *                         /        \
+ *                       /            \
+ *                 [SockAddrUn]  [SockAddrInet]
+ *                                     /\
+ *                                   /    \
+ *                                 /        \
+ *                               /            \
+ *                         [SockAddrIn]  [SockAddrIn6]
  *
  *****************************************************************************/
 
@@ -117,7 +117,20 @@ private:
 class SockAddr
 {
 public:
+    SockAddr() = default;
+
     ~SockAddr() = default;
+
+    // 获取内部的 sockaddr_xx 对象
+    virtual sockaddr* data() = 0;
+
+    virtual const sockaddr* data() const = 0;
+
+    // 获取内部 sockaddr_xx 对象的长度
+    virtual socklen_t length() const = 0;
+
+    // 能够正常工作，即各项参数均未出错
+    virtual bool is_work() const = 0;
 
     std::string getDesc() const
     {
@@ -134,24 +147,14 @@ private:
     std::string m_desc;
 };
 
+// ----------------------------------------------------------------------------
+
 class SockAddrInet : public SockAddr
 {
 public:
-    SockAddrInet();
+    SockAddrInet() = default;
 
     ~SockAddrInet() = default;
-
-    // 判断地址是否可用，即设置值的过程中未出现错误
-    bool addr_is_available() const
-    {
-        return m_addr_available; 
-    }
-
-    // 判断端口是否可用，即设置值的过程中未出现错误
-    bool port_is_available() const
-    {
-        return m_port_available;    
-    }
 
     // 获取地址的字符串表示形式
     virtual std::string getAddr() const = 0;
@@ -167,11 +170,9 @@ public:
 
     // 通过字符串设置端口号
     virtual void setPort(const std::string& port) = 0;
-
-protected:
-    bool m_addr_available;
-    bool m_port_available;
 }; 
+
+// ----------------------------------------------------------------------------
 
 // IPv4
 class SockAddrIn : public SockAddrInet
@@ -198,9 +199,38 @@ public:
     // 通过字符串设置端口号
     void setPort(const std::string& port) override;
 
+    // 获取内部的 sockaddr_xx 对象
+    sockaddr* data() override;
+
+    const sockaddr* data() const override;
+
+    // 获取内部 sockaddr_xx 对象的长度
+    socklen_t length() const override;
+
+    // 判断地址是否可用，即设置值的过程中未出现错误
+    bool addr_is_available() const
+    {
+        return m_addr_available; 
+    }
+
+    // 判断端口是否可用，即设置值的过程中未出现错误
+    bool port_is_available() const
+    {
+        return m_port_available;    
+    }
+
+    bool is_work() const override
+    {
+        return m_addr_available && m_port_available;    
+    }
+
 private:
     sockaddr_in m_sockaddr;
+    bool m_addr_available;
+    bool m_port_available;
 };
+
+// ----------------------------------------------------------------------------
 
 class SockAddrIn6 : public SockAddrInet
 {
@@ -226,17 +256,77 @@ public:
     // 通过字符串设置端口号
     void setPort(const std::string& port) override;
 
+    // 获取内部的 sockaddr_xx 对象
+    sockaddr* data() override;
+
+    const sockaddr* data() const override;
+
+    // 获取内部 sockaddr_xx 对象的长度
+    socklen_t length() const override;
+
+    // 判断地址是否可用，即设置值的过程中未出现错误
+    bool addr_is_available() const
+    {
+        return m_addr_available; 
+    }
+
+    // 判断端口是否可用，即设置值的过程中未出现错误
+    bool port_is_available() const
+    {
+        return m_port_available;    
+    }
+
+    bool is_work() const override
+    {
+        return m_addr_available && m_port_available;    
+    }
+
 private:
     sockaddr_in6 m_sockaddr;
+    bool m_addr_available;
+    bool m_port_available;
 };
 
+// ----------------------------------------------------------------------------
+
+// Local
 class SockAddrUn : public SockAddr
 {
 public:
+    SockAddrUn(const std::string& path);
+
+    // 获取路径
+    std::string getPath() const;
+
+    // 设置路径
+    void setPath(const std::string& path);
+
+    // 获取内部的 sockaddr_xx 对象
+    sockaddr* data() override;
+
+    const sockaddr* data() const override;
+
+    // 获取内部 sockaddr_xx 对象的长度
+    socklen_t length() const override;
+
+    // 判断路径是否可用，即设置值的过程中未出现错误
+    bool path_is_available() const
+    {
+        return m_path_available;    
+    }
+
+    bool is_work() const override
+    {
+        return m_path_available;
+    }
 
 private:
     sockaddr_un m_sockaddr;
+    bool m_path_available;
 };
+
+// ----------------------------------------------------------------------------
+
 
 }   // namespace net
 }   // namespace o7si

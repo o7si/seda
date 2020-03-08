@@ -1,11 +1,11 @@
-#include "sockaddr.h"
-
+#include "sockaddr.h" 
 
 namespace o7si
 {
 namespace net
 {
     
+
 // ----------------------------------------------------------------------------
 
 Lookup::HostInfo::HostInfo(std::string name, std::string addr)
@@ -101,10 +101,7 @@ void Lookup::lookup(const std::string& host)
 
 // ----------------------------------------------------------------------------
 
-SockAddrInet::SockAddrInet()
-    : m_addr_available(false), m_port_available(false)
-{
-}
+// SockAddrInet
 
 // ----------------------------------------------------------------------------
 
@@ -207,6 +204,21 @@ void SockAddrIn::setPort(uint32_t port)
 void SockAddrIn::setPort(const std::string& port)
 {
     setPort(std::stoi(port));    
+}
+
+sockaddr* SockAddrIn::data()
+{
+    return (sockaddr*)&m_sockaddr;    
+}
+
+const sockaddr* SockAddrIn::data() const
+{
+    return (const sockaddr*)&m_sockaddr;    
+}
+
+socklen_t SockAddrIn::length() const
+{
+    return sizeof(m_sockaddr);    
 }
 
 // ----------------------------------------------------------------------------
@@ -312,11 +324,78 @@ void SockAddrIn6::setPort(const std::string& port)
     setPort(std::stoi(port));    
 }
 
+sockaddr* SockAddrIn6::data()
+{
+    return (sockaddr*)&m_sockaddr;    
+}
+
+const sockaddr* SockAddrIn6::data() const
+{
+    return (const sockaddr*)&m_sockaddr;    
+}
+
+socklen_t SockAddrIn6::length() const
+{
+    return sizeof(m_sockaddr);    
+}
+
 // ----------------------------------------------------------------------------
 
-// SockAddrUn
+SockAddrUn::SockAddrUn(const std::string& path)
+{
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    m_sockaddr.sun_family = AF_UNIX; 
+    setPath(path);
+}
+
+std::string SockAddrUn::getPath() const
+{
+    std::string def = "unknown";
+    if (!m_path_available)
+    {
+        LOG_WARN_SYS << "path invalid, "
+                     << "return '" << def << "'.";     
+        return def;
+    }
+    return m_sockaddr.sun_path;
+}
+
+void SockAddrUn::setPath(const std::string& path)
+{
+    // struct sockaddr_un {
+    //     sa_family_t sun_family;
+    //     char        sun_path[108];
+    // };
+    // 路径的最大长度为 108 - 1，即 107 个字节
+
+    if (path.size() >= sizeof(m_sockaddr.sun_path))
+    {
+        LOG_WARN_SYS << "path set failure. "
+                     << "path = " << path;    
+        m_path_available = false;
+        return;
+    }
+    memcpy(m_sockaddr.sun_path, path.data(), path.size());
+    m_path_available = true;
+}
+
+sockaddr* SockAddrUn::data()
+{
+    return (sockaddr*)&m_sockaddr;    
+}
+
+const sockaddr* SockAddrUn::data() const
+{
+    return (const sockaddr*)&m_sockaddr;    
+}
+
+socklen_t SockAddrUn::length() const
+{
+    return sizeof(m_sockaddr);    
+}
 
 // ----------------------------------------------------------------------------
+
 
 }   // namespace net    
 }   // namespace o7si
