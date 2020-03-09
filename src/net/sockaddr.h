@@ -21,8 +21,8 @@
 
 
 /******************************************************************************
- *
- *                         [SockAddr]
+ * 类结构：
+ *                         [SockAddr]                                        
  *                             /\
  *                           /    \
  *                         /        \
@@ -85,21 +85,25 @@ public:
     // 可以传入 IPv6 地址，例如 ::1
     void lookup(const std::string& host); 
 
+    // 获取结果中对应的 IPv4 地址
     std::vector<HostInfo> get4() const
     {
         return m_ipv4;    
     }
 
+    // 获取结果中对应的 IPv6 地址
     std::vector<HostInfo> get6() const
     {
         return m_ipv6;
     }
 
+    // 结果中是否存在 IPv4 地址 
     bool has4() const
     {
         return !m_ipv4.empty();    
     }
 
+    // 结果中是否存在 IPv6 地址 
     bool has6() const
     {
         return !m_ipv6.empty();    
@@ -121,17 +125,6 @@ public:
 
     ~SockAddr() = default;
 
-    // 获取内部的 sockaddr_xx 对象
-    virtual sockaddr* data() = 0;
-
-    virtual const sockaddr* data() const = 0;
-
-    // 获取内部 sockaddr_xx 对象的长度
-    virtual socklen_t length() const = 0;
-
-    // 能够正常工作，即各项参数均未出错
-    virtual bool is_work() const = 0;
-
     std::string getDesc() const
     {
         return m_desc;    
@@ -141,6 +134,27 @@ public:
     {
         m_desc = std::move(desc);    
     }
+
+    // 获取内部的 sockaddr_xx 对象
+    virtual sockaddr* get_c_data() = 0;
+
+    virtual const sockaddr* get_c_data() const = 0;
+
+    // 设置内部的 sockaddr_xx 对象
+    // 该方法只会检查成员 family 的值是否正确
+    // 如果正确，类会被强制变成可工作的
+    // 如果不正确，类会被强制变成不可工作的
+    // 其它参数不进行检查，需要调用方保证参数的正确性
+    virtual void set_c_data(sockaddr* sockaddr) = 0;
+
+    // 获取内部 sockaddr_xx 对象的长度
+    virtual socklen_t length() const = 0;
+
+    // 强制修改类的可工作性
+    virtual void enable_work(bool flag) = 0; 
+
+    // 能够正常工作，即各项参数均未出错
+    virtual bool is_work() const = 0;
 
 private:    
     // 关于地址的描述信息
@@ -178,6 +192,8 @@ public:
 class SockAddrIn : public SockAddrInet
 {
 public:
+    SockAddrIn();
+
     // 参数 addr 为点分十进制的 IPv4 地址
     // 参数 port 为端口号
     SockAddrIn(const std::string& addr, uint32_t port);
@@ -200,9 +216,12 @@ public:
     void setPort(const std::string& port) override;
 
     // 获取内部的 sockaddr_xx 对象
-    sockaddr* data() override;
+    sockaddr* get_c_data() override;
 
-    const sockaddr* data() const override;
+    const sockaddr* get_c_data() const override;
+
+    // 设置内部的 sockaddr_xx 对象
+    void set_c_data(sockaddr* sockaddr) override;
 
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
@@ -219,9 +238,16 @@ public:
         return m_port_available;    
     }
 
+    void enable_work(bool flag) override
+    {
+        m_addr_available = flag;
+        m_port_available = flag;    
+    }
+
     bool is_work() const override
     {
-        return m_addr_available && m_port_available;    
+        return m_addr_available &&
+               m_port_available;    
     }
 
 private:
@@ -235,6 +261,8 @@ private:
 class SockAddrIn6 : public SockAddrInet
 {
 public:
+    SockAddrIn6();
+
     // 参数 addr 为冒号十六进制的 IPv6 地址
     // 参数 port 为端口号
     SockAddrIn6(const std::string& addr, uint32_t port);
@@ -257,9 +285,12 @@ public:
     void setPort(const std::string& port) override;
 
     // 获取内部的 sockaddr_xx 对象
-    sockaddr* data() override;
+    sockaddr* get_c_data() override;
 
-    const sockaddr* data() const override;
+    const sockaddr* get_c_data() const override;
+
+    // 设置内部的 sockaddr_xx 对象
+    void set_c_data(sockaddr* sockaddr) override;
 
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
@@ -276,9 +307,16 @@ public:
         return m_port_available;    
     }
 
+    void enable_work(bool flag) override
+    {
+        m_addr_available = flag;
+        m_port_available = flag;    
+    }
+
     bool is_work() const override
     {
-        return m_addr_available && m_port_available;    
+        return m_addr_available &&
+               m_port_available;    
     }
 
 private:
@@ -293,6 +331,8 @@ private:
 class SockAddrUn : public SockAddr
 {
 public:
+    SockAddrUn();
+
     SockAddrUn(const std::string& path);
 
     // 获取路径
@@ -302,9 +342,12 @@ public:
     void setPath(const std::string& path);
 
     // 获取内部的 sockaddr_xx 对象
-    sockaddr* data() override;
+    sockaddr* get_c_data() override;
 
-    const sockaddr* data() const override;
+    const sockaddr* get_c_data() const override;
+
+    // 设置内部的 sockaddr_xx 对象
+    void set_c_data(sockaddr* sockaddr) override;
 
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
@@ -313,6 +356,11 @@ public:
     bool path_is_available() const
     {
         return m_path_available;    
+    }
+
+    void enable_work(bool flag) override
+    {
+        m_path_available = flag; 
     }
 
     bool is_work() const override

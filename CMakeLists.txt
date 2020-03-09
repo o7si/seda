@@ -27,8 +27,8 @@ set(SRCS
     src/net/http_parser.cpp
     src/net/sockaddr.h
     src/net/sockaddr.cpp
-    src/net/socket.h
-    src/net/socket.cpp
+#    src/net/socket.h
+#    src/net/socket.cpp
     src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp

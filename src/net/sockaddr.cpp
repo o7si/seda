@@ -1,5 +1,4 @@
 #include "sockaddr.h" 
-
 namespace o7si
 {
 namespace net
@@ -105,7 +104,17 @@ void Lookup::lookup(const std::string& host)
 
 // ----------------------------------------------------------------------------
 
+SockAddrIn::SockAddrIn()
+    : m_addr_available(false),
+      m_port_available(false)
+{
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    m_sockaddr.sin_family = AF_INET;
+}
+
 SockAddrIn::SockAddrIn(const std::string& addr, uint32_t port)
+    : m_addr_available(false),
+      m_port_available(false)
 {
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin_family = AF_INET;
@@ -206,24 +215,54 @@ void SockAddrIn::setPort(const std::string& port)
     setPort(std::stoi(port));    
 }
 
-sockaddr* SockAddrIn::data()
+sockaddr* SockAddrIn::get_c_data()
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn may not work.";    
     return (sockaddr*)&m_sockaddr;    
 }
 
-const sockaddr* SockAddrIn::data() const
+const sockaddr* SockAddrIn::get_c_data() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn may not work.";    
     return (const sockaddr*)&m_sockaddr;    
+}
+
+void SockAddrIn::set_c_data(sockaddr* sockaddr)
+{
+    if (sockaddr->sa_family != AF_INET)
+    {
+        LOG_WARN_SYS << "c_data set failure, "
+                     << "family must be AF_INET.";
+        enable_work(false);
+        return;
+    } 
+    
+    m_sockaddr = *(sockaddr_in*)sockaddr;
+    enable_work(true);
 }
 
 socklen_t SockAddrIn::length() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn may not work.";    
     return sizeof(m_sockaddr);    
 }
 
 // ----------------------------------------------------------------------------
 
+SockAddrIn6::SockAddrIn6()
+    : m_addr_available(false),
+      m_port_available(false)
+{
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    m_sockaddr.sin6_family = AF_INET6;
+}
+
 SockAddrIn6::SockAddrIn6(const std::string& addr, uint32_t port)
+    : m_addr_available(false),
+      m_port_available(false)
 {
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin6_family = AF_INET6;
@@ -324,24 +363,52 @@ void SockAddrIn6::setPort(const std::string& port)
     setPort(std::stoi(port));    
 }
 
-sockaddr* SockAddrIn6::data()
+sockaddr* SockAddrIn6::get_c_data()
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn6 may not work.";    
     return (sockaddr*)&m_sockaddr;    
 }
 
-const sockaddr* SockAddrIn6::data() const
+const sockaddr* SockAddrIn6::get_c_data() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn6 may not work.";    
     return (const sockaddr*)&m_sockaddr;    
+}
+
+void SockAddrIn6::set_c_data(sockaddr* sockaddr)
+{
+    if (sockaddr->sa_family != AF_INET6)
+    {
+        LOG_WARN_SYS << "c_data set failure, "
+                     << "family must be AF_INET6.";
+        enable_work(false);
+        return;
+    } 
+    
+    m_sockaddr = *(sockaddr_in6*)sockaddr;
+    enable_work(true);
 }
 
 socklen_t SockAddrIn6::length() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrIn6 may not work.";    
     return sizeof(m_sockaddr);    
 }
 
 // ----------------------------------------------------------------------------
 
+SockAddrUn::SockAddrUn()
+    : m_path_available(false)
+{
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    m_sockaddr.sun_family = AF_UNIX; 
+}
+
 SockAddrUn::SockAddrUn(const std::string& path)
+    : m_path_available(false)
 {
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sun_family = AF_UNIX; 
@@ -379,18 +446,38 @@ void SockAddrUn::setPath(const std::string& path)
     m_path_available = true;
 }
 
-sockaddr* SockAddrUn::data()
+sockaddr* SockAddrUn::get_c_data()
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrUn may not work.";    
     return (sockaddr*)&m_sockaddr;    
 }
 
-const sockaddr* SockAddrUn::data() const
+const sockaddr* SockAddrUn::get_c_data() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrUn may not work.";    
     return (const sockaddr*)&m_sockaddr;    
+}
+
+void SockAddrUn::set_c_data(sockaddr* sockaddr)
+{
+    if (sockaddr->sa_family != AF_UNIX)
+    {
+        LOG_WARN_SYS << "c_data set failure, "
+                     << "family must be AF_UNIX.";
+        enable_work(false); 
+        return;
+    } 
+    
+    m_sockaddr = *(sockaddr_un*)sockaddr;
+    enable_work(true);
 }
 
 socklen_t SockAddrUn::length() const
 {
+    if (!is_work())
+        LOG_WARN_SYS << "SockAddrUn may not work.";    
     return sizeof(m_sockaddr);    
 }
 
