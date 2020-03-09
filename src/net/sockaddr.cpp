@@ -1,4 +1,6 @@
 #include "sockaddr.h" 
+
+
 namespace o7si
 {
 namespace net
@@ -105,17 +107,32 @@ void Lookup::lookup(const std::string& host)
 // ----------------------------------------------------------------------------
 
 SockAddrIn::SockAddrIn()
-    : m_addr_available(false),
-      m_port_available(false)
 {
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin_family = AF_INET;
 }
 
-SockAddrIn::SockAddrIn(const std::string& addr, uint32_t port)
-    : m_addr_available(false),
-      m_port_available(false)
+SockAddrIn::SockAddrIn(const sockaddr* value)
 {
+    enable_work(true);
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    set_c_data(value);
+}
+
+SockAddrIn::SockAddrIn(const sockaddr_in* value)
+    : SockAddrIn((const sockaddr*)value) 
+{    
+}
+
+SockAddrIn::SockAddrIn(const sockaddr_storage* value)
+    : SockAddrIn((const sockaddr*)value)
+{
+}
+
+SockAddrIn::SockAddrIn(const std::string& addr, uint32_t port)
+{
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin_family = AF_INET;
     setAddr(addr);
@@ -229,7 +246,7 @@ const sockaddr* SockAddrIn::get_c_data() const
     return (const sockaddr*)&m_sockaddr;    
 }
 
-void SockAddrIn::set_c_data(sockaddr* sockaddr)
+void SockAddrIn::set_c_data(const sockaddr* sockaddr)
 {
     if (sockaddr->sa_family != AF_INET)
     {
@@ -253,17 +270,32 @@ socklen_t SockAddrIn::length() const
 // ----------------------------------------------------------------------------
 
 SockAddrIn6::SockAddrIn6()
-    : m_addr_available(false),
-      m_port_available(false)
 {
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin6_family = AF_INET6;
 }
 
-SockAddrIn6::SockAddrIn6(const std::string& addr, uint32_t port)
-    : m_addr_available(false),
-      m_port_available(false)
+SockAddrIn6::SockAddrIn6(const sockaddr* value)
 {
+    enable_work(true);
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    set_c_data(value);
+}
+
+SockAddrIn6::SockAddrIn6(const sockaddr_in* value)
+    : SockAddrIn6((const sockaddr*)value) 
+{    
+}
+
+SockAddrIn6::SockAddrIn6(const sockaddr_storage* value)
+    : SockAddrIn6((const sockaddr*)value)
+{
+}
+
+SockAddrIn6::SockAddrIn6(const std::string& addr, uint32_t port)
+{
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sin6_family = AF_INET6;
     setAddr(addr);
@@ -377,7 +409,7 @@ const sockaddr* SockAddrIn6::get_c_data() const
     return (const sockaddr*)&m_sockaddr;    
 }
 
-void SockAddrIn6::set_c_data(sockaddr* sockaddr)
+void SockAddrIn6::set_c_data(const sockaddr* sockaddr)
 {
     if (sockaddr->sa_family != AF_INET6)
     {
@@ -401,15 +433,32 @@ socklen_t SockAddrIn6::length() const
 // ----------------------------------------------------------------------------
 
 SockAddrUn::SockAddrUn()
-    : m_path_available(false)
 {
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sun_family = AF_UNIX; 
 }
 
-SockAddrUn::SockAddrUn(const std::string& path)
-    : m_path_available(false)
+SockAddrUn::SockAddrUn(const sockaddr* value)
 {
+    enable_work(true);
+    memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
+    set_c_data(value);
+}
+
+SockAddrUn::SockAddrUn(const sockaddr_in* value)
+    : SockAddrUn((const sockaddr*)value) 
+{    
+}
+
+SockAddrUn::SockAddrUn(const sockaddr_storage* value)
+    : SockAddrUn((const sockaddr*)value)
+{
+}
+
+SockAddrUn::SockAddrUn(const std::string& path)
+{
+    enable_work(false);
     memset(&m_sockaddr, 0, sizeof(m_sockaddr));    
     m_sockaddr.sun_family = AF_UNIX; 
     setPath(path);
@@ -460,7 +509,7 @@ const sockaddr* SockAddrUn::get_c_data() const
     return (const sockaddr*)&m_sockaddr;    
 }
 
-void SockAddrUn::set_c_data(sockaddr* sockaddr)
+void SockAddrUn::set_c_data(const sockaddr* sockaddr)
 {
     if (sockaddr->sa_family != AF_UNIX)
     {

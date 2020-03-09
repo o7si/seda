@@ -50,8 +50,8 @@ void test_set_c_data()
         ((sockaddr_in*)&storage)->sin_port = htons(1234);
         inet_pton(AF_INET, "1.2.3.4", &((sockaddr_in*)&storage)->sin_addr.s_addr);
 
-        o7si::net::SockAddrIn in;
-        in.set_c_data((sockaddr*)&storage);
+        o7si::net::SockAddrIn in(&storage);
+        // in.set_c_data((sockaddr*)&storage);
     
         LOG_DEBUG_SYS << "addr = " << in.getAddr();
         LOG_DEBUG_SYS << "port = " << in.getPort();
@@ -64,8 +64,8 @@ void test_set_c_data()
         ((sockaddr_in6*)&storage)->sin6_port = htons(1234);
         inet_pton(AF_INET6, "::", &((sockaddr_in6*)&storage)->sin6_addr.s6_addr);
 
-        o7si::net::SockAddrIn6 in6;
-        in6.set_c_data((sockaddr*)&storage);
+        o7si::net::SockAddrIn6 in6(&storage);
+        // in6.set_c_data((sockaddr*)&storage);
     
         LOG_DEBUG_SYS << "addr = " << in6.getAddr();
         LOG_DEBUG_SYS << "port = " << in6.getPort();
@@ -77,8 +77,8 @@ void test_set_c_data()
         ((sockaddr_un*)&storage)->sun_family = AF_UNIX;
         strcpy(((sockaddr_un*)&storage)->sun_path, "test.socket");
 
-        o7si::net::SockAddrUn un;
-        un.set_c_data((sockaddr*)&storage);
+        o7si::net::SockAddrUn un(&storage);
+        // un.set_c_data((sockaddr*)&storage);
     
         LOG_DEBUG_SYS << "path = " << un.getPath();
     }
@@ -87,16 +87,19 @@ void test_set_c_data()
 int main(int argc, char* argv[])
 {
     // work
+    LOG_DEBUG_SYS << "work";
     test_sockaddr_in("www.google.com", "80");
     test_sockaddr_in6("www.google.com", "80");
     test_sockaddr_un("/tmp/test.socket");
     
     // not work
+    LOG_DEBUG_SYS << "not work";
     test_sockaddr_in("www.google.com", "80000");
     test_sockaddr_in6("www.google.com", "80000");
     test_sockaddr_un(std::string(200, 'a').data());
     
     // set_c_data
+    LOG_DEBUG_SYS << "set_c_data";
     test_set_c_data();
     return 0;
 }
