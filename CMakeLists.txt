@@ -27,8 +27,8 @@ set(SRCS
     src/net/http_parser.cpp
     src/net/sockaddr.h
     src/net/sockaddr.cpp
-    #src/net/socket.h
-    #src/net/socket.cpp
+    src/net/socket.h
+    src/net/socket.cpp
     src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp
@@ -61,3 +61,8 @@ add_executable(test_net tests/test_net.cpp)
 target_link_libraries(test_net ${LIBS})
 add_executable(test_sockaddr tests/test_sockaddr.cpp)
 target_link_libraries(test_sockaddr ${LIBS})
+
+add_executable(test_socket_server tests/test_socket_server.cpp)
+target_link_libraries(test_socket_server ${LIBS})
+add_executable(test_socket_client tests/test_socket_client.cpp)
+target_link_libraries(test_socket_client ${LIBS})
