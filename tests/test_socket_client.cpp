@@ -5,28 +5,19 @@
 int main(int argc, char* argv[])
 {
     using namespace o7si::net;
-    //std::shared_ptr<SockAddr> sockaddr = std::make_shared<SockAddrIn>
-    //    ("127.0.0.1", 10000);
     std::shared_ptr<SockAddr> sockaddr = SockAddrIn::LocalHost(10000);
     std::shared_ptr<TCPClientSocket> client_socket = TCPClientSocket::GenSocket(sockaddr);
-
-    bool ret = client_socket->connect();
-    if (!ret)
-    {
-        LOG_DEBUG_SYS << "connect error";
-        return EXIT_FAILURE;  
-    }
-
+    client_socket->connect();
     while (true)
     {
-        std::string msg;
-        std::cin >> msg;
+        std::string send;
+        std::cin >> send;
+        int send_size = client_socket->send(send.data(), send.size());
+        std::cout << "client-send-data-len = " << send_size << std::endl;
 
-        client_socket->send(msg.data(), msg.size());
-
-        char buf[BUFSIZ];
-        int size = client_socket->recv(buf, sizeof(buf));
-        std::string recv(buf, size);
+        std::string recv; 
+        int recv_size = client_socket->recv(recv);
+        std::cout << "client-recv-data-len = " << recv_size << std::endl;
         std::cout << "<server-say> " << recv << std::endl;
     }
     return 0;    

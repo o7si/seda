@@ -197,10 +197,9 @@ public:
 class SockAddrIn : public SockAddrInet
 {
 public:
-    static std::shared_ptr<SockAddrIn> LocalHost(uint32_t port)
-    {
-        return std::make_shared<SockAddrIn>("127.0.0.1", port);    
-    }
+    static std::shared_ptr<SockAddrIn> LocalHost(uint32_t port);
+
+    static std::shared_ptr<SockAddrIn> LocalHost(const std::string& port);
 
     SockAddrIn();
 
@@ -277,6 +276,10 @@ private:
 class SockAddrIn6 : public SockAddrInet
 {
 public:
+    static std::shared_ptr<SockAddrIn6> LocalHost(uint32_t port);
+
+    static std::shared_ptr<SockAddrIn6> LocalHost(const std::string& port);
+
     SockAddrIn6();
 
     // 以下 3 个构造函数均不检验参数的合法性

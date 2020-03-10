@@ -66,10 +66,22 @@ public:
     // 向指定的客户端发送信息
     ssize_t send(int cli_fd, const void* buf, size_t len, 
                  int flags = 0);
+
+    ssize_t send(int cli_fd, const std::string& buf,
+                 int flags = 0);
     
     // 从指定的客户端接收数据
     ssize_t recv(int cli_fd, void* buf, size_t len,
                  int flags = 0);
+
+    ssize_t recv(int cli_fd, std::string& buf,
+                 int flags = 0);
+
+    ssize_t recv_all(int cli_fd, void* buf, size_t len,
+                    int flags = 0);
+
+    ssize_t recv_all(int cli_fd, std::string& buf,
+                    int flags = 0);
 
     // 关闭服务端
     bool server_close();
@@ -110,8 +122,12 @@ public:
     // 向指定的客户端发送信息
     ssize_t send(const void* buf, size_t len, int flags = 0);
 
+    ssize_t send(const std::string& buf, int flags = 0);
+
     // 从指定的客户端接收数据
     ssize_t recv(void* buf, size_t len, int flags = 0);
+
+    ssize_t recv(std::string& buf, int flags = 0);
 
     // 关闭客户端
     bool client_close();

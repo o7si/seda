@@ -106,6 +106,16 @@ void Lookup::lookup(const std::string& host)
 
 // ----------------------------------------------------------------------------
 
+std::shared_ptr<SockAddrIn> SockAddrIn::LocalHost(uint32_t port)
+{
+    return std::make_shared<SockAddrIn>("0.0.0.0", port);    
+}
+
+std::shared_ptr<SockAddrIn> SockAddrIn::LocalHost(const std::string& port)
+{
+    return SockAddrIn::LocalHost(std::stoi(port));    
+}
+
 SockAddrIn::SockAddrIn()
 {
     enable_work(false);
@@ -268,6 +278,16 @@ socklen_t SockAddrIn::length() const
 }
 
 // ----------------------------------------------------------------------------
+
+std::shared_ptr<SockAddrIn6> SockAddrIn6::LocalHost(uint32_t port)
+{
+    return std::make_shared<SockAddrIn6>("::", port);    
+}
+
+std::shared_ptr<SockAddrIn6> SockAddrIn6::LocalHost(const std::string& port)
+{
+    return SockAddrIn6::LocalHost(std::stoi(port));    
+}
 
 SockAddrIn6::SockAddrIn6()
 {

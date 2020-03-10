@@ -138,6 +138,12 @@ ssize_t TCPServerSocket::send(int cli_fd, const void* buf, size_t len,
     return sent;
 }
 
+ssize_t TCPServerSocket::send(int cli_fd, const std::string& buf,
+                              int flags)
+{
+    return send(cli_fd, buf.data(), buf.size(), flags);    
+}
+
 ssize_t TCPServerSocket::recv(int cli_fd, void* buf, size_t len,
                               int flags)
 {
@@ -148,6 +154,17 @@ ssize_t TCPServerSocket::recv(int cli_fd, void* buf, size_t len,
                      << "error desc is '" << strerror(errno) << "', "
                      << "error code is " << errno << ".";
     }
+    return received;
+}
+
+ssize_t TCPServerSocket::recv(int cli_fd, std::string& buf, 
+                              int flags)
+{
+    char tmp[BUFSIZ];
+    memset(tmp, 0, sizeof(tmp));
+     
+    ssize_t received = recv(cli_fd, tmp, sizeof(tmp), flags); 
+    buf = received == -1 ? "" : std::string(tmp, received);
     return received;
 }
 
@@ -252,6 +269,11 @@ ssize_t TCPClientSocket::send(const void* buf, size_t len, int flags)
     return sent;
 }
 
+ssize_t TCPClientSocket::send(const std::string& buf, int flags)
+{
+    return send(buf.data(), buf.size(), flags);     
+}
+
 ssize_t TCPClientSocket::recv(void* buf, size_t len, int flags)
 {
     int received = ::recv(m_fd, buf, len, flags);
@@ -262,6 +284,16 @@ ssize_t TCPClientSocket::recv(void* buf, size_t len, int flags)
                      << "error code is " << errno << ".";
     }
     return received;
+}
+
+ssize_t TCPClientSocket::recv(std::string& buf, int flags)
+{
+    char tmp[BUFSIZ];
+    memset(tmp, 0, sizeof(tmp));
+    
+    ssize_t received = recv(tmp, sizeof(tmp), flags);
+    buf = received == -1 ? "" : std::string(tmp, received);
+    return received;     
 }
 
 bool TCPClientSocket::client_close()
