@@ -10,6 +10,9 @@ int main(int argc, char* argv[])
     std::shared_ptr<UDPClientSocket> client_socket = 
         UDPClientSocket::GenSocket(SockAddrIn::LocalHost(10000));
 
+    client_socket->setSendTimeout(1);
+    client_socket->setRecvTimeout(1);
+
     while (true)
     {
         // 目的端口以及消息
@@ -41,17 +44,17 @@ int main(int argc, char* argv[])
         std::string recv_msg;
         int recv_size = client_socket->recvfrom(from, recv_msg);
 
-        // 如果消息接收失败
+        // 如果消息接收失败，通常情况下是超时
         if (recv_size == -1)
-            break;
+        {
+            std::cout << "recv timeout" << std::endl;
+            continue;
+        }
 
         std::cout << "recv-info" << std::endl;
         std::cout << "\tmsg  : " << recv_msg << std::endl;
         std::cout << "\tsize : " << recv_size << std::endl; 
-        std::cout << "\tsour : " << std::endl;
-
-        if (recv_msg == "quit")
-            break;
+        std::cout << "\tfrom : " << std::endl;
     }
     return EXIT_SUCCESS;    
 }

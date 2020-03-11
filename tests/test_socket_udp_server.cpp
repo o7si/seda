@@ -18,19 +18,29 @@ int main(int argc, char* argv[])
     std::shared_ptr<UDPServerSocket> server_socket = 
         UDPServerSocket::GenSocket(SockAddrIn::LocalHost(atoi(argv[1])));
 
+    server_socket->setSendTimeout(5);
+    server_socket->setRecvTimeout(5);
+
     while (true)
     {
         std::shared_ptr<SockAddr> from;
         std::string recv_msg;
         ssize_t recv_size = server_socket->recvfrom(from, recv_msg);    
 
-        // 如果消息接收失败
+        // 如果消息接收失败，通常情况下是超时
         if (recv_size == -1)
-            break;
+        {
+            std::cout << "recv timeout" << std::endl;
+            continue;
+        }
 
         std::cout << "recv-info" << std::endl;
         std::cout << "\tmsg  : " << recv_msg << std::endl;
         std::cout << "\tsize : " << recv_size << std::endl; 
+        std::cout << "\tfrom : " << std::endl;
+
+        if (recv_msg == "quit")
+            break;
 
         std::shared_ptr<SockAddr> to = from;
         std::string send_msg = std::to_string(recv_msg.size()) + " bytes";
@@ -44,6 +54,5 @@ int main(int argc, char* argv[])
         std::cout << "\tmsg  : " << send_msg << std::endl;
         std::cout << "\tsize : " << send_size << std::endl;
     }
-     
-    return 0;    
+    return EXIT_SUCCESS;    
 }

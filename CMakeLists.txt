@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0) 
 project(seda)
 
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CPP_COMPILER clang)
+
 add_compile_options(-g)
 
 # HTTP 协议解析源码

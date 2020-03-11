@@ -5,6 +5,80 @@ namespace o7si
 namespace net
 {
     
+// ----------------------------------------------------------------------------
+
+std::ostream& operator<<(std::ostream& stream,
+                         const Socket::Timeout& rhs)
+{
+    return stream << "["
+                  << rhs.m_seconds << "s "
+                  << rhs.m_milliseconds << "ms "
+                  << rhs.m_microseconds << "us"  
+                  << "]";
+}
+
+Socket::Timeout::Timeout(int s, int ms, int us)
+    : m_seconds(s), m_milliseconds(ms), m_microseconds(us)
+{
+}
+
+Socket::Timeout Socket::getSendTimeout() const
+{
+    return m_send_timeout;    
+}
+
+void Socket::setSendTimeout(const Socket::Timeout& timeout)
+{
+    timeval tv;
+    tv.tv_sec = timeout.s();
+    tv.tv_usec = timeout.ms() * 1000 + timeout.us();    
+    
+    int ret = ::setsockopt(m_fd, SOL_SOCKET, SO_SNDTIMEO, 
+                           &tv, sizeof(tv));
+    if (ret == -1)
+    {
+        LOG_WARN_SYS << "set send timeout failure, "
+                     << "error desc is '" << strerror(errno) << "', "
+                     << "error code is " << errno << ". "
+                     << "timeout = " << timeout;
+        return;
+    }
+    m_send_timeout = timeout;
+}
+
+void Socket::setSendTimeout(int s, int ms, int us)
+{
+    setSendTimeout(Socket::Timeout(s, ms, us));    
+}
+
+Socket::Timeout Socket::getRecvTimeout() const
+{
+    return m_recv_timeout;    
+}
+
+void Socket::setRecvTimeout(const Socket::Timeout& timeout)
+{
+    timeval tv;
+    tv.tv_sec = timeout.s();
+    tv.tv_usec = timeout.ms() * 1000 + timeout.us();    
+
+    int ret = ::setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO, 
+                           &tv, sizeof(tv));
+    if (ret == -1)
+    {
+        LOG_WARN_SYS << "set recv timeout failure, "
+                     << "error desc is '" << strerror(errno) << "', "
+                     << "error code is " << errno << ". "
+                     << "timeout = " << timeout;
+        return;
+    }
+    m_recv_timeout = timeout; 
+}
+
+void Socket::setRecvTimeout(int s, int ms, int us)
+{
+    setRecvTimeout(Socket::Timeout(s, ms, us));
+}
 
 // ----------------------------------------------------------------------------
 

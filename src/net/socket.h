@@ -27,17 +27,107 @@
 // | sendto   | sent     | -1, errno |
 
 
+// 服务端 TCP Socket
+// socket -> bind -> listen -> accept -> recv/send -> close
+// 客户端 TCP Socket
+// socket -> connet -> recv/send -> close
+// 服务端 UDP Socket
+// socket -> bind -> recvfrom/sendto -> close
+// 客户端 UDP Socket
+// socket -> recvfrom/sendto -> close
+
 namespace o7si
 {
 namespace net
 {
 
+// ---------------------------------------------------------------------------- 
+
+class Socket
+{
+public:
+    // 超时时间
+    class Timeout
+    {
+        friend std::ostream& operator<<(std::ostream& stream,
+                                        const Timeout& rhs);
+    public:
+        Timeout(int s = 0, int ms = 0, int us = 0);
+
+        int s() const
+        {
+            return m_seconds;    
+        }
+
+        void s(int count)
+        {
+            m_seconds = count; 
+        }
+
+        int ms() const
+        {
+            return m_milliseconds;    
+        } 
+
+        void ms(int count)
+        {
+            m_milliseconds = count;    
+        }
+
+        int us() const
+        {
+            return m_microseconds; 
+        }
+
+        void us(int count)
+        {
+            m_microseconds = count;    
+        }
+
+    private:
+        // 秒
+        int m_seconds;
+        // 毫秒
+        int m_milliseconds;
+        // 微秒
+        int m_microseconds;    
+    };
+
+    Socket() = default;;
+
+    virtual ~Socket() = default;
+
+    // 获取 Socket 对应的文件描述符
+    int get_fd() const
+    {
+        return m_fd;    
+    }
+
+    Socket::Timeout getSendTimeout() const; 
+
+    void setSendTimeout(const Socket::Timeout& timeout);
+
+    void setSendTimeout(int s, int ms = 0, int us = 0);
+
+    Socket::Timeout getRecvTimeout() const;
+
+    void setRecvTimeout(const Socket::Timeout& timeout);
+
+    void setRecvTimeout(int s, int ms = 0, int us = 0);
+
+protected:
+    // 文件描述符
+    int m_fd;  
+    // 超时时间（ms）
+    Socket::Timeout m_send_timeout;
+    Socket::Timeout m_recv_timeout; 
+};
 
 // ---------------------------------------------------------------------------- 
 
 // 服务端 TCP Socket
 // socket -> bind -> listen -> accept -> recv/send -> close
-class TCPServerSocket
+class TCPServerSocket : public Socket
 {
 public:
     // 创建 Socket 对象
@@ -49,6 +139,12 @@ public:
     TCPServerSocket(std::shared_ptr<SockAddr> sockaddr);
 
     ~TCPServerSocket();
+
+    // 设置超时时间（发送数据/接收数据）
+    void setTimeout(int millisecond);
+
+    // 获取超时时间
+    int getTimeout() const;
 
     // 建立一个 socket 并且生成文件描述符
     bool socket(); 
@@ -94,8 +190,6 @@ public:
     bool client_close(int cli_fd);
 
 private:
-    // 服务端 socket 对应的文件描述符
-    int m_fd;   
     // 服务端 socket 绑定的地址信息
     std::shared_ptr<SockAddr> m_bind_sockaddr;
     // 目前正在连接的客户端对象
@@ -106,7 +200,7 @@ private:
 
 // 客户端 TCP Socket
 // socket -> connet -> recv/send -> close
-class TCPClientSocket
+class TCPClientSocket : public Socket
 {
 public:
     // 创建 Socket 对象
@@ -146,8 +240,6 @@ public:
     bool client_close();
 
 private:
-    // 客户端 socket 对应的文件描述符
-    int m_fd;
     // 客户端 socket 请求的地址信息
     std::shared_ptr<SockAddr> m_conn_sockaddr;
 };
@@ -156,7 +248,7 @@ private:
 
 // 服务端 UDP Socket
 // socket -> bind -> recvfrom/sendto -> close
-class UDPServerSocket
+class UDPServerSocket : public Socket
 {
 public: 
     // 创建 Socket 对象
@@ -194,8 +286,6 @@ public:
     bool server_close();
 
 private:    
-    // 服务端 socket 对应的文件描述符
-    int m_fd;   
     // 服务端 socket 绑定的地址信息
     std::shared_ptr<SockAddr> m_bind_sockaddr;
 };
@@ -204,7 +294,7 @@ private:
 
 // 客户端 UDP Socket
 // socket -> recvfrom/sendto -> close
-class UDPClientSocket
+class UDPClientSocket : public Socket
 {
 public:
     // 创建 Socket 对象
@@ -242,8 +332,6 @@ public:
     bool client_close();
 
 private:   
-    // 客户端 socket 对应的文件描述符
-    int m_fd;
     // 客户端 socket 发送消息的目的地址
     std::shared_ptr<SockAddr> m_dest_sockaddr;
 };
