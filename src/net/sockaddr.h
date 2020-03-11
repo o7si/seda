@@ -356,6 +356,9 @@ private:
 class SockAddrUn : public SockAddr
 {
 public:
+    // 静态方法名设置为 LocalHost 是为了保持代码的一致性
+    static std::shared_ptr<SockAddrUn> LocalHost(const std::string& path);
+
     SockAddrUn();
 
     // 以下 3 个构造函数均不检验参数的合法性
@@ -406,6 +409,11 @@ private:
 
 // ----------------------------------------------------------------------------
 
+std::ostream& operator<<(std::ostream& stream, const SockAddrIn& sockaddr);
+std::ostream& operator<<(std::ostream& stream, const SockAddrIn6& sockaddr);
+std::ostream& operator<<(std::ostream& stream, const SockAddrUn& sockaddr);
+
+// ----------------------------------------------------------------------------
 
 }   // namespace net
 }   // namespace o7si

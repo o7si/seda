@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
-
+cmake_minimum_required(VERSION 3.0) 
 project(seda)
 
 add_compile_options(-g)
@@ -71,3 +70,6 @@ add_executable(test_socket_udp_server tests/test_socket_udp_server.cpp)
 target_link_libraries(test_socket_udp_server ${LIBS})
 add_executable(test_socket_udp_client tests/test_socket_udp_client.cpp)
 target_link_libraries(test_socket_udp_client ${LIBS})
+
+add_executable(test_sockaddr_print tests/test_sockaddr_print.cpp)
+target_link_libraries(test_sockaddr_print ${LIBS})

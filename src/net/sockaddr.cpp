@@ -452,6 +452,11 @@ socklen_t SockAddrIn6::length() const
 
 // ----------------------------------------------------------------------------
 
+std::shared_ptr<SockAddrUn> SockAddrUn::LocalHost(const std::string& path)
+{
+    return std::make_shared<SockAddrUn>(path);    
+}
+
 SockAddrUn::SockAddrUn()
 {
     enable_work(false);
@@ -548,6 +553,34 @@ socklen_t SockAddrUn::length() const
     if (!is_work())
         LOG_WARN_SYS << "SockAddrUn may not work.";    
     return sizeof(m_sockaddr);    
+}
+
+// ----------------------------------------------------------------------------
+
+std::ostream& operator<<(std::ostream& stream, const SockAddrIn& sockaddr)
+{
+    stream << "[IPv4]"
+           << "[" << sockaddr.getAddr() << "]"   
+           << ":" << sockaddr.getPort()
+           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const SockAddrIn6& sockaddr)
+{
+    stream << "[IPv6]"
+           << "[" << sockaddr.getAddr() << "]"
+           << ":" << sockaddr.getPort()
+           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
+    return stream; 
+}
+
+std::ostream& operator<<(std::ostream& stream, const SockAddrUn& sockaddr)
+{
+    stream << "[UNIX]"
+           << "[" << sockaddr.getPath() << "]"
+           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
+    return stream;
 }
 
 // ----------------------------------------------------------------------------
