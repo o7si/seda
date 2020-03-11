@@ -12,11 +12,11 @@ int main(int argc, char* argv[])
     {
         std::string send;
         std::cin >> send;
-        int send_size = client_socket->send(send.data(), send.size());
+        int send_size = client_socket->write(send.data(), send.size());
         std::cout << "client-send-data-len = " << send_size << std::endl;
 
         std::string recv; 
-        int recv_size = client_socket->recv(recv);
+        int recv_size = client_socket->read(recv);
         std::cout << "client-recv-data-len = " << recv_size << std::endl;
         std::cout << "<server-say> " << recv << std::endl;
     }

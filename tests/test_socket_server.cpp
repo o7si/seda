@@ -11,13 +11,13 @@ int main(int argc, char* argv[])
     while (true)
     {
         std::string recv;
-        int recv_size = server_socket->recv(cli_fd, recv);
+        int recv_size = server_socket->read(cli_fd, recv);
         std::cout << "server-recv-data-len = " << recv_size << std::endl;
         std::cout << "<client-say> " << recv << std::endl;
 
         time_t t = time(nullptr);
         std::string send = asctime(localtime(&t));
-        int send_size = server_socket->send(cli_fd, send);
+        int send_size = server_socket->write(cli_fd, send);
         std::cout << "send-msg-size = " << send_size << std::endl;
     }
     return 0;    

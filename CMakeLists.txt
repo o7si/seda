@@ -66,3 +66,8 @@ add_executable(test_socket_server tests/test_socket_server.cpp)
 target_link_libraries(test_socket_server ${LIBS})
 add_executable(test_socket_client tests/test_socket_client.cpp)
 target_link_libraries(test_socket_client ${LIBS})
+
+add_executable(test_socket_udp_server tests/test_socket_udp_server.cpp)
+target_link_libraries(test_socket_udp_server ${LIBS})
+add_executable(test_socket_udp_client tests/test_socket_udp_client.cpp)
+target_link_libraries(test_socket_udp_client ${LIBS})

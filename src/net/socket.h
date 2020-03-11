@@ -1,5 +1,4 @@
-/******************************************************************************
- * File: socket.h
+/****************************************************************************** * File: socket.h
  * Description: Socket 的封装。 
  * Author: o7si
  *****************************************************************************/
@@ -16,14 +15,16 @@
 #include "sockaddr.h"
 
 
-// | method  | success  | failure   |
-// | socket  | fd       | -1, errno | 
-// | bind    | 0        | -1, errno |  
-// | listen  | 0        | -1, errno | 
-// | accept  | fd       | -1, errno | 
-// | connect | 0        | -1, errno | 
-// | recv    | received | -1, error |
-// | send    | sent     | -1, errno | 
+// | method   | success  | failure   |
+// | socket   | fd       | -1, errno | 
+// | bind     | 0        | -1, errno |  
+// | listen   | 0        | -1, errno | 
+// | accept   | fd       | -1, errno | 
+// | connect  | 0        | -1, errno | 
+// | recv     | received | -1, error |
+// | send     | sent     | -1, errno | 
+// | recvfrom | received | -1, errno |
+// | sendto   | sent     | -1, errno |
 
 
 namespace o7si
@@ -35,6 +36,7 @@ namespace net
 // ---------------------------------------------------------------------------- 
 
 // 服务端 TCP Socket
+// socket -> bind -> listen -> accept -> recv/send -> close
 class TCPServerSocket
 {
 public:
@@ -69,6 +71,10 @@ public:
 
     ssize_t send(int cli_fd, const std::string& buf,
                  int flags = 0);
+
+    ssize_t write(int cli_fd, const void* buf, size_t len);
+
+    ssize_t write(int cli_fd, const std::string& buf);
     
     // 从指定的客户端接收数据
     ssize_t recv(int cli_fd, void* buf, size_t len,
@@ -77,11 +83,9 @@ public:
     ssize_t recv(int cli_fd, std::string& buf,
                  int flags = 0);
 
-    ssize_t recv_all(int cli_fd, void* buf, size_t len,
-                    int flags = 0);
+    ssize_t read(int cli_fd, void* buf, size_t len);
 
-    ssize_t recv_all(int cli_fd, std::string& buf,
-                    int flags = 0);
+    ssize_t read(int cli_fd, std::string& buf);
 
     // 关闭服务端
     bool server_close();
@@ -101,6 +105,7 @@ private:
 // ----------------------------------------------------------------------------
 
 // 客户端 TCP Socket
+// socket -> connet -> recv/send -> close
 class TCPClientSocket
 {
 public:
@@ -124,10 +129,18 @@ public:
 
     ssize_t send(const std::string& buf, int flags = 0);
 
+    ssize_t write(const void* buf, size_t len);
+
+    ssize_t write(const std::string& buf);
+
     // 从指定的客户端接收数据
     ssize_t recv(void* buf, size_t len, int flags = 0);
 
     ssize_t recv(std::string& buf, int flags = 0);
+
+    ssize_t read(void* buf, size_t len);
+
+    ssize_t read(std::string& buf);
 
     // 关闭客户端
     bool client_close();
@@ -139,6 +152,102 @@ private:
     std::shared_ptr<SockAddr> m_conn_sockaddr;
 };
     
+// ----------------------------------------------------------------------------
+
+// 服务端 UDP Socket
+// socket -> bind -> recvfrom/sendto -> close
+class UDPServerSocket
+{
+public: 
+    // 创建 Socket 对象
+    // 参数 sockaddr 表示服务端要绑定的地址
+    static std::shared_ptr<UDPServerSocket>
+    GenSocket(std::shared_ptr<SockAddr> sockaddr); 
+    
+    UDPServerSocket(std::shared_ptr<SockAddr> sockaddr);
+
+    ~UDPServerSocket();
+      
+    // 建立一个 socket 并且生成文件描述符
+    bool socket(); 
+
+    // 绑定地址和端口 
+    bool bind();
+
+    // 发送消息到某个客户端 
+    // 当传入参数为 nullptr 时，将会导致段错误
+    ssize_t sendto(const std::shared_ptr<SockAddr> to, 
+                   const void* buf, size_t len, int flags = 0);
+
+    ssize_t sendto(const std::shared_ptr<SockAddr> to,
+                   const std::string& buf, int flags = 0);
+
+    // 接收某个客户端的消息
+    // 出现错误时，from 将会被置为 nullptr
+    ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
+                     void* buf, size_t len, int flags = 0);
+
+    ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
+                     std::string& buf, int flags = 0);
+
+    // 关闭服务端
+    bool server_close();
+
+private:    
+    // 服务端 socket 对应的文件描述符
+    int m_fd;   
+    // 服务端 socket 绑定的地址信息
+    std::shared_ptr<SockAddr> m_bind_sockaddr;
+};
+
+// ----------------------------------------------------------------------------
+
+// 客户端 UDP Socket
+// socket -> recvfrom/sendto -> close
+class UDPClientSocket
+{
+public:
+    // 创建 Socket 对象
+    // 参数 sockaddr 表示客户端发送消息的目的地址
+    static std::shared_ptr<UDPClientSocket>
+    GenSocket(std::shared_ptr<SockAddr> sockaddr); 
+
+    UDPClientSocket(std::shared_ptr<SockAddr> sockaddr);
+
+    ~UDPClientSocket();
+
+    // 建立一个 socket 并且生成文件描述符
+    bool socket(); 
+
+    // 发送消息到指定的客户端
+    ssize_t sendto(const std::shared_ptr<SockAddr> to, 
+                   const void* buf, size_t len, int flags = 0);
+
+    ssize_t sendto(const std::shared_ptr<SockAddr> to,
+                   const std::string& buf, int flags = 0);
+
+    // 发送消息到默认的客户端 
+    ssize_t sendto(const void* buf, size_t len, int flags = 0);
+
+    ssize_t sendto(const std::string& buf, int flags = 0);
+
+    // 接收某个客户端的消息
+    ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
+                     void* buf, size_t len, int flags = 0);
+
+    ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
+                     std::string& buf, int flags = 0);
+
+    // 关闭客户端
+    bool client_close();
+
+private:   
+    // 客户端 socket 对应的文件描述符
+    int m_fd;
+    // 客户端 socket 发送消息的目的地址
+    std::shared_ptr<SockAddr> m_dest_sockaddr;
+};
+
 // ----------------------------------------------------------------------------
 
 
