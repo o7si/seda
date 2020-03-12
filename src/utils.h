@@ -42,7 +42,7 @@ std::string to_upper(const std::string& str);
 std::string to_lower(const std::string& str);
 
 // 载入文件内容
-std::string load_file(const std::string& filename);
+bool load_file(const std::string& filename, std::string& content);
 
 }   // namespace utils
 }   // o7si

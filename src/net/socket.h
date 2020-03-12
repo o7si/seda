@@ -140,12 +140,6 @@ public:
 
     ~TCPServerSocket();
 
-    // 设置超时时间（发送数据/接收数据）
-    void setTimeout(int millisecond);
-
-    // 获取超时时间
-    int getTimeout() const;
-
     // 建立一个 socket 并且生成文件描述符
     bool socket(); 
 

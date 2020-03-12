@@ -56,15 +56,34 @@ std::string to_lower(const std::string& str)
     return ret;
 }
 
-std::string load_file(const std::string& filename)
+bool load_file(const std::string& filename, std::string& content)
 {
-    std::ifstream stream(filename, std::ifstream::in);
-    std::string ret = {
-        std::istreambuf_iterator<char>(stream),
-        std::istreambuf_iterator<char>(), 
-    };
-    stream.close();
-    return ret;
+    try
+    {
+        std::ifstream stream(filename, std::ifstream::in);
+
+        // 无法打开文件
+        if (!stream.is_open())
+        {
+            content = "";
+            return false;
+        }
+
+        content = {
+            std::istreambuf_iterator<char>(stream),
+            std::istreambuf_iterator<char>(), 
+        };
+        stream.close();
+    }
+    catch (...)
+    {
+        // 读取文件时出现异常
+        content = "";
+        return false; 
+    }
+
+    // 文件正常打开且读取内容时无异常
+    return true;
 }
 
 }   // namespace utils

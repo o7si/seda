@@ -23,6 +23,8 @@ set(SRCS
     src/config.cpp
     src/utils.h
     src/utils.cpp
+    src/server.h
+    src/server.cpp
     src/net/http.h
     src/net/http.cpp
     src/net/http_parser.h
@@ -31,6 +33,8 @@ set(SRCS
     src/net/sockaddr.cpp
     src/net/socket.h
     src/net/socket.cpp
+    src/net/servlet.h
+    src/net/servlet.cpp
     src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp
@@ -76,3 +80,6 @@ target_link_libraries(test_socket_udp_client ${LIBS})
 
 add_executable(test_sockaddr_print tests/test_sockaddr_print.cpp)
 target_link_libraries(test_sockaddr_print ${LIBS})
+
+add_executable(test_server tests/test_server.cpp)
+target_link_libraries(test_server ${LIBS})

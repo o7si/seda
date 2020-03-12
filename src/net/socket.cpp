@@ -1,5 +1,4 @@
 #include "socket.h" 
-
 namespace o7si
 {
 namespace net
