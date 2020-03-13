@@ -57,29 +57,29 @@ set(LIBS
 
 include_directories(src)
 
-add_executable(test_log tests/test_log.cpp)
-target_link_libraries(test_log ${LIBS})
-add_executable(test_config tests/test_config.cpp)
-target_link_libraries(test_config ${LIBS})
-add_executable(test_stage tests/test_stage.cpp)
-target_link_libraries(test_stage ${LIBS})
-add_executable(test_net tests/test_net.cpp)
-target_link_libraries(test_net ${LIBS})
-add_executable(test_sockaddr tests/test_sockaddr.cpp)
-target_link_libraries(test_sockaddr ${LIBS})
-
-add_executable(test_socket_server tests/test_socket_server.cpp)
-target_link_libraries(test_socket_server ${LIBS})
-add_executable(test_socket_client tests/test_socket_client.cpp)
-target_link_libraries(test_socket_client ${LIBS})
-
-add_executable(test_socket_udp_server tests/test_socket_udp_server.cpp)
-target_link_libraries(test_socket_udp_server ${LIBS})
-add_executable(test_socket_udp_client tests/test_socket_udp_client.cpp)
-target_link_libraries(test_socket_udp_client ${LIBS})
-
-add_executable(test_sockaddr_print tests/test_sockaddr_print.cpp)
-target_link_libraries(test_sockaddr_print ${LIBS})
+#add_executable(test_log tests/test_log.cpp)
+#target_link_libraries(test_log ${LIBS})
+#add_executable(test_config tests/test_config.cpp)
+#target_link_libraries(test_config ${LIBS})
+#add_executable(test_stage tests/test_stage.cpp)
+#target_link_libraries(test_stage ${LIBS})
+#add_executable(test_net tests/test_net.cpp)
+#target_link_libraries(test_net ${LIBS})
+#add_executable(test_sockaddr tests/test_sockaddr.cpp)
+#target_link_libraries(test_sockaddr ${LIBS})
+#
+#add_executable(test_socket_server tests/test_socket_server.cpp)
+#target_link_libraries(test_socket_server ${LIBS})
+#add_executable(test_socket_client tests/test_socket_client.cpp)
+#target_link_libraries(test_socket_client ${LIBS})
+#
+#add_executable(test_socket_udp_server tests/test_socket_udp_server.cpp)
+#target_link_libraries(test_socket_udp_server ${LIBS})
+#add_executable(test_socket_udp_client tests/test_socket_udp_client.cpp)
+#target_link_libraries(test_socket_udp_client ${LIBS})
+#
+#add_executable(test_sockaddr_print tests/test_sockaddr_print.cpp)
+#target_link_libraries(test_sockaddr_print ${LIBS})
 
 add_executable(test_server tests/test_server.cpp)
 target_link_libraries(test_server ${LIBS})

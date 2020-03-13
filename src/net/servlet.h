@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+#include "../log.h"
 #include "../utils.h"
 #include "http.h"
 
@@ -24,6 +25,7 @@ class Servlet
 public:
     explicit Servlet(std::string root);
 
+    // 处理 HTTP 请求
     void todo(std::shared_ptr<HttpRequest> request, 
               std::shared_ptr<HttpResponse> response);
 

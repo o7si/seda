@@ -14,7 +14,7 @@
 
 #include "sockaddr.h"
 
-
+// API（原生） 
 // | method   | success  | failure   |
 // | socket   | fd       | -1, errno | 
 // | bind     | 0        | -1, errno |  
@@ -27,14 +27,16 @@
 // | sendto   | sent     | -1, errno |
 
 
-// 服务端 TCP Socket
+// 一般性的使用流程
+// TCP-Server
 // socket -> bind -> listen -> accept -> recv/send -> close
-// 客户端 TCP Socket
+// TCP-Client
 // socket -> connet -> recv/send -> close
-// 服务端 UDP Socket
+// UDP-Server
 // socket -> bind -> recvfrom/sendto -> close
-// 客户端 UDP Socket
+// UDP-Client
 // socket -> recvfrom/sendto -> close
+
 
 namespace o7si
 {
@@ -177,6 +179,8 @@ public:
 
     ssize_t read(int cli_fd, std::string& buf);
 
+    bool close();
+
     // 关闭服务端
     bool server_close();
 
@@ -230,6 +234,8 @@ public:
 
     ssize_t read(std::string& buf);
 
+    bool close();
+
     // 关闭客户端
     bool client_close();
 
@@ -276,6 +282,8 @@ public:
     ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
                      std::string& buf, int flags = 0);
 
+    bool close();
+
     // 关闭服务端
     bool server_close();
 
@@ -321,6 +329,8 @@ public:
 
     ssize_t recvfrom(std::shared_ptr<SockAddr>& from,
                      std::string& buf, int flags = 0);
+
+    bool close();
 
     // 关闭客户端
     bool client_close();

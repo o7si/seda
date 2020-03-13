@@ -105,9 +105,7 @@ TCPServerSocket::TCPServerSocket(std::shared_ptr<SockAddr> sockaddr)
 
 TCPServerSocket::~TCPServerSocket()
 {
-    for (const auto& item : m_cli_objs)
-        client_close(item.first);
-    server_close();
+    close();
 }
 
 bool TCPServerSocket::socket()
@@ -260,6 +258,19 @@ ssize_t TCPServerSocket::read(int cli_fd, std::string& buf)
     return recv(cli_fd, buf, 0);    
 }
 
+bool TCPServerSocket::close()
+{
+    int count = 0;
+    for (const auto& item : m_cli_objs)
+        if (!client_close(item.first))
+            ++ count;
+
+    if (!server_close())
+        ++ count;
+
+    return count == 0;
+}
+
 bool TCPServerSocket::server_close()
 {
     int ret = ::close(m_fd); 
@@ -315,7 +326,7 @@ TCPClientSocket::TCPClientSocket(std::shared_ptr<SockAddr> sockaddr)
 
 TCPClientSocket::~TCPClientSocket()
 {
-    client_close();
+    close();
 }
 
 bool TCPClientSocket::socket()
@@ -408,6 +419,11 @@ ssize_t TCPClientSocket::read(std::string& buf)
     return recv(buf, 0);    
 }
 
+bool TCPClientSocket::close()
+{
+    return client_close();
+}
+
 bool TCPClientSocket::client_close()
 {
     int ret = ::close(m_fd);
@@ -444,7 +460,7 @@ UDPServerSocket::UDPServerSocket(std::shared_ptr<SockAddr> sockaddr)
 
 UDPServerSocket::~UDPServerSocket()
 {
-    server_close();
+    close();
 }
 
 bool UDPServerSocket::socket()
@@ -549,6 +565,11 @@ ssize_t UDPServerSocket::recvfrom(std::shared_ptr<SockAddr>& from,
     return received;
 }
 
+bool UDPServerSocket::close()
+{
+    return server_close();
+}
+
 bool UDPServerSocket::server_close()
 {
     int ret = ::close(m_fd); 
@@ -582,7 +603,7 @@ UDPClientSocket::UDPClientSocket(std::shared_ptr<SockAddr> sockaddr)
 
 UDPClientSocket::~UDPClientSocket()
 {
-    client_close();
+    close();
 }
 
 bool UDPClientSocket::socket()
@@ -680,6 +701,11 @@ ssize_t UDPClientSocket::recvfrom(std::shared_ptr<SockAddr>& from,
     ssize_t received = recvfrom(from, tmp, sizeof(tmp), flags);
     buf = received == -1 ? "" : std::string(tmp, received);
     return received;
+}
+
+bool UDPClientSocket::close()
+{
+    return client_close();
 }
 
 bool UDPClientSocket::client_close()

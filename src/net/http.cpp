@@ -166,9 +166,8 @@ std::ostream& HttpRequest::dump(std::ostream& stream)
            << "\r\n";
     // 字段
     for (const auto& elem : m_fields)
-    {
         stream << elem.first << ": " << elem.second << "\r\n";     
-    }
+
     // 空行
     stream << "\r\n";
     // 主体
@@ -196,9 +195,7 @@ std::ostream& HttpResponse::dump(std::ostream& stream)
            << "\r\n";
     // 字段
     for (const auto& elem : m_fields)
-    {
         stream << elem.first << ": " << elem.second << "\r\n";     
-    }
     stream << "Content-Length: " << m_body.size() << "\r\n";
 
     // 空行

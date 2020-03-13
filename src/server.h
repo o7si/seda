@@ -79,6 +79,16 @@ public:
         m_path = std::move(path);    
     }
 
+    int getThreadPoolCapacity() const
+    {
+        return m_pool_capacity;   
+    }
+
+    void setThreadPoolCapacity(int capacity)
+    {
+        m_pool_capacity = capacity;    
+    }
+
     // 启动服务
     bool start();
 
@@ -106,6 +116,7 @@ private:
     // 由于该服务的存在意识是为了监控和调节服务器的内部细节
     // 所以无法调整该线程池的容量
     std::vector<std::thread> m_worker_pool;
+    // 线程池容量
     int m_pool_capacity;
     
     // 线程任务

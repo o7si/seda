@@ -11,17 +11,15 @@ namespace server
 
 
 WebServer::WebServer(int protocol, int port, std::string path)
-    : m_port(port), m_path(std::move(path))
+    : m_port(port), m_path(std::move(path)),
+      m_pool_capacity(5)
 {
     setProtocol(protocol);
-    
-    // 线程池的默认容量为 5
-    m_pool_capacity = 5;
 }
 
 WebServer::~WebServer()
 {
-    
+    stop(); 
 }
 
 bool WebServer::start()
@@ -40,6 +38,7 @@ bool WebServer::start()
             o7si::net::SockAddrIn6::LocalHost(m_port)
         );    
     }
+
     // 建立 Socket 失败
     if (m_socket == nullptr)
     {
@@ -48,21 +47,51 @@ bool WebServer::start()
         return false;     
     }
 
+    // 设定超时时间
+    m_socket->setSendTimeout(1);
+    m_socket->setRecvTimeout(1);
+
     // 启动线程
     for (int i = 0; i < m_pool_capacity; ++ i)
         m_worker_pool.emplace_back(Worker(this, i));
 
+    LOG_INFO_SYS << "webserver start success. "
+                 << "port = " << m_port << ", "
+                 << "protocol = " << m_protocol << ", "
+                 << "path = " << m_path;
     return true;
 }
 
 bool WebServer::restart()
 {
+    // 停止服务
+    if (!stop())
+        return false;
+    // 启动服务
+    if (!start())
+        return false;
+
+    LOG_INFO_SYS << "webserver restart success.";
     return true;    
 }
 
 bool WebServer::stop()
 {
-    return true;    
+    // 当服务未被关闭
+    if (!m_shutdown)
+    {
+        // 调整服务状态 
+        m_shutdown = true;   
+        // 等待线程服务完毕
+        for (auto& thread : m_worker_pool)
+            thread.join();
+        // 清理 Socket 资源
+        m_socket->close(); 
+        m_socket = nullptr;
+    }
+
+    LOG_INFO_SYS << "webserver stop success.";
+    return true;
 }
 
 WebServer::Worker::Worker(WebServer* server, int id)
@@ -79,6 +108,8 @@ void WebServer::Worker::operator()()
         // 客户端连接到服务器时出现错误
         if (cli_fd == -1)
             continue;
+        LOG_DEBUG_SYS << "connection establishment" 
+                      << "(" << cli_fd << ")";
 
         // 如果服务未关闭，则循环处理客户端的请求
         while (!m_server->m_shutdown)
@@ -104,8 +135,6 @@ void WebServer::Worker::operator()()
             std::shared_ptr<o7si::net::HttpRequest> request 
                 = req_parser.inner_request();
 
-            std::cout << request->format() << std::endl;
-
             // 处理 HTTP 请求
             o7si::net::Servlet servlet(m_server->m_path);
             std::shared_ptr<o7si::net::HttpResponse> response
@@ -116,6 +145,8 @@ void WebServer::Worker::operator()()
             std::string res_msg = response->format();
             m_server->m_socket->send(cli_fd, res_msg);
         }
+        LOG_DEBUG_SYS << "disconnect" 
+                      << "(" << cli_fd << ")";
     }
 }
 

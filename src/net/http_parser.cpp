@@ -10,7 +10,7 @@ namespace net
 void request_field_cb(void* data, const char* field, size_t flen, 
                                   const char* value, size_t vlen)
 {
-    LOG_INFO_SYS << std::string(field, flen) << " " 
+    LOG_DEBUG_SYS << std::string(field, flen) << ": " 
                  << std::string(value, vlen);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->set_field(std::string(field, flen), 
@@ -19,56 +19,57 @@ void request_field_cb(void* data, const char* field, size_t flen,
 
 void request_method_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->method(GenMethodFrom(std::string(at, length)));
 }
 
 void request_uri_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->uri(std::string(at, length));
 }
 
 void request_fragment_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->fragment(std::string(at, length));
 }
 
 void request_path_cb(void* data, const char* at, size_t length) 
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->path(std::string(at, length));
 }
 
 void request_query_cb(void* data, const char* at, size_t length) 
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->query(std::string(at, length));
 }
 
 void request_version_cb(void* data, const char* at, size_t length) 
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
     parser->inner_request()->version(GenVersionFrom(std::string(at, length)));
 }
 
 void request_header_done_cb(void* data, const char* at, size_t length) 
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpRequestParser* parser = static_cast<HttpRequestParser*>(data);
+    parser->inner_request()->body(std::string(at, length));
 }
 
 void response_field_cb(void* data, const char* field, size_t flen,
                                    const char* value, size_t vlen)
 {
-    LOG_INFO_SYS << std::string(field, flen) << " " 
+    LOG_DEBUG_SYS << std::string(field, flen) << ": " 
                  << std::string(value, vlen);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->set_field(std::string(field, flen), 
@@ -77,15 +78,14 @@ void response_field_cb(void* data, const char* field, size_t flen,
 
 void response_reason_phrase_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->reason_phrase(std::string(at, length));
 }
 
 void response_status_code_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
-    //LOG_DEBUG << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->status(
         GenStatusFrom(std::stoi(std::string(at, length))));
@@ -93,27 +93,27 @@ void response_status_code_cb(void* data, const char* at, size_t length)
 
 void response_chunk_size_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
 }
 
 void response_version_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
     parser->inner_response()->version(GenVersionFrom(std::string(at, length)));
 }
 
 void response_header_done_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
+    parser->inner_response()->body(std::string(at, length));
 }
-
 
 void response_last_chunk_cb(void* data, const char* at, size_t length)
 {
-    LOG_INFO_SYS << std::string(at, length);
+    LOG_DEBUG_SYS << std::string(at, length);
     HttpResponseParser* parser = static_cast<HttpResponseParser*>(data);
 }
 
