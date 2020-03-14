@@ -5,6 +5,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <jsoncpp/json/json.h>
 
 #include "api_manager.h"
 

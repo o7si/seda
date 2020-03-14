@@ -30,6 +30,8 @@ set(SRCS
     src/net/sockaddr.h
     src/net/socket.cpp
     src/net/socket.h
+    src/random.cpp
+    src/random.h
     src/seda/component/event_handler.hpp
     src/seda/component/event_queue.hpp     
     src/seda/component/performeter.hpp
@@ -91,3 +93,6 @@ target_link_libraries(test_server ${LIBS})
 
 add_executable(test_jsoncpp tests/test_jsoncpp.cpp)
 target_link_libraries(test_jsoncpp ${LIBS})
+
+add_executable(test_random tests/test_random.cpp)
+target_link_libraries(test_random ${LIBS})
