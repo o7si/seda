@@ -1,22 +1,22 @@
 /******************************************************************************
- * File: server.h
- * Description: 提供对外接口，调节相关细节。 
+ * File: web_server.h
+ * Description: 提供 Web 服务，从而调整框架的内部细节。 
  * Author: o7si
  *****************************************************************************/
 #pragma once
 
-#include <stdexcept>
 #include <string>
 #include <memory>
 #include <thread>
 
-#include "log.h"
+#include "../log.h"
 
-#include "net/http.h"
-#include "net/http_parser.h"
-#include "net/sockaddr.h"
-#include "net/socket.h"
-#include "net/servlet.h"
+#include "../net/http.h"
+#include "../net/http_parser.h"
+#include "../net/sockaddr.h"
+#include "../net/socket.h"
+
+#include "servlet.h"
 
 
 namespace o7si

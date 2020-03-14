@@ -23,8 +23,6 @@ set(SRCS
     src/config.cpp
     src/utils.h
     src/utils.cpp
-    src/server.h
-    src/server.cpp
     src/net/http.h
     src/net/http.cpp
     src/net/http_parser.h
@@ -33,8 +31,10 @@ set(SRCS
     src/net/sockaddr.cpp
     src/net/socket.h
     src/net/socket.cpp
-    src/net/servlet.h
-    src/net/servlet.cpp
+    src/server/web_server.h
+    src/server/web_server.cpp
+    src/server/servlet.h
+    src/server/servlet.cpp
     src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp

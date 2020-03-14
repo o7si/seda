@@ -41,8 +41,5 @@ std::string to_upper(const std::string& str);
 // 将字符串转化为小写
 std::string to_lower(const std::string& str);
 
-// 载入文件内容
-bool load_file(const std::string& filename, std::string& content);
-
 }   // namespace utils
 }   // o7si
