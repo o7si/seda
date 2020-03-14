@@ -1,4 +1,6 @@
 #include "socket.h" 
+
+
 namespace o7si
 {
 namespace net
@@ -756,7 +758,6 @@ bool UDPClientSocket::client_close()
 }
 
 // ----------------------------------------------------------------------------
-
 
 }   // namespace net    
 }   // namespace o7si

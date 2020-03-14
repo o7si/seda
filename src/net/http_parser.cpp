@@ -1,5 +1,6 @@
 #include "http_parser.h"
 
+
 namespace o7si
 {
 namespace net
@@ -119,7 +120,6 @@ void response_last_chunk_cb(void* data, const char* at, size_t length)
 
 // ----------------------------------------------------------------------------    
 
-
 HttpRequestParser::HttpRequestParser()
 {
     m_request = std::make_shared<HttpRequest>();
@@ -206,6 +206,8 @@ size_t HttpResponseParser::parser_execute(const char* data,
 {
     return httpclient_parser_execute(&m_parser, data, len, off);
 }
+
+// ----------------------------------------------------------------------------
 
 }   // namespace net    
 }   // namespace o7si

@@ -12,11 +12,10 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include <iostream>
 #include <string>
 #include <vector>
 
-#include <log.h>
+#include "../log.h"
 
 
 /******************************************************************************
@@ -39,7 +38,6 @@ namespace o7si
 {
 namespace net
 {
-
 
 // ----------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0) 
 project(seda)
 
+# 使用 clang 编写项目
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CPP_COMPILER clang)
 
@@ -17,46 +18,46 @@ set(HTTP_ANALYSIS_SRCS
 add_library(http-analysis SHARED ${HTTP_ANALYSIS_SRCS})
 
 set(SRCS
-    src/log.h
-    src/log.cpp
-    src/config.h 
     src/config.cpp
-    src/utils.h
-    src/utils.cpp
-    src/net/http.h
+    src/config.h 
+    src/log.cpp
+    src/log.h
     src/net/http.cpp
-    src/net/http_parser.h
+    src/net/http.h
     src/net/http_parser.cpp
-    src/net/sockaddr.h
+    src/net/http_parser.h
     src/net/sockaddr.cpp
-    src/net/socket.h
+    src/net/sockaddr.h
     src/net/socket.cpp
-    src/server/web_server.h
-    src/server/web_server.cpp
-    src/server/servlet.h
-    src/server/servlet.cpp
-    src/server/api.h
-    src/server/api.cpp
-    src/server/api_manager.h
-    src/server/api_manager.cpp
-    src/seda/macro.h
-    src/seda/stage.h
-    src/seda/stage.cpp
-    src/seda/stage_manager.h
-    src/seda/stage_manager.cpp
-    src/seda/component/event_queue.hpp     
+    src/net/socket.h
     src/seda/component/event_handler.hpp
+    src/seda/component/event_queue.hpp     
     src/seda/component/performeter.hpp
     src/seda/component/thread_pool.hpp
+    src/seda/macro.h
+    src/seda/stage.cpp
+    src/seda/stage.h
+    src/seda/stage_manager.cpp
+    src/seda/stage_manager.h
+    src/server/api.cpp
+    src/server/api.h
+    src/server/api_manager.cpp
+    src/server/api_manager.h
+    src/server/servlet.cpp
+    src/server/servlet.h
+    src/server/web_server.cpp
+    src/server/web_server.h
+    src/utils.cpp
+    src/utils.h
 )
-
 add_library(seda SHARED ${SRCS})
 
 set(LIBS
-    seda
-    pthread
-    yaml-cpp
     http-analysis
+    jsoncpp
+    pthread
+    seda
+    yaml-cpp
 )
 
 include_directories(src)
@@ -87,3 +88,6 @@ include_directories(src)
 
 add_executable(test_server tests/test_server.cpp)
 target_link_libraries(test_server ${LIBS})
+
+add_executable(test_jsoncpp tests/test_jsoncpp.cpp)
+target_link_libraries(test_jsoncpp ${LIBS})

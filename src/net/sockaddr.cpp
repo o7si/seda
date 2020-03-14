@@ -5,7 +5,6 @@ namespace o7si
 {
 namespace net
 {
-    
 
 // ----------------------------------------------------------------------------
 
@@ -584,7 +583,6 @@ std::ostream& operator<<(std::ostream& stream, const SockAddrUn& sockaddr)
 }
 
 // ----------------------------------------------------------------------------
-
 
 }   // namespace net    
 }   // namespace o7si

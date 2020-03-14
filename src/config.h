@@ -12,6 +12,7 @@
 #include "log.h"
 #include "seda/stage.h"
 
+
 namespace o7si
 {
 namespace config

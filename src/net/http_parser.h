@@ -9,6 +9,7 @@
 #include <net/analysis/httpclient_parser.h>
 
 #include "../log.h"
+
 #include "http.h"
 
 
@@ -100,6 +101,8 @@ private:
     httpclient_parser m_parser;
     std::shared_ptr<HttpResponse> m_response;
 };
+
+// ----------------------------------------------------------------------------
 
 }    
 }
