@@ -71,115 +71,33 @@
 
 
 // 带检查的日志宏
-#define LOG_CHECK(level, user, check, target) \
-        LOG_TEMPLATE(level, user, (check) == target)
+#define LOG_CHECK(level, user, check) \
+        LOG_TEMPLATE(level, user, check)
 
-#define LOG_CHECK_SYS(level, check, target) \
-        LOG_CHECK(level, SYSTEM, check, target)
+#define LOG_CHECK_SYS(level, check) \
+        LOG_CHECK(level, SYSTEM, check)
 
-#define LOG_DEBUG_CHECK(user, check, target) \
-        LOG_CHECK(DEBUG, user, check, target)
-#define LOG_INFO_CHECK(user, check, target) \
-        LOG_CHECK(INFO, user, check, target)
-#define LOG_WARN_CHECK(user, check, target) \
-        LOG_CHECK(WARN, user, check, target)
-#define LOG_ERROR_CHECK(user, check, target) \
-        LOG_CHECK(ERROR, user, check, target)
-#define LOG_FATAL_CHECK(user, check, target) \
-        LOG_CHECK(FATAL, user, check, target)
+#define LOG_DEBUG_CHECK(user, check) \
+        LOG_CHECK(DEBUG, user, check)
+#define LOG_INFO_CHECK(user, check) \
+        LOG_CHECK(INFO, user, check)
+#define LOG_WARN_CHECK(user, check) \
+        LOG_CHECK(WARN, user, check)
+#define LOG_ERROR_CHECK(user, check) \
+        LOG_CHECK(ERROR, user, check)
+#define LOG_FATAL_CHECK(user, check) \
+        LOG_CHECK(FATAL, user, check)
 
-#define LOG_DEBUG_CHECK_SYS(check, target) \
-        LOG_DEBUG_CHECK(SYSTEM, check, target)
-#define LOG_INFO_CHECK_SYS(check, target) \
-        LOG_INFO_CHECK(SYSTEM, check, target)
-#define LOG_WARN_CHECK_SYS(check, target) \
-        LOG_WARN_CHECK(SYSTEM, check, target)
-#define LOG_ERROR_CHECK_SYS(check, target) \
-        LOG_ERROR_CHECK(SYSTEM, check, target)
-#define LOG_FATAL_CHECK_SYS(check, target) \
-        LOG_FATAL_CHECK(SYSTEM, check, target)
-
-#define LOG_CHECK_TRUE(level, user, check) \
-        LOG_TEMPLATE(level, user, (check) == true)
-
-#define LOG_CHECK_TRUE_SYS(level, check) \
-        LOG_CHECK_TRUE(level, SYSTEM, check)
-
-#define LOG_DEBUG_CHECK_TRUE(user, check) \
-        LOG_CHECK_TRUE(DEBUG, user, check)
-#define LOG_INFO_CHECK_TRUE(user, check) \
-        LOG_CHECK_TRUE(INFO, user, check)
-#define LOG_WARN_CHECK_TRUE(user, check) \
-        LOG_CHECK_TRUE(WARN, user, check)
-#define LOG_ERROR_CHECK_TRUE(user, check) \
-        LOG_CHECK_TRUE(ERROR, user, check)
-#define LOG_FATAL_CHECK_TRUE(user, check) \
-        LOG_CHECK_TRUE(FATAL, user, check)
-
-#define LOG_DEBUG_CHECK_TRUE_SYS(check) \
-        LOG_DEBUG_CHECK_TRUE(SYSTEM, check)
-#define LOG_INFO_CHECK_TRUE_SYS(check) \
-        LOG_INFO_CHECK_TRUE(SYSTEM, check)
-#define LOG_WARN_CHECK_TRUE_SYS(check) \
-        LOG_WARN_CHECK_TRUE(SYSTEM, check)
-#define LOG_ERROR_CHECK_TRUE_SYS(check) \
-        LOG_ERROR_CHECK_TRUE(SYSTEM, check)
-#define LOG_FATAL_CHECK_TRUE_SYS(check) \
-        LOG_FATAL_CHECK_TRUE(SYSTEM, check)
-
-#define LOG_CHECK_FALSE(level, user, check) \
-        LOG_TEMPLATE(level, user, (check) == false)
-
-#define LOG_CHECK_FALSE_SYS(level, check) \
-        LOG_CHECK_FALSE(level, SYSTEM, check)
-
-#define LOG_DEBUG_CHECK_FALSE(user, check) \
-        LOG_CHECK_FALSE(DEBUG, user, check)
-#define LOG_INFO_CHECK_FALSE(user, check) \
-        LOG_CHECK_FALSE(INFO, user, check)
-#define LOG_WARN_CHECK_FALSE(user, check) \
-        LOG_CHECK_FALSE(WARN, user, check)
-#define LOG_ERROR_CHECK_FALSE(user, check) \
-        LOG_CHECK_FALSE(ERROR, user, check)
-#define LOG_FATAL_CHECK_FALSE(user, check) \
-        LOG_CHECK_FALSE(FATAL, user, check)
-
-#define LOG_DEBUG_CHECK_FALSE_SYS(check) \
-        LOG_DEBUG_CHECK_FALSE(SYSTEM, check)
-#define LOG_INFO_CHECK_FALSE_SYS(check) \
-        LOG_INFO_CHECK_FALSE(SYSTEM, check)
-#define LOG_WARN_CHECK_FALSE_SYS(check) \
-        LOG_WARN_CHECK_FALSE(SYSTEM, check)
-#define LOG_ERROR_CHECK_FALSE_SYS(check) \
-        LOG_ERROR_CHECK_FALSE(SYSTEM, check)
-#define LOG_FATAL_CHECK_FALSE_SYS(check) \
-        LOG_FATAL_CHECK_FALSE(SYSTEM, check)
-
-// 由于某些宏定义的名称中关键字的顺序容易被记错
-// 于是定义了以下的宏方便使用（调整了关键字的顺序）
-#define LOG_SYS_CHECK LOG_CHECK_SYS
-
-#define LOG_DEBUG_SYS_CHECK LOG_DEBUG_CHECK_SYS
-#define LOG_INFO_SYS_CHECK LOG_INFO_CHECK_SYS
-#define LOG_WARN_SYS_CHECK LOG_WARN_CHECK_SYS
-#define LOG_ERROR_SYS_CHECK LOG_ERROR_CHECK_SYS
-#define LOG_FATAL_SYS_CHECK LOG_FATAL_CHECK_SYS
-
-#define LOG_SYS_CHECK_FALSE LOG_CHECK_FALSE_SYS
-
-#define LOG_DEBUG_SYS_CHECK_FALSE LOG_DEBUG_CHECK_FALSE_SYS
-#define LOG_INFO_SYS_CHECK_FALSE LOG_INFO_CHECK_FALSE_SYS
-#define LOG_WARN_SYS_CHECK_FALSE LOG_WARN_CHECK_FALSE_SYS
-#define LOG_ERROR_SYS_CHECK_FALSE LOG_ERROR_CHECK_FALSE_SYS
-#define LOG_FATAL_SYS_CHECK_FALSE LOG_FATAL_CHECK_FALSE_SYS
-
-#define LOG_SYS_CHECK_TRUE LOG_CHECK_TRUE_SYS
-
-#define LOG_DEBUG_SYS_CHECK_TRUE LOG_DEBUG_CHECK_TRUE_SYS
-#define LOG_INFO_SYS_CHECK_TRUE LOG_INFO_CHECK_TRUE_SYS
-#define LOG_WARN_SYS_CHECK_TRUE LOG_WARN_CHECK_TRUE_SYS
-#define LOG_ERROR_SYS_CHECK_TRUE LOG_ERROR_CHECK_TRUE_SYS
-#define LOG_FATAL_SYS_CHECK_TRUE LOG_FATAL_CHECK_TRUE_SYS
+#define LOG_DEBUG_CHECK_SYS(check) \
+        LOG_DEBUG_CHECK(SYSTEM, check)
+#define LOG_INFO_CHECK_SYS(check)  \
+        LOG_INFO_CHECK(SYSTEM, check)
+#define LOG_WARN_CHECK_SYS(check)  \
+        LOG_WARN_CHECK(SYSTEM, check)
+#define LOG_ERROR_CHECK_SYS(check)  \
+        LOG_ERROR_CHECK(SYSTEM, check)
+#define LOG_FATAL_CHECK_SYS(check)  \
+        LOG_FATAL_CHECK(SYSTEM, check)
 
 
 namespace o7si

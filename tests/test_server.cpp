@@ -7,7 +7,6 @@ int main(int argc, char* argv[])
     server.start();
     std::this_thread::sleep_for(std::chrono::seconds(2));    
     server.stop();
-    server.setPort(10101);
     server.setProtocol(6);
     server.restart();
     std::this_thread::sleep_for(std::chrono::seconds(2000));    

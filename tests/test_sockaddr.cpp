@@ -12,7 +12,7 @@ void test_sockaddr_in(const char* addr, const char* port)
     }
 
     o7si::net::SockAddrIn sockaddr(lookup.get4()[0].getAddr(), port);
-    LOG_DEBUG_CHECK_FALSE_SYS(sockaddr.is_work()) << "may not work.";
+    LOG_DEBUG_CHECK_SYS(!sockaddr.is_work()) << "may not work.";
     LOG_DEBUG_SYS << "addr = " << sockaddr.getAddr();
     LOG_DEBUG_SYS << "port = " << sockaddr.getPort();
 }
@@ -28,7 +28,7 @@ void test_sockaddr_in6(const char* addr, const char* port)
     }
 
     o7si::net::SockAddrIn6 sockaddr(lookup.get6()[0].getAddr(), port);
-    LOG_DEBUG_CHECK_FALSE_SYS(sockaddr.is_work()) << "may not work.";
+    LOG_DEBUG_CHECK_SYS(!sockaddr.is_work()) << "may not work.";
     LOG_DEBUG_SYS << "addr = " << sockaddr.getAddr();
     LOG_DEBUG_SYS << "port = " << sockaddr.getPort();
 }
@@ -36,7 +36,7 @@ void test_sockaddr_in6(const char* addr, const char* port)
 void test_sockaddr_un(const char* path)
 {
     o7si::net::SockAddrUn sockaddr(path);
-    LOG_DEBUG_CHECK_FALSE_SYS(sockaddr.is_work()) << "may not work.";
+    LOG_DEBUG_CHECK_SYS(!sockaddr.is_work()) << "may not work.";
     LOG_DEBUG_SYS << "path = " << sockaddr.getPath();
 }
 

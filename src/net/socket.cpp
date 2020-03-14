@@ -26,6 +26,11 @@ Socket::Timeout Socket::getSendTimeout() const
     return m_send_timeout;    
 }
 
+Socket::Socket()
+    : m_log(true)
+{
+}
+
 void Socket::setSendTimeout(const Socket::Timeout& timeout)
 {
     timeval tv;
@@ -36,10 +41,11 @@ void Socket::setSendTimeout(const Socket::Timeout& timeout)
                            &tv, sizeof(tv));
     if (ret == -1)
     {
-        LOG_WARN_SYS << "set send timeout failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ". "
-                     << "timeout = " << timeout;
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "set send timeout failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ". "
+            << "timeout = " << timeout;
         return;
     }
     m_send_timeout = timeout;
@@ -65,10 +71,11 @@ void Socket::setRecvTimeout(const Socket::Timeout& timeout)
                            &tv, sizeof(tv));
     if (ret == -1)
     {
-        LOG_WARN_SYS << "set recv timeout failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ". "
-                     << "timeout = " << timeout;
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "set recv timeout failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ". "
+            << "timeout = " << timeout;
         return;
     }
     m_recv_timeout = timeout; 
@@ -115,9 +122,10 @@ bool TCPServerSocket::socket()
                        0);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "socket failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "socket failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     m_fd = ret;     
@@ -131,9 +139,10 @@ bool TCPServerSocket::bind()
                      m_bind_sockaddr->length());    
     if (ret == -1)
     {
-        LOG_WARN_SYS << "bind failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "bind failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -144,9 +153,10 @@ bool TCPServerSocket::listen(int backlog)
     int ret = ::listen(m_fd, backlog);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "bind failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "bind failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;    
@@ -160,9 +170,10 @@ int TCPServerSocket::accept()
     int ret = ::accept(m_fd, (sockaddr*)&storage, &storage_len);     
     if (ret == -1)
     {
-        LOG_WARN_SYS << "accept failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "accept failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return -1;
     }
 
@@ -179,15 +190,17 @@ int TCPServerSocket::accept()
             cli_sockaddr = std::make_shared<SockAddrUn>(&storage);
             break;
         default:   
-            LOG_WARN_SYS << "accept failure, "
-                         << "unknown family.";
+            LOG_WARN_CHECK_SYS(m_log) 
+                << "accept failure, "
+                << "unknown family.";
             return -1;
     }
 
     if (m_cli_objs.find(ret) != m_cli_objs.end())
     {
-        LOG_WARN_SYS << "accept failure, "
-                     << ret << "(fd) already exists.";     
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "accept failure, "
+            << ret << "(fd) already exists.";     
         return -1;
     }
 
@@ -201,9 +214,10 @@ ssize_t TCPServerSocket::send(int cli_fd, const void* buf, size_t len,
     int sent = ::send(cli_fd, buf, len, flags);    
     if (sent == -1)
     {
-        LOG_WARN_SYS << "send failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "send failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return sent;
 }
@@ -230,9 +244,10 @@ ssize_t TCPServerSocket::recv(int cli_fd, void* buf, size_t len,
     int received = ::recv(cli_fd, buf, len, flags);
     if (received == -1)
     {
-        LOG_WARN_SYS << "recv failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "recv failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return received;
 }
@@ -276,9 +291,10 @@ bool TCPServerSocket::server_close()
     int ret = ::close(m_fd); 
     if (ret == -1)
     {
-        LOG_WARN_SYS << "close failure, "    
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "close failure, "    
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -289,17 +305,19 @@ bool TCPServerSocket::client_close(int cli_fd)
     auto iter = m_cli_objs.find(cli_fd);
     if (iter == m_cli_objs.end())    
     {
-        LOG_WARN_SYS << "close failure, "    
-                     << cli_fd << "(fd) not exist.";     
+        LOG_WARN_CHECK_SYS(m_log)
+            << "close failure, "    
+            << cli_fd << "(fd) not exist.";     
         return false;
     }
 
     int ret = ::close(cli_fd);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "close failure, "    
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "close failure, "    
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
 
@@ -336,9 +354,10 @@ bool TCPClientSocket::socket()
                        0);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "socket failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "socket failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     m_fd = ret;     
@@ -352,9 +371,10 @@ bool TCPClientSocket::connect()
                         m_conn_sockaddr->length());      
     if (ret == -1)
     {
-        LOG_WARN_SYS << "connect failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "connect failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -365,9 +385,10 @@ ssize_t TCPClientSocket::send(const void* buf, size_t len, int flags)
     int sent = ::send(m_fd, buf, len, flags);    
     if (sent == -1)
     {
-        LOG_WARN_SYS << "send failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "send failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return sent;
 }
@@ -392,9 +413,10 @@ ssize_t TCPClientSocket::recv(void* buf, size_t len, int flags)
     int received = ::recv(m_fd, buf, len, flags);
     if (received == -1)
     {
-        LOG_WARN_SYS << "recv failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "recv failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return received;
 }
@@ -429,9 +451,10 @@ bool TCPClientSocket::client_close()
     int ret = ::close(m_fd);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "close failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "close failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -470,9 +493,10 @@ bool UDPServerSocket::socket()
                        0);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "socket failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "socket failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     m_fd = ret;     
@@ -486,9 +510,10 @@ bool UDPServerSocket::bind()
                      m_bind_sockaddr->length());    
     if (ret == -1)
     {
-        LOG_WARN_SYS << "bind failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "bind failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -501,9 +526,10 @@ ssize_t UDPServerSocket::sendto(const std::shared_ptr<SockAddr> to,
                         to->get_c_data(), to->length());     
     if (sent == -1)
     {
-        LOG_WARN_SYS << "send failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "send failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return sent;
 }
@@ -524,9 +550,10 @@ ssize_t UDPServerSocket::recvfrom(std::shared_ptr<SockAddr>& from,
                               (sockaddr*)&storage, &storage_len); 
     if (received == -1)
     {
-        LOG_WARN_SYS << "recvfrom failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "recvfrom failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         from = nullptr;
         return -1;
     }
@@ -544,8 +571,9 @@ ssize_t UDPServerSocket::recvfrom(std::shared_ptr<SockAddr>& from,
             cli_sockaddr = std::make_shared<SockAddrUn>(&storage);
             break;
         default:   
-            LOG_WARN_SYS << "recvfrom failure, "
-                         << "unknown family.";
+            LOG_WARN_CHECK_SYS(m_log) 
+                << "recvfrom failure, "
+                << "unknown family.";
             from = nullptr;
             return -1;
     }
@@ -575,9 +603,10 @@ bool UDPServerSocket::server_close()
     int ret = ::close(m_fd); 
     if (ret == -1)
     {
-        LOG_WARN_SYS << "close failure, "    
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "close failure, "    
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;
@@ -613,9 +642,10 @@ bool UDPClientSocket::socket()
                        0);
     if (ret == -1)
     {
-        LOG_WARN_SYS << "socket failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "socket failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     m_fd = ret;     
@@ -631,9 +661,10 @@ ssize_t UDPClientSocket::sendto(const std::shared_ptr<SockAddr> to,
 
     if (sent == -1)
     {
-        LOG_WARN_SYS << "send failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "send failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
     }
     return sent;
 }
@@ -664,9 +695,10 @@ ssize_t UDPClientSocket::recvfrom(std::shared_ptr<SockAddr>& from,
                               (sockaddr*)&storage, &storage_len); 
     if (received == -1)
     {
-        LOG_WARN_SYS << "recvfrom failure, "
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log) 
+            << "recvfrom failure, "
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return -1;
     }
 
@@ -683,8 +715,9 @@ ssize_t UDPClientSocket::recvfrom(std::shared_ptr<SockAddr>& from,
             ser_sockaddr = std::make_shared<SockAddrUn>(&storage);
             break;
         default:   
-            LOG_WARN_SYS << "recvfrom failure, "
-                         << "unknown family.";
+            LOG_WARN_CHECK_SYS(m_log) 
+                << "recvfrom failure, "
+                << "unknown family.";
             return -1;
     }
 
@@ -713,9 +746,10 @@ bool UDPClientSocket::client_close()
     int ret = ::close(m_fd); 
     if (ret == -1)
     {
-        LOG_WARN_SYS << "close failure, "    
-                     << "error desc is '" << strerror(errno) << "', "
-                     << "error code is " << errno << ".";
+        LOG_WARN_CHECK_SYS(m_log)
+            << "close failure, "    
+            << "error desc is '" << strerror(errno) << "', "
+            << "error code is " << errno << ".";
         return false;
     }
     return true;

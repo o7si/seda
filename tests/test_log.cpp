@@ -3,107 +3,48 @@
 void test_log_print()
 {    
     // 普通日志
-    LOG(DEBUG, SYSTEM) << "N";
+    LOG(DEBUG, SYSTEM) << "Y";
 
-    LOG_DEBUG(SYSTEM) << "N";
+    LOG_DEBUG(SYSTEM) << "Y";
     LOG_INFO(SYSTEM) << "Y";
     LOG_WARN(SYSTEM) << "Y";
     LOG_ERROR(SYSTEM) << "Y";
     LOG_FATAL(SYSTEM) << "Y";
 
-    LOG_DEBUG_SYS << "N";
+    LOG_DEBUG_SYS << "Y";
     LOG_INFO_SYS << "Y";
     LOG_WARN_SYS << "Y";
     LOG_ERROR_SYS << "Y";
     LOG_FATAL_SYS << "Y";
 
-    // 带检查的日志，当 check 与 target 的值相同时才输出日志
-    LOG_CHECK(DEBUG, SYSTEM, 1 == 1, true) << "N";
-    LOG_CHECK(DEBUG, SYSTEM, 1 == 1, false) << "N";
+    // 带检查的日志
+    LOG_CHECK(DEBUG, SYSTEM, 1 == 1) << "Y";
+    LOG_CHECK(DEBUG, SYSTEM, 1 != 1) << "N";
 
-    LOG_CHECK_SYS(DEBUG, 1 == 1, true) << "N";
-    LOG_CHECK_SYS(DEBUG, 1 == 1, false) << "N";
+    LOG_CHECK_SYS(DEBUG, 1 == 1) << "Y";
+    LOG_CHECK_SYS(DEBUG, 1 != 1) << "N";
 
-    LOG_DEBUG_CHECK(SYSTEM, 1 == 1, true) << "N";
-    LOG_DEBUG_CHECK(SYSTEM, 1 == 1, false) << "N";
-    LOG_INFO_CHECK(SYSTEM, 1 == 1, true) << "Y";
-    LOG_INFO_CHECK(SYSTEM, 1 == 1, false) << "N";
-    LOG_WARN_CHECK(SYSTEM, 1 == 1, true) << "Y";
-    LOG_WARN_CHECK(SYSTEM, 1 == 1, false) << "N";
-    LOG_ERROR_CHECK(SYSTEM, 1 == 1, true) << "Y";
-    LOG_ERROR_CHECK(SYSTEM, 1 == 1, false) << "N";
-    LOG_FATAL_CHECK(SYSTEM, 1 == 1, true) << "Y";
-    LOG_FATAL_CHECK(SYSTEM, 1 == 1, false) << "N";
+    LOG_DEBUG_CHECK(SYSTEM, 1 == 1) << "Y";
+    LOG_DEBUG_CHECK(SYSTEM, 1 != 1) << "N";
+    LOG_INFO_CHECK(SYSTEM, 1 == 1) << "Y";
+    LOG_INFO_CHECK(SYSTEM, 1 != 1) << "N";
+    LOG_WARN_CHECK(SYSTEM, 1 == 1) << "Y";
+    LOG_WARN_CHECK(SYSTEM, 1 != 1) << "N";
+    LOG_ERROR_CHECK(SYSTEM, 1 == 1) << "Y";
+    LOG_ERROR_CHECK(SYSTEM, 1 != 1) << "N";
+    LOG_FATAL_CHECK(SYSTEM, 1 == 1) << "Y";
+    LOG_FATAL_CHECK(SYSTEM, 1 != 1) << "N";
 
-    LOG_DEBUG_CHECK_SYS(1 == 1, true) << "N";
-    LOG_DEBUG_CHECK_SYS(1 == 1, false) << "N";
-    LOG_INFO_CHECK_SYS(1 == 1, true) << "Y";
-    LOG_INFO_CHECK_SYS(1 == 1, false) << "N";
-    LOG_WARN_CHECK_SYS(1 == 1, true) << "Y";
-    LOG_WARN_CHECK_SYS(1 == 1, false) << "N";
-    LOG_ERROR_CHECK_SYS(1 == 1, true) << "Y";
-    LOG_ERROR_CHECK_SYS(1 == 1, false) << "N";
-    LOG_FATAL_CHECK_SYS(1 == 1, true) << "Y";
-    LOG_FATAL_CHECK_SYS(1 == 1, false) << "N";
-
-    LOG_SYS_CHECK(DEBUG, 1 == 1, true) << "N";
-
-    LOG_DEBUG_SYS_CHECK(1 == 1, true) << "N";
-    LOG_INFO_SYS_CHECK(1 == 1, true) << "Y";
-    LOG_WARN_SYS_CHECK(1 == 1, true) << "Y";
-    LOG_ERROR_SYS_CHECK(1 == 1, true) << "Y";
-    LOG_FATAL_SYS_CHECK(1 == 1, true) << "Y";
-
-    // 带检查的日志，当 check 与 target 的值相同时才输出日志
-    LOG_CHECK_TRUE(DEBUG, SYSTEM, 1 == 1) << "N";
-
-    LOG_CHECK_TRUE_SYS(DEBUG, 1 == 1) << "N";
-
-    LOG_DEBUG_CHECK_TRUE(SYSTEM, 1 == 1) << "N";
-    LOG_INFO_CHECK_TRUE(SYSTEM, 1 == 1) << "Y";
-    LOG_WARN_CHECK_TRUE(SYSTEM, 1 == 1) << "Y";
-    LOG_ERROR_CHECK_TRUE(SYSTEM, 1 == 1) << "Y";
-    LOG_FATAL_CHECK_TRUE(SYSTEM, 1 == 1) << "Y";
-
-    LOG_DEBUG_CHECK_TRUE_SYS(1 == 1) << "N";
-    LOG_INFO_CHECK_TRUE_SYS(1 == 1) << "Y";
-    LOG_WARN_CHECK_TRUE_SYS(1 == 1) << "Y";
-    LOG_ERROR_CHECK_TRUE_SYS(1 == 1) << "Y";
-    LOG_FATAL_CHECK_TRUE_SYS(1 == 1) << "Y";
-
-    LOG_SYS_CHECK_TRUE(DEBUG, 1 == 1) << "N";
-
-    LOG_DEBUG_SYS_CHECK_TRUE(1 == 1) << "N";
-    LOG_INFO_SYS_CHECK_TRUE(1 == 1) << "Y";
-    LOG_WARN_SYS_CHECK_TRUE(1 == 1) << "Y";
-    LOG_ERROR_SYS_CHECK_TRUE(1 == 1) << "Y";
-    LOG_FATAL_SYS_CHECK_TRUE(1 == 1) << "Y";
-
-    // 带检查的日志，当 check 值为假时才输出日志
-    LOG_CHECK_FALSE(DEBUG, SYSTEM, 1 == 1) << "N";
-
-    LOG_CHECK_FALSE_SYS(DEBUG, 1 == 1) << "N";
-
-    LOG_DEBUG_CHECK_FALSE(SYSTEM, 1 == 1) << "N";
-    LOG_INFO_CHECK_FALSE(SYSTEM, 1 == 1) << "N";
-    LOG_WARN_CHECK_FALSE(SYSTEM, 1 == 1) << "N";
-    LOG_ERROR_CHECK_FALSE(SYSTEM, 1 == 1) << "N";
-    LOG_FATAL_CHECK_FALSE(SYSTEM, 1 == 1) << "N";
-
-
-    LOG_DEBUG_CHECK_FALSE_SYS(1 == 1) << "N";
-    LOG_INFO_CHECK_FALSE_SYS(1 == 1) << "N";
-    LOG_WARN_CHECK_FALSE_SYS(1 == 1) << "N";
-    LOG_ERROR_CHECK_FALSE_SYS(1 == 1) << "N";
-    LOG_FATAL_CHECK_FALSE_SYS(1 == 1) << "N";
-
-    LOG_SYS_CHECK_FALSE(DEBUG, 1 == 1) << "N";
-
-    LOG_DEBUG_SYS_CHECK_FALSE(1 == 1) << "N";
-    LOG_INFO_SYS_CHECK_FALSE(1 == 1) << "N";
-    LOG_WARN_SYS_CHECK_FALSE(1 == 1) << "N";
-    LOG_ERROR_SYS_CHECK_FALSE(1 == 1) << "N";
-    LOG_FATAL_SYS_CHECK_FALSE(1 == 1) << "N";
+    LOG_DEBUG_CHECK_SYS(1 == 1) << "Y";
+    LOG_DEBUG_CHECK_SYS(1 != 1) << "N";
+    LOG_INFO_CHECK_SYS(1 == 1) << "Y";
+    LOG_INFO_CHECK_SYS(1 != 1) << "N";
+    LOG_WARN_CHECK_SYS(1 == 1) << "Y";
+    LOG_WARN_CHECK_SYS(1 != 1) << "N";
+    LOG_ERROR_CHECK_SYS(1 == 1) << "Y";
+    LOG_ERROR_CHECK_SYS(1 != 1) << "N";
+    LOG_FATAL_CHECK_SYS(1 == 1) << "Y";
+    LOG_FATAL_CHECK_SYS(1 != 1) << "N";
 }
 
 void test_register_behavior()

@@ -11,10 +11,12 @@ namespace server
 
 
 WebServer::WebServer(int protocol, int port, std::string path)
-    : m_port(port), m_path(std::move(path)),
-      m_pool_capacity(5)
+    : m_path(std::move(path)),
+      m_pool_capacity(5),
+      m_shutdown(true)
 {
     setProtocol(protocol);
+    setPort(port);
 }
 
 WebServer::~WebServer()
@@ -24,6 +26,13 @@ WebServer::~WebServer()
 
 bool WebServer::start()
 {
+    // 服务已经处于启动状态
+    if (!m_shutdown)
+    {
+        LOG_INFO_SYS << "webserver has started. ";
+        return true;    
+    }
+
     m_shutdown = false;
     // 建立 Socket，进入监听状态，等待客户端的连接
     if (m_protocol == 4)
@@ -58,15 +67,25 @@ bool WebServer::start()
     LOG_INFO_SYS << "webserver start success. "
                  << "port = " << m_port << ", "
                  << "protocol = " << m_protocol << ", "
-                 << "path = " << m_path;
+                 << "path = " << m_path << ", "
+                 << "thread_capacity = " << m_pool_capacity;
+    
+    // 关闭 Socket 的输出
+    m_socket->log(false);
+
     return true;
 }
 
 bool WebServer::restart()
 {
-    // 停止服务
-    if (!stop())
-        return false;
+    // 当服务处于启动状态时，关闭服务
+    if (!m_shutdown)
+    {
+        // 停止服务
+        if (!stop())
+            return false;
+    }
+
     // 启动服务
     if (!start())
         return false;

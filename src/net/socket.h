@@ -45,6 +45,9 @@ namespace net
 
 // ---------------------------------------------------------------------------- 
 
+// Socket 操作失败时会输出相应的日志进行提示
+// 日志级别均为 WARN
+
 class Socket
 {
 public:
@@ -95,7 +98,7 @@ public:
         int m_microseconds;    
     };
 
-    Socket() = default;;
+    Socket();
 
     virtual ~Socket() = default;
 
@@ -103,6 +106,16 @@ public:
     int get_fd() const
     {
         return m_fd;    
+    }
+
+    bool is_log() const
+    {
+        return m_log;
+    }
+
+    void log(bool flag)
+    {
+        m_log = flag;    
     }
 
     Socket::Timeout getSendTimeout() const; 
@@ -118,6 +131,10 @@ public:
     void setRecvTimeout(int s, int ms = 0, int us = 0);
 
 protected:
+    // 由于 Socket 操作较频繁，可能会有大量相关日志输出
+    // 虽然可以通过调整系统用户的全局日志级别来抑制输出，但是不易操作
+    // 该变量用于控制 Socket 的日志输出行为，默认为开启
+    bool m_log;
     // 文件描述符
     int m_fd;  
     // 超时时间（ms）
