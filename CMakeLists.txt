@@ -35,6 +35,10 @@ set(SRCS
     src/server/web_server.cpp
     src/server/servlet.h
     src/server/servlet.cpp
+    src/server/api.h
+    src/server/api.cpp
+    src/server/api_manager.h
+    src/server/api_manager.cpp
     src/seda/macro.h
     src/seda/stage.h
     src/seda/stage.cpp

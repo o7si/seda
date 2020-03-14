@@ -6,7 +6,12 @@ namespace o7si
 namespace seda
 {
 
-std::shared_ptr<StageManager> StageManager::instance(new StageManager());
+
+std::shared_ptr<StageManager> StageManager::Instance()
+{
+    static std::shared_ptr<StageManager> instance(new StageManager());
+    return instance;    
+}
 
 std::shared_ptr<Stage> 
 StageManager::doRegister(const std::string& name, std::shared_ptr<Stage> stage)
@@ -38,6 +43,7 @@ StageManager::doLogin(const std::string& name)
     LOG_INFO_SYS << "login failure: " << name;
     return nullptr;
 }
+
 
 }    
 }

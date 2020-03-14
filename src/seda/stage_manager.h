@@ -13,6 +13,7 @@ namespace o7si
 namespace seda
 {
     
+
 class Stage;
 
 // Stage 的管理类(单例工厂)
@@ -27,10 +28,8 @@ public:
     std::shared_ptr<Stage> doLogin(const std::string& name);
 
 public:
-    static std::shared_ptr<StageManager> Instance()
-    {
-        return instance;    
-    }
+    // 获取单例对象
+    static std::shared_ptr<StageManager> Instance();
 
     // 删除拷贝构造函数，防止用户拷贝该对象
     StageManager(const StageManager& other) = delete;
@@ -42,9 +41,8 @@ private:
 
     // 字符串和 Stage 的映射关系
     std::unordered_map<std::string, std::shared_ptr<Stage>> mapping;
-    // 单例对象
-    static std::shared_ptr<StageManager> instance;
 };
+
 
 }   // namespace seda    
 }   // namespace o7si

@@ -427,7 +427,7 @@ private:
     std::shared_ptr<Logger> login_behavior_3(const std::string& user);
 
 private: 
-    /// 将构造函数修饰为私有，防止用户擅自实例化对象
+    // 将构造函数修饰为私有，防止用户擅自实例化对象
     LoggerManager();   
 
     // 注册行为
@@ -436,7 +436,7 @@ private:
         = std::function<std::shared_ptr<Logger>(const std::string&, Level)>;
     std::vector<RegisterBehavior> m_register_behavior_list;
 
-    /// 登录行为
+    // 登录行为
     int m_login_behavior;
     using LoginBehavior 
         = std::function<std::shared_ptr<Logger>(const std::string&)>;
@@ -444,8 +444,6 @@ private:
 
     // 映射表
     std::unordered_map<std::string, std::shared_ptr<Logger>> m_table;
-    // 单例对象
-    static std::shared_ptr<LoggerManager> instance;
 };
 
 // ----------------------------------------------------------------------------

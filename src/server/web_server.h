@@ -5,12 +5,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 #include <thread>
 
 #include "../log.h"
-
 #include "../net/http.h"
 #include "../net/http_parser.h"
 #include "../net/sockaddr.h"

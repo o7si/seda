@@ -262,10 +262,9 @@ void Logger::log(Level level, const Event::Information& information)
 
 // ----------------------------------------------------------------------------
 
-std::shared_ptr<LoggerManager> LoggerManager::instance(new LoggerManager());
-
 std::shared_ptr<LoggerManager> LoggerManager::Instance() 
 {
+    static std::shared_ptr<LoggerManager> instance(new LoggerManager());
     return instance;    
 }
 

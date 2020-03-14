@@ -3,7 +3,7 @@
 
 namespace o7si
 {
-namespace net
+namespace server
 {
 
 
@@ -14,8 +14,8 @@ Servlet::Servlet(std::string root)
 {
 }
     
-void Servlet::todo(std::shared_ptr<HttpRequest> request,
-                     std::shared_ptr<HttpResponse> response)
+void Servlet::todo(std::shared_ptr<o7si::net::HttpRequest> request,
+                     std::shared_ptr<o7si::net::HttpResponse> response)
 {
     // HTTP Method == GET
     if (request->method() == o7si::net::HttpMethod::HTTP_METHOD_GET)
@@ -33,8 +33,8 @@ void Servlet::todo(std::shared_ptr<HttpRequest> request,
     response->status(o7si::net::GenStatusFrom(400));
 }
 
-void Servlet::doGet(std::shared_ptr<HttpRequest> request,
-                    std::shared_ptr<HttpResponse> response)
+void Servlet::doGet(std::shared_ptr<o7si::net::HttpRequest> request,
+                    std::shared_ptr<o7si::net::HttpResponse> response)
 {
     std::string resource;
     try
@@ -67,14 +67,35 @@ void Servlet::doGet(std::shared_ptr<HttpRequest> request,
     response->body(resource); 
 }
 
-void Servlet::doPost(std::shared_ptr<HttpRequest> request,
-                     std::shared_ptr<HttpResponse> response)
+void Servlet::doPost(std::shared_ptr<o7si::net::HttpRequest> request,
+                     std::shared_ptr<o7si::net::HttpResponse> response)
 {
-    response->status(o7si::net::GenStatusFrom(404));   
+    std::string api = request->path();
+    // 未知的请求接口
+    if (!APIManager::Instance()->has(api))
+    {
+        response->status(o7si::net::GenStatusFrom(404));
+        return;    
+    }
+
+    // 接口存在，调用接口
+    std::string out;
+    bool ret = APIManager::Instance()->call(api, request->body(), out);
+
+    // 执行错误
+    if (!ret)
+    {
+        response->status(o7si::net::GenStatusFrom(500));
+        return;    
+    }
+
+    // 正常执行
+    response->status(o7si::net::GenStatusFrom(200));
+    response->body(out);
 }
 
 // ----------------------------------------------------------------------------
 
 
-}   // namespace net    
+}   // namespace server 
 }   // namespace o7si

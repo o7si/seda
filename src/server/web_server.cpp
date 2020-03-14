@@ -155,7 +155,7 @@ void WebServer::Worker::operator()()
                 = req_parser.inner_request();
 
             // 处理 HTTP 请求
-            o7si::net::Servlet servlet(m_server->m_path);
+            o7si::server::Servlet servlet(m_server->m_path);
             std::shared_ptr<o7si::net::HttpResponse> response
                 = std::make_shared<o7si::net::HttpResponse>();
             servlet.todo(request, response);

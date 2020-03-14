@@ -11,9 +11,12 @@
 #include "../log.h"
 #include "../net/http.h"
 
+#include "api_manager.h"
+
+
 namespace o7si
 {
-namespace net
+namespace server 
 {
 
 
@@ -48,14 +51,14 @@ public:
     explicit Servlet(std::string root);
 
     // 处理 HTTP 请求
-    void todo(std::shared_ptr<HttpRequest> request, 
-              std::shared_ptr<HttpResponse> response);
+    void todo(std::shared_ptr<o7si::net::HttpRequest> request, 
+              std::shared_ptr<o7si::net::HttpResponse> response);
 
-    void doGet(std::shared_ptr<HttpRequest> request,
-               std::shared_ptr<HttpResponse> response);
+    void doGet(std::shared_ptr<o7si::net::HttpRequest> request,
+               std::shared_ptr<o7si::net::HttpResponse> response);
 
-    void doPost(std::shared_ptr<HttpRequest> request,
-                std::shared_ptr<HttpResponse> response);
+    void doPost(std::shared_ptr<o7si::net::HttpRequest> request,
+                std::shared_ptr<o7si::net::HttpResponse> response);
 
 private:
     // 页面的根路径
@@ -65,5 +68,5 @@ private:
 // ----------------------------------------------------------------------------
     
 
-}   // namespace net    
+}   // namespace server 
 }   // nemespace o7si
