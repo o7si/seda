@@ -104,6 +104,7 @@ bool WebServer::stop()
         // 等待线程服务完毕
         for (auto& thread : m_worker_pool)
             thread.join();
+        m_worker_pool.clear();
         // 清理 Socket 资源
         m_socket->close(); 
         m_socket = nullptr;
