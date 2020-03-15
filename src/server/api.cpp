@@ -7,12 +7,42 @@ namespace o7si
 namespace server
 {
     
+// ----------------------------------------------------------------------------
+
+bool make_json(const std::string& in, Json::Value& out)
+{
+    Json::Reader reader;
+    return reader.parse(in, out);     
+}
+
+bool make_sequence(const Json::Value& in, std::string& out)
+{
+    try
+    {
+        Json::FastWriter writer;
+        out = writer.write(in);    
+        return true;
+    }
+    catch (...)
+    {
+        return false;    
+    }
+}
+
+std::string make_error_json(int error_code, const std::string& error_desc)
+{
+    std::stringstream stream;
+    stream << "{";
+    stream << "\"" << "error_code" << "\": " << error_code << ", ";
+    stream << "\"" << "error_desc" << "\": \"" << error_desc << "\""; 
+    stream << "}";
+    return stream.str();
+}
 
 // ----------------------------------------------------------------------------
 
 bool help(const std::string& in, std::string& out)
 {
-    out = "1 + 1 = 2";
     return true;      
 }
 
@@ -26,32 +56,48 @@ bool stage_list(const std::string& in, std::string& out)
         auto stage = item.second;
 
         Json::Value obj;
-        // 名称
         obj["name"] = stage->getName();
-        // 短名称
         obj["short_name"] = stage->getShortName();
-        // 事件队列的长度
         obj["event_queue_size"] = (int)stage->getEventQueueSize();
-        // 线程池的容量
         obj["thread_pool_capacity"] = (int)stage->getThreadPoolCapacity();
-        // 性能监控器的容量
         obj["performeter_capacity"] = (int)stage->getPerformeterCapacity();
-        // 可能的后续状态数
         obj["next_state_number"] = (int)stage->getNextStateNumber();
-        // 是否运行在系统中
         obj["is_run"] = stage->isRun(); 
         
         array.append(obj);
     }
+
     Json::Value root;
     root["data"] = array;
-    root["error_code"] = 0;
 
-    Json::FastWriter writer;
-    out = writer.write(root);
+    return make_sequence(root, out);
+}
 
-    std::cout << out << std::endl;
-    return true;
+bool stage_info(const std::string& in, std::string& out)
+{
+    Json::Value params;
+    bool ret = make_json(in, params);
+    if (!ret)
+        return false;
+
+    // 没有携带 stage_name 参数
+    if (!params.isMember("stage_name"))
+    {
+        out = make_error_json(1, "missing parameter");
+        return true;
+    }
+
+    std::string stage_name = params["stage_name"].asString();
+    if (!o7si::seda::StageManager::Instance()->has(stage_name))
+    {
+        out = make_error_json(101, "not find stage");    
+        return true;
+    }
+
+    Json::Value root; 
+    Json::Value data;
+
+    return true;    
 }
 
 bool repeater(const std::string& in, std::string& out)
@@ -65,6 +111,7 @@ bool repeater(const std::string& in, std::string& out)
 
 REGISTER_API(/help, help)
 REGISTER_API(/stage/list, stage_list)
+REGISTER_API(/stage/info, stage_info)
 REGISTER_API(/repeater, repeater)
 
 // ----------------------------------------------------------------------------

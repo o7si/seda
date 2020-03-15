@@ -39,3 +39,23 @@ function stage_list(id) {
         }
     });
 }
+
+// 获取某个 Stage 的详细信息
+function stage_info(id, stage_name) {
+    $.ajax({
+        url: "/stage/info",
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+           // "stage_name": stage_name
+        }),
+        success: function (result) {
+            console.log(result);
+        },
+        error: function (result) {
+            console.log(result);
+            render_feedback_window(id, "panel-danger", "error");
+        }
+    });
+}

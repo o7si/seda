@@ -108,6 +108,33 @@ public:
         m_performeter.setCapacity(capacity);    
     }
 
+    // 获取最长耗时（线程等待 + 任务执行）
+    double getLongestDura() const;   
+    // 获取最长耗时（线程等待）
+    double getLongestWaitDura() const;
+    // 获取最长耗时（任务执行）
+    double getLongestExecDura() const;
+    // 获取总耗时（线程等待 + 任务执行）
+    double getSumDura() const;
+    // 获取总耗时（线程等待）
+    double getSumWaitDura() const;
+    // 获取总耗时（任务执行）
+    double getSumExecDura() const;
+    // 获取平均耗时（线程等待 + 任务执行）
+    double getAvgDura() const;
+    // 获取平均耗时（线程等待）
+    double getAvgWaitDura() const;
+    // 获取平均耗时（任务执行）
+    double getAvgExecDura() const;
+    // 获取任务的总执行次数
+    size_t getTaskCount() const;
+    // 获取最新的耗时列表（线程等待 + 任务执行）
+    std::list<double> getLastestDuraList() const; 
+    // 获取最新的耗时列表（线程等待）
+    std::list<double> getLastestWaitDuraList() const;
+    // 获取最新的耗时列表（任务执行）
+    std::list<double> getLastestExecDuraList() const;
+
     // 获取 Stage 的后续状态的数量
     size_t getNextStateNumber() const
     {
