@@ -2,6 +2,4 @@
 cmake-build-debug
 build
 log
-web
 *.swp
-web

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="api.js"></script>
+
+    <title>o7si-seda</title>
+
+    <script>
+        // 当用户按下回车键后，会清空命令输入框
+        // 解析命令，并根据命令请求特定的接口
+        // 客户端将服务器返回的结果渲染到页面
+        $(function () {
+            $('#command-line').bind('keypress', function (event) {
+                // 监听回车事件
+                if (event.keyCode == 13) {
+                    // 获取命令并清空输入框
+                    var command = $(this).val().trim();
+                    $(this).val(null);
+
+                    // 当输入命令为空，则不进行任何处理
+                    if (command == '')
+                        return;
+
+                    // 生成反馈窗口，使用时间戳作为唯一标识，并添加至页面
+                    var feedback_id = 'feedback_' + $.now();
+                    $(make_feedback_window(feedback_id, command)).prependTo($('#feedback-list'));
+
+                    // 处理命令
+                    call(feedback_id, command);
+                }
+            });
+        });
+
+        // 生成默认的反馈窗口，会根据服务器的反馈结果进一步渲染
+        // 样式：panel-primary
+        // 标题：所输入的命令
+        // 内容：waiting...
+        function make_feedback_window(id, heading) {
+            var $template = $('#feedback-template').clone();
+            $template.children('div')
+                .attr('id', id);
+            $template.children('div').children('div')
+                .addClass('panel').addClass('panel-primary');
+            $template.children('div').children('div').children('div:nth-child(1)')
+                .addClass('panel-heading').html(heading);
+            $template.children('div').children('div').children('div:nth-child(2)')
+                .addClass('panel-body').html('waiting...');
+            return $template.children('div');
+        }
+
+        // 渲染反馈窗口
+        // 样式：panel-success/panel-danger
+        // 标题：保持原样
+        // 内容：命令执行结果
+        function render_feedback_window(id, scene, body) {
+            var $feedback = $('#' + id);
+            $feedback.children('div')
+                .removeClass().addClass('panel').addClass(scene);
+            $feedback.children('div').children('div:nth-child(2)')
+                .html(body);
+        }
+
+        // 解析并处理命令
+        function call(id, command) {
+
+            var command_item = command.split(/\s+/);
+            console.log(command_item);
+
+            stage_list(id);
+        }
+    </script>
+</head>
+
+<body>
+    <h1>你好，世界！</h1>
+
+    <!-- 反馈窗口模板 -->
+    <div id="feedback-template">
+        <!-- 窗口标识 -->
+        <div>
+            <!-- 窗口样式 -->
+            <div>
+                <!-- 窗口标题 -->
+                <div></div>
+                <!-- 窗口内容 -->
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 命令输入框 -->
+    <div class="input-group command-window">
+        <span class="input-group-addon" id="sizing-addon2">$</span>
+        <input id="command-line" type="text" class="form-control" placeholder="..." aria-describedby="sizing-addon2">
+    </div>
+
+    <!-- 反馈窗口列表 -->
+    <div id="feedback-list"></div>
+
+</body>
+
+</html>

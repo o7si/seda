@@ -163,6 +163,9 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
         // 初始化
         stage->init();
 
+        // 调整状态
+        stage->run();
+
         // 后续状态
         YAML::Node state_table = i->second["state"];
         for (auto j = state_table.begin(); j != state_table.end(); ++ j)

@@ -20,12 +20,24 @@ class Stage;
 class StageManager
 {
 public:
+    using MapType = std::unordered_map<std::string, std::shared_ptr<Stage>>;
+public:
     // 注册 Stage 到管理类
     std::shared_ptr<Stage> doRegister(const std::string& name, 
                                       std::shared_ptr<Stage> stage);
 
     // 从管理类中获取 Stage 
     std::shared_ptr<Stage> doLogin(const std::string& name);
+
+    bool has(const std::string& name)
+    {
+        return m_mapping.find(name) != m_mapping.end();    
+    }
+
+    MapType getMapping() const
+    {
+        return m_mapping;
+    }    
 
 public:
     // 获取单例对象
@@ -39,8 +51,8 @@ public:
 private:
     StageManager() = default;
 
-    // 字符串和 Stage 的映射关系
-    std::unordered_map<std::string, std::shared_ptr<Stage>> mapping;
+    // 映射关系
+    MapType m_mapping;
 };
 
 

@@ -29,6 +29,13 @@ STAGE(Stage1, 1500)
 STAGE(Stage2, 2500)
 STAGE(Stage3, 500)
 STAGE(Stage4, 3500)
+STAGE(Stage5, 3500)
+STAGE(Stage6, 3500)
+STAGE(Stage7, 3500)
+STAGE(Stage8, 3500)
+STAGE(Stage9, 3500)
+STAGE(Stage10, 3500)
+STAGE(Stage11, 3500)
 
 }   // namespace seda
 }   // namespace o7si

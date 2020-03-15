@@ -7,6 +7,7 @@ namespace seda
 
 Stage::Stage(std::string name)
     : m_name(std::move(name)), 
+      m_run(false),
       m_thread_pool(&m_event_queue, &m_performeter)
 {
     // 生成 Stage 的短名称

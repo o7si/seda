@@ -12,6 +12,7 @@
 #include <boost/any.hpp>
 
 #include "../log.h"
+
 #include "macro.h"
 #include "stage_manager.h"
 #include "component/event_handler.hpp"
@@ -38,26 +39,49 @@ public:
     
     virtual ~Stage() = default;
 
+    // 初始化 Stage 的内部组件
     void init();
 
+    // 获取 Stage 的名称
     std::string getName() const
     {
         return m_name;    
     }
 
+    // 设置 Stage 的名称
     void setName(std::string name)
     {
         m_name = std::move(name);    
     } 
 
+    // 获取 Stage 的短名称
     std::string getShortName() const
     {
         return m_short_name;    
     }
 
+    // 设置 Stage 的短名称
     void setShortName(std::string short_name)
     {
         m_short_name = std::move(short_name);   
+    }
+
+    // 判断 Stage 是否处于运行状态
+    bool isRun() const
+    {
+        return m_run;    
+    }
+
+    // 设置 Stage 为启动状态 
+    void run()
+    {
+        m_run = true;    
+    }
+
+    // 获取事件队列的长度
+    size_t getEventQueueSize() const
+    {
+        return m_event_queue.size();    
     }
 
     // 获取线程池的最大容量
@@ -82,6 +106,12 @@ public:
     void setPerformeterCapacity(size_t capacity)
     {
         m_performeter.setCapacity(capacity);    
+    }
+
+    // 获取 Stage 的后续状态的数量
+    size_t getNextStateNumber() const
+    {
+        return m_conver_mapping.size();
     }
 
     // 设置 Stage 的后续状态
@@ -141,8 +171,9 @@ protected:
     // 状态转换表
     ConverMapping m_conver_mapping;
 
-    // 事件处理状态
-    std::string state;
+    // 是否处于运行状态
+    // 该变量不会影响 Stage 的任何内部细节
+    bool m_run;
 
     // 事件队列
     EventQueue<EventQueueElem> m_event_queue;
