@@ -16,10 +16,13 @@
 #include "api_manager.h"
 
 // 错误码定义
+//
+// 一般的错误码：
 // 1    ->  missing parameter
 //
-//
+// Stage 相关的错误码：
 // 101  -> not find stage  
+// 102  -> not find key 
 
 namespace o7si
 {
@@ -79,6 +82,16 @@ bool stage_list(const std::string& in, std::string& out);
 // | 22 | lastest_exec_dura_list | 最新的耗时列表（任务执行）            | 
 // | 23 | task_count             | 总执行次数                            |
 bool stage_info(const std::string& in, std::string& out);
+
+// 修改某个 Stage 的信息
+// 对于该 Stage 而言，可供修改的参数如下：
+// | 1 | name                 | 名称             | 修改参数构成问题   |
+// | 2 | short_name           | 短名称           | 修改参数不构成问题 |
+// | 3 | thread_pool_name     | 线程池的名称     | 修改参数构成问题   |
+// | 4 | thread_pool_capacity | 线程池的容量     | 修改参数构成问题   |
+// | 5 | performeter_name     | 性能监控器的名称 | 修改参数不构成问题 |
+// | 6 | performeter_capacity | 性能监控器的容量 | 修改参数不构成问题 | 
+bool stage_updata(const std::string& in, std::string& out);
 
 // 复读机
 bool repeater(const std::string& in, std::string& out);

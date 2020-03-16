@@ -30,6 +30,13 @@
                     if (command == '')
                         return;
 
+                    // 清理命令
+                    if (command == 'clear')
+                    {
+                        $('#feedback-list').html(null);
+                        return;
+                    }
+
                     // 生成反馈窗口，使用时间戳作为唯一标识，并添加至页面
                     var feedback_id = 'feedback_' + $.now();
                     $(make_feedback_window(feedback_id, command)).prependTo($('#feedback-list'));
@@ -75,14 +82,16 @@
             var command_item = command.split(/\s+/);
             console.log(command_item);
 
-            //stage_list(id);
-            stage_info(id, "Stage1");
+            if (command == '1')
+                stage_list(id);
+            else
+                stage_info(id, "Stage1");
         }
     </script>
 </head>
 
 <body>
-    <h1>你好，世界！</h1>
+    <h2>网页控制台</h2>
 
     <!-- 反馈窗口模板 -->
     <div id="feedback-template">
@@ -101,10 +110,9 @@
     <!-- 命令输入框 -->
     <div class="input-group command-window">
         <span class="input-group-addon" id="sizing-addon2">$</span>
-        <input id="command-line" type="text" class="form-control" placeholder="..." aria-describedby="sizing-addon2">
-    </div>
-
-    <!-- 反馈窗口列表 -->
+        <input id="command-line" type="text" class="form-control" placeholder="Please input command..."
+            aria-describedby="sizing-addon2">
+    </div> <!-- 反馈窗口列表 -->
     <div id="feedback-list"></div>
 
 </body>

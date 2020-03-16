@@ -174,6 +174,33 @@ public:
         return m_sum_exec_dura / m_counter;    
     }
 
+    // 获取最新的耗时列表（线程等待 + 任务执行）
+    std::list<Duration> lastest_dura_list() const
+    {
+        std::list<Duration> dura_list;
+        for (const auto& item : m_notes)
+            dura_list.push_back(item.wait_dura() + item.exec_dura());
+        return dura_list;
+    }
+
+    // 获取最新的耗时列表（线程等待）
+    std::list<Duration> lastest_wait_dura_list() const
+    {
+        std::list<Duration> dura_list;
+        for (const auto& item : m_notes)
+            dura_list.push_back(item.wait_dura());
+        return dura_list;
+    }
+
+    // 获取最新的耗时列表（任务执行）
+    std::list<Duration> lastest_exec_dura_list() const
+    {
+        std::list<Duration> dura_list;
+        for (const auto& item : m_notes)
+            dura_list.push_back(item.exec_dura());
+        return dura_list;
+    }
+    
     // 获取总执行次数
     size_t count() const
     {

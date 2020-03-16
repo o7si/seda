@@ -96,6 +96,18 @@ public:
         m_thread_pool.setCapacity(capacity);   
     }
 
+    // 获取线程池的名称
+    std::string getThreadPoolName() const
+    {
+        return m_thread_pool.getName();    
+    }
+
+    // 设置线程池的名称
+    void setThreadPoolName(std::string name)
+    {
+        m_thread_pool.setName(std::move(name));    
+    }
+
     // 获取性能监控器的容量
     size_t getPerformeterCapacity() const
     {
@@ -108,32 +120,107 @@ public:
         m_performeter.setCapacity(capacity);    
     }
 
+    // 获取性能监控器的名称
+    std::string getPerformeterName() const
+    {
+        return m_performeter.getName();    
+    }
+
+    // 设置性能监控器的名称
+    void setPerformeterName(std::string name)
+    {
+        m_performeter.setName(std::move(name));    
+    }
+
     // 获取最长耗时（线程等待 + 任务执行）
-    double getLongestDura() const;   
+    double getLongestDura() const   
+    {
+        return m_performeter.longest_dura().count();    
+    }
+
     // 获取最长耗时（线程等待）
-    double getLongestWaitDura() const;
+    double getLongestWaitDura() const
+    {
+        return m_performeter.longest_wait_dura().count();   
+    }
+
     // 获取最长耗时（任务执行）
-    double getLongestExecDura() const;
+    double getLongestExecDura() const
+    {
+        return m_performeter.longest_exec_dura().count();        
+    }
+
     // 获取总耗时（线程等待 + 任务执行）
-    double getSumDura() const;
+    double getSumDura() const
+    {
+        return m_performeter.sum_dura().count();    
+    }
+
     // 获取总耗时（线程等待）
-    double getSumWaitDura() const;
+    double getSumWaitDura() const
+    {
+        return m_performeter.sum_wait_dura().count();    
+    }
+
     // 获取总耗时（任务执行）
-    double getSumExecDura() const;
+    double getSumExecDura() const
+    {
+        return m_performeter.sum_exec_dura().count();
+    }
+
     // 获取平均耗时（线程等待 + 任务执行）
-    double getAvgDura() const;
+    double getAvgDura() const
+    {
+        return m_performeter.avg_dura().count();    
+    }
+
     // 获取平均耗时（线程等待）
-    double getAvgWaitDura() const;
+    double getAvgWaitDura() const
+    {
+        return m_performeter.avg_wait_dura().count();   
+    }
+
     // 获取平均耗时（任务执行）
-    double getAvgExecDura() const;
-    // 获取任务的总执行次数
-    size_t getTaskCount() const;
+    double getAvgExecDura() const
+    {
+        return m_performeter.avg_exec_dura().count();    
+    }
+
     // 获取最新的耗时列表（线程等待 + 任务执行）
-    std::list<double> getLastestDuraList() const; 
+    std::list<double> getLastestDuraList() const 
+    {
+        auto dura_list = m_performeter.lastest_dura_list();
+        std::list<double> ret;
+        for (const auto& item : dura_list)
+            ret.push_back(item.count());
+        return ret;
+    }
+
     // 获取最新的耗时列表（线程等待）
-    std::list<double> getLastestWaitDuraList() const;
+    std::list<double> getLastestWaitDuraList() const
+    {
+        auto dura_list = m_performeter.lastest_wait_dura_list();
+        std::list<double> ret;
+        for (const auto& item : dura_list)
+            ret.push_back(item.count());
+        return ret;
+    }
+
     // 获取最新的耗时列表（任务执行）
-    std::list<double> getLastestExecDuraList() const;
+    std::list<double> getLastestExecDuraList() const
+    {
+        auto dura_list = m_performeter.lastest_exec_dura_list();
+        std::list<double> ret;
+        for (const auto& item : dura_list)
+            ret.push_back(item.count());
+        return ret;
+    }
+
+    // 获取任务的总执行次数
+    size_t getTaskCount() const
+    {
+        return m_performeter.count();     
+    }
 
     // 获取 Stage 的后续状态的数量
     size_t getNextStateNumber() const

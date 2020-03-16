@@ -13,6 +13,16 @@ int main(int argc, char* argv[])
 
     server.setProtocol(6);
     server.restart();
-    std::this_thread::sleep_for(std::chrono::seconds(2000));    
+
+    auto stage1 = o7si::seda::StageManager::Instance()->doLogin("Stage1");
+    while (true)
+    {
+        stage1->call(0);        
+        stage1->call(0);        
+        stage1->call(0);        
+
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+
     return 0;    
 }
