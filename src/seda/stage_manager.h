@@ -29,6 +29,11 @@ public:
     // 从管理类中获取 Stage 
     std::shared_ptr<Stage> doLogin(const std::string& name);
 
+    // 更改 Stage 的映射名
+    bool doUpdate(const std::string& old_name,
+                  const std::string& new_name);
+
+    // 是否有名称为 name 的 Stage
     bool has(const std::string& name)
     {
         return m_mapping.find(name) != m_mapping.end();    

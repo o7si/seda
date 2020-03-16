@@ -6,6 +6,8 @@ int main(int argc, char* argv[])
 {
     o7si::config::load("/root/reps/seda/conf/test.conf");
 
+    o7si::log::LoggerManager::Instance()->login_behavior(1);
+
     o7si::server::WebServer server(4, atoi(argv[1]), "/root/reps/seda/web");
     server.start();
     std::this_thread::sleep_for(std::chrono::seconds(2));    
@@ -22,6 +24,12 @@ int main(int argc, char* argv[])
         stage1->call(0);        
 
         std::this_thread::sleep_for(std::chrono::seconds(2));
+
+
+        auto stage = o7si::seda::StageManager::Instance()->doLogin("HelloWorld");
+        if (stage == nullptr)
+            continue;
+        std::cout << stage->getName() << std::endl;
     }
 
     return 0;    

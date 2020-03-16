@@ -21,10 +21,13 @@ Stage::Stage(std::string name)
     m_performeter.setName(getShortName());
 }
 
-void Stage::init()
+bool Stage::setName(std::string new_name)
 {
-    // 初始化线程池
-    m_thread_pool.init();    
+    bool ret = StageManager::Instance()->doUpdate(m_name, new_name);    
+    if (!ret)
+        return false;
+    m_name = std::move(new_name);    
+    return true;
 }
 
 void Stage::next(const std::string& state, const std::string& stage)
@@ -52,27 +55,6 @@ std::shared_ptr<Stage> Stage::next(const std::string& state)
     if (m_conver_mapping.find(state) == m_conver_mapping.end())
         return nullptr;
     return m_conver_mapping[state];
-}
-
-void Stage::performeter_internal_state() const
-{
-    // 调试性代码
-    LOG_INFO_SYS << "name = " << m_performeter.getName();
-    LOG_INFO_SYS << "capacity = " << m_performeter.getCapacity();
-
-    LOG_INFO_SYS << "longest = " << m_performeter.longest_dura().count() << " s";
-    LOG_INFO_SYS << "longest(wait) = " << m_performeter.longest_wait_dura().count() << " s";
-    LOG_INFO_SYS << "longest(exec) = " << m_performeter.longest_exec_dura().count() << " s";
-
-    LOG_INFO_SYS << "sum = " << m_performeter.sum_dura().count() << " s";
-    LOG_INFO_SYS << "sum(wait) = " << m_performeter.sum_wait_dura().count() << " s";
-    LOG_INFO_SYS << "sum(exec) = " << m_performeter.sum_exec_dura().count() << " s";
-
-    LOG_INFO_SYS << "average = " << m_performeter.avg_dura().count() << " s";
-    LOG_INFO_SYS << "average(wait) = " << m_performeter.avg_wait_dura().count() << " s";
-    LOG_INFO_SYS << "average(exec) = " << m_performeter.avg_exec_dura().count() << " s";
-
-    LOG_INFO_SYS << "counter = " << m_performeter.count();
 }
 
 void Stage::bind(EventHandlerFunc&& function)

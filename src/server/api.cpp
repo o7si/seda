@@ -200,7 +200,12 @@ bool stage_update(const std::string& in, std::string& out)
     if (key == "name")
     {
         std::string value = params["value"].asString();
-        stage->setName(value);
+        bool ret = stage->setName(value);
+        if (!ret)
+        {
+            out = make_error_json(103, "stage name repeat");
+            return true;    
+        }
     }
     else if (key == "short_name")
     {
@@ -214,7 +219,7 @@ bool stage_update(const std::string& in, std::string& out)
     }
     else if (key == "thread_pool_capacity")
     {
-        int value = params["value"].asInt();
+        int value = std::stoi(params["value"].asString());
         stage->setThreadPoolCapacity(value);    
     }
     else if (key == "performeter_name")
@@ -224,7 +229,7 @@ bool stage_update(const std::string& in, std::string& out)
     }
     else if (key == "performeter_capacity")
     {
-        int value = params["value"].asInt();
+        int value = std::stoi(params["value"].asString());
         stage->setPerformeterCapacity(value);    
     }
     else

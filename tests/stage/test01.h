@@ -16,6 +16,7 @@ public: \
     std::pair<std::string, boost::any> handler(boost::any& args) override \
     { \
         int level = boost::any_cast<int>(args); \
+        LOG_DEBUG(my-log-1) << "o7si"; \
         LOG_DEBUG(var) << level; \
         LOG_DEBUG(test) << #stage << ".begin"; \
         std::this_thread::sleep_for(std::chrono::milliseconds(time)); \

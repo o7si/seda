@@ -32,6 +32,8 @@ namespace seda
 // 3. 线程池
 // 4. 性能监控器
 
+class StageManager;
+
 class Stage
 {
 public:
@@ -39,20 +41,15 @@ public:
     
     virtual ~Stage() = default;
 
-    // 初始化 Stage 的内部组件
-    void init();
+    // 设置 Stage 的名称
+    // 同时会改变 StageManager 中的映射名
+    bool setName(std::string new_name);
 
     // 获取 Stage 的名称
     std::string getName() const
     {
         return m_name;    
     }
-
-    // 设置 Stage 的名称
-    void setName(std::string name)
-    {
-        m_name = std::move(name);    
-    } 
 
     // 获取 Stage 的短名称
     std::string getShortName() const
@@ -237,10 +234,6 @@ public:
     // 根据状态名称获取 Stage 的后续状态
     std::shared_ptr<Stage> next(const std::string& state); 
     
-public:
-    // 输出性能监控器的内部信息(用于调试)
-    void performeter_internal_state() const;
-
 public:
     // 事件处理函数
     virtual std::pair<std::string, boost::any> handler(boost::any& args) = 0;

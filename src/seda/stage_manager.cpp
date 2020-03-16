@@ -44,6 +44,19 @@ StageManager::doLogin(const std::string& name)
     return nullptr;
 }
 
+bool StageManager::doUpdate(const std::string& old_name, 
+                            const std::string& new_name)
+{
+    // 判断新的名称是否被占用
+    if (has(new_name))
+        return false;
+    // 更新
+    auto stage = m_mapping[old_name];
+    m_mapping.erase(m_mapping.find(old_name));
+    m_mapping[new_name] = stage;
+    return true;
+}
+
 
 }    
 }

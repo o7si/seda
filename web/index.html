@@ -81,11 +81,15 @@
 
             var command_item = command.split(/\s+/);
             console.log(command_item);
+            
+
 
             if (command == '1')
                 stage_list(id);
-            else
+            else if (command == '2')
                 stage_info(id, "Stage1");
+            else if (command == '3')
+                stage_update(id, "Stage1", "thread_pool_capacity", 1);
         }
     </script>
 </head>

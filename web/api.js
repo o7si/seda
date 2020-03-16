@@ -188,3 +188,31 @@ function stage_info(id, stage_name) {
         }
     });
 }
+
+// 修改 Stage 的某个字段
+function stage_update(id, stage_name, key, value)
+{
+    $.ajax({
+        url: '/stage/update',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+            'stage_name': stage_name,
+            'key': key,
+            'value': value
+        }),
+        success: function (result) {
+
+            if (result['error_code'] != 0) {
+                render_feedback_window(id, 'panel-danger', result['error_desc']);
+                return;
+            }
+
+            render_feedback_window(id, 'panel-success', result['data']);
+        },
+        error: function (result) {
+            render_feedback_window(id, 'panel-danger', 'error');
+        }
+    });
+}

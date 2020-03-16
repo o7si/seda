@@ -160,9 +160,6 @@ void operator>>(const YAML::Node& yaml, o7si::seda::StageManager& manager)
             i->second["thread_capacity"].as<size_t>();
         stage->setThreadPoolCapacity(thread_pool_capacity);
 
-        // 初始化
-        stage->init();
-
         // 调整状态
         stage->run();
 

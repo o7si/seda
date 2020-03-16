@@ -46,36 +46,25 @@ public:
         return m_capacity;
     }
 
+    // 修改线程池容量
     void setCapacity(size_t capacity)
     {
-        m_capacity = capacity;    
-    }
-
-    // 初始化线程池(最大容量)
-    void init()
-    {
-        // 如果线程池已经被初始化
-        if (m_initialize)
-            return; 
-        m_initialize = true;
-
-        // 如果线程池未被初始化
-        for (size_t i = 0; i < m_capacity; ++ i)
-            m_threads.emplace_back(ThreadWorker(this, i));
-    }
-
-    // 初始化线程池(指定数量，不能大于最大容量)
-    void init(size_t number)
-    {
-        // 如果线程池已经被初始化
-        if (m_initialize)
+        m_capacity = capacity;
+        
+        // 当新容量大于旧容量时，启动新线程
+        if (m_capacity > m_threads.size())
+        {
+            for (size_t i = m_threads.size(); i < m_capacity; ++ i)
+                m_threads.emplace_back(ThreadWorker(this, i));
             return;
-        m_initialize = true;
-
-        // 如果线程池未被初始化
-        number = std::min(number, m_capacity);
-        for (size_t i = 0; i < number; ++ i)
-            m_threads.emplace_back(ThreadWorker(this, i));
+        }
+        // 当新容量小于旧容量时，关闭部分线程
+        if (m_capacity < m_threads.size())
+        {
+            for (size_t i = m_capacity; i < m_threads.size(); ++ i)
+                if (m_threads[i].joinable())
+                    m_threads[i].join();
+        }
     }
 
     // 销毁线程池
@@ -91,6 +80,7 @@ public:
             if (iter->joinable())
                 iter->join();
         }
+        m_threads.clear();
     }
 
     // 唤醒一个随机线程
@@ -113,8 +103,6 @@ public:
 private:
     // 线程池是否被关闭
     std::atomic_bool m_shutdown;
-    // 线程池是否已被初始化
-    std::atomic_bool m_initialize;
     
     // 线程池名称
     std::string m_name;
@@ -139,15 +127,25 @@ private:
         ThreadWorker(ThreadPool* pool, size_t id)
             : m_pool(pool), m_id(id)
         {
-            m_thread_name = pool->m_name + "_" + std::to_string(id);
         }
-         
+
+        void try_update_thread_name()
+        {
+            if (m_pool_name == m_pool->m_name)
+                return;
+                
+            m_pool_name = m_pool->m_name;
+            m_thread_name = m_pool_name + "_" + std::to_string(m_id);
+            o7si::utils::set_thread_name(m_thread_name);
+        } 
+
         void operator()()
         {
-            o7si::utils::set_thread_name(m_thread_name);
-            // 循环执行，直到线程池被关闭
-            while (!m_pool->m_shutdown) 
+            // 循环执行，直到线程池被关闭或当前线程 ID 大于容量
+            while (!m_pool->m_shutdown && m_id < m_pool->m_capacity) 
             {
+                try_update_thread_name();
+
                 EventQueueElem elem;
                 bool success;
                 {
@@ -184,6 +182,8 @@ private:
 
         // 线程名称
         std::string m_thread_name;
+        // 线程池的名称
+        std::string m_pool_name;
     };
 };
 

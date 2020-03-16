@@ -23,6 +23,7 @@
 // Stage 相关的错误码：
 // 101  -> not find stage  
 // 102  -> not find key 
+// 103  -> stage name repeat 
 
 namespace o7si
 {
@@ -85,12 +86,12 @@ bool stage_info(const std::string& in, std::string& out);
 
 // 修改某个 Stage 的信息
 // 对于该 Stage 而言，可供修改的参数如下：
-// | 1 | name                 | 名称             | 修改参数构成问题   |
-// | 2 | short_name           | 短名称           | 修改参数不构成问题 |
-// | 3 | thread_pool_name     | 线程池的名称     | 修改参数构成问题   |
+// | 1 | name                 | 名称             | 修改参数构成问题   | OK |
+// | 2 | short_name           | 短名称           | 修改参数不构成问题 | OK |
+// | 3 | thread_pool_name     | 线程池的名称     | 修改参数构成问题   | OK |
 // | 4 | thread_pool_capacity | 线程池的容量     | 修改参数构成问题   |
-// | 5 | performeter_name     | 性能监控器的名称 | 修改参数不构成问题 |
-// | 6 | performeter_capacity | 性能监控器的容量 | 修改参数不构成问题 | 
+// | 5 | performeter_name     | 性能监控器的名称 | 修改参数不构成问题 | OK |
+// | 6 | performeter_capacity | 性能监控器的容量 | 修改参数不构成问题 | OK | 
 bool stage_updata(const std::string& in, std::string& out);
 
 // 复读机
