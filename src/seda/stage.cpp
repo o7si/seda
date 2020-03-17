@@ -78,12 +78,12 @@ void Stage::call(boost::any&& args)
         auto ret = future.get();
         
         // 根据返回值决定后续状态
-        auto next = m_conver_mapping[ret.first];
         // 如果不存在后续状态
-        if (next == nullptr)
+        if (m_conver_mapping.find(ret.first) == m_conver_mapping.end())
             return;
         // 如果存在后续状态
-        next->call(std::forward<boost::any>(ret.second));
+        m_conver_mapping[ret.first]->call(
+            std::forward<boost::any>(ret.second));
     };
     // 提交任务
     commit(std::move(wrapper), std::forward<boost::any>(args));

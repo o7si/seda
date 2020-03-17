@@ -217,19 +217,95 @@ function stage_update(id, stage_name, key, value) {
 }
 
 // 绘制 Stage 的耗时图表
-function stage_dura_chart(id, stage_name) {
+function stage_dura_chart(id, stage_name, type) {
 
-    // 生成一个 Canvas 用于绘图
-    // canvas 的外部容器
-    var $container = $('<div style="position: relative; margin: auto; width:80vw; height: 80vh;"></div>')
+    // 生成 Canvas 的 ID
     var chart_id = "chart_" + id.slice(9);
+    // 添加 Canvas 至页面，用于后续的绘制
+    var $container = $('<div style="position: relative; margin: auto; width:80vw; height: 80vh;"></div>');
     $('<canvas id="' + chart_id + '"></canvas>').appendTo($container);
-
-    // 添加到页面
     render_feedback_window(id, 'panel-primary', $container.prop('outerHTML'));
+
+    // Canvas 的上下文对象
     var ctx = document.getElementById(chart_id).getContext('2d');
 
-    function draw_chart(id, stage_name, ctx) {
+    // 定时器 ID
+    var interval_id;
+
+    var count = 50;
+    var labels = [];
+    for (var i = 0; i < count; ++i)
+        labels[i] = '';
+
+    var dura_chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "线程等待 + 任务执行",
+                    fill: false,
+                    pointBackgroundColor: "rgba(250, 177, 160, 1.0)",
+                    pointBorderWidth: 0,
+                    borderColor: "rgba(250, 177, 160, 1.0)",
+                    borderWidth: 2,
+                    data: []
+                },
+                {
+                    label: "线程等待",
+                    fill: false,
+                    pointBackgroundColor: "rgba(255, 234, 167, 1.0)",
+                    pointBorderWidth: 0,
+                    borderColor: "rgba(255, 234, 167, 1.0)",
+                    borderWidth: 2,
+                    data: []
+                },
+                {
+                    label: "任务执行",
+                    fill: false,
+                    pointBackgroundColor: "rgba(178, 190, 195, 1.0)",
+                    pointBorderWidth: 0,
+                    borderColor: "rgba(178, 190, 195, 1.0)",
+                    borderWidth: 2,
+                    data: []
+                }
+            ]
+        },
+        options: {
+            animation: false,
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    }
+                }],
+                yAxes: [{
+                    gridLines: {
+                        display: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // 判断 ctx 是否可用
+    function try_use_ctx() {
+        var chart = document.getElementById(chart_id);
+        if (chart == null)
+            return false;
+        return true;
+    }
+
+    // 请求数据并更新图表
+    function update_chart() {
+        
+        // 当 ctx 不可使用时，结束定时器
+        if (!try_use_ctx()) {
+            
+            clearInterval(interval_id);
+            return;
+        }
+
         $.ajax({
             url: '/stage/info',
             type: 'POST',
@@ -241,80 +317,30 @@ function stage_dura_chart(id, stage_name) {
             success: function (result) {
 
                 if (result['error_code'] != 0) {
-                    render_feedback_window(id, 'panel-danger', result['error_desc']);
+                    render_feedback_window_only_scene(id, 'panel-danger');
                     return;
                 }
 
-                // 图表显示的数据数量为 50 个
-                var number = 50;
-
-                var label = [];
-                for (var i = 0; i < number; ++i)
-                    label[i] = '';
-
-                var dura_list = result['data']['lastest_dura_list'];
-                dura_list = dura_list.slice(-50);
+                var lastest_dura_list = result['data']['lastest_dura_list'];
+                var dura_list = lastest_dura_list.slice(-count);
                 for (var i = 0; i < dura_list.length; ++i)
                     dura_list[i] *= 1000;
-                var dura_wait_list = result['data']['lastest_wait_dura_list'];
-                dura_wait_list = dura_wait_list.slice(-50);
-                for (var i = 0; i < dura_wait_list.length; ++i)
-                    dura_wait_list[i] *= 1000;
-                var dura_exec_list = result['data']['lastest_exec_dura_list'];
-                dura_exec_list = dura_exec_list.slice(-50);
-                for (var i = 0; i < dura_exec_list.length; ++i)
-                    dura_exec_list[i] *= 1000;
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: label,
-                        datasets: [
-                            {
-                                label: "线程等待 + 任务执行",
-                                fill: false,
-                                pointBackgroundColor: "rgba(250, 177, 160, 1.0)",
-                                pointBorderWidth: 0,
-                                borderColor: "rgba(250, 177, 160, 1.0)",
-                                borderWidth: 2,
-                                data: dura_list
-                            },
-                            {
-                                label: "线程等待",
-                                fill: false,
-                                pointBackgroundColor: "rgba(255, 234, 167, 1.0)",
-                                pointBorderWidth: 0,
-                                borderColor: "rgba(255, 234, 167, 1.0)",
-                                borderWidth: 2,
-                                data: dura_wait_list
-                            },
-                            {
-                                label: "任务执行",
-                                fill: false,
-                                pointBackgroundColor: "rgba(178, 190, 195, 1.0)",
-                                pointBorderWidth: 0,
-                                borderColor: "rgba(178, 190, 195, 1.0)",
-                                borderWidth: 2,
-                                data: dura_exec_list
-                            }
-                        ]
-                    },
-                    options: {
-                        animation: false,
-                        scales: {
-                            xAxes: [{
-                                gridLines: {
-                                    display: false
-                                }
-                            }],
-                            yAxes: [{
-                                gridLines: {
-                                    display: true
-                                }
-                            }]
-                        }
-                    }
-                });
+                var lastest_wait_dura_list = result['data']['lastest_wait_dura_list'];
+                var wait_dura_list = lastest_wait_dura_list.slice(-count);
+                for (var i = 0; i < wait_dura_list.length; ++i)
+                    wait_dura_list[i] *= 1000;
+
+                var lastest_exec_dura_list = result['data']['lastest_exec_dura_list'];
+                var exec_dura_list = lastest_exec_dura_list.slice(-count);
+                for (var i = 0; i < exec_dura_list.length; ++i)
+                    exec_dura_list[i] *= 1000;
+
+                dura_chart.data.datasets[0].data = dura_list;
+                dura_chart.data.datasets[1].data = wait_dura_list;
+                dura_chart.data.datasets[2].data = exec_dura_list;
+                dura_chart.update();
+
                 render_feedback_window_only_scene(id, 'panel-success');
             },
             error: function (result) {
@@ -323,7 +349,24 @@ function stage_dura_chart(id, stage_name) {
         });
     }
 
-    setInterval(() => {
-        draw_chart(id, stage_name, ctx);
-    }, 1000);
+    update_chart();
+    
+    // 动态图表/静态图表
+    if (type == "dynamic")
+        interval_id = setInterval(update_chart, 500);
+}
+
+// 绘制 Stage 的耗时图表（动态）
+function stage_dynamic_dura_chart(id, stage_name) {
+    stage_dura_chart(id, stage_name, "dynamic");
+}
+
+// 绘制 Stage 的耗时图表（静态）
+function stage_static_dura_chart(id, stage_name) {
+    stage_dura_chart(id, stage_name, "staitc");
+}
+
+// 命令错误的回显
+function command_error(id, desc) {
+    render_feedback_window(id, "panel-danger", desc);
 }

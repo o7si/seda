@@ -118,6 +118,7 @@ bool stage_info(const std::string& in, std::string& out)
         Json::Value array;
         for (const auto& item : conver_mapping)
             array.append(item.first + " -> " + item.second->getName());
+
         return array;
     }();
     data["is_run"] = stage->isRun();

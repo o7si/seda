@@ -5,6 +5,7 @@
 int main(int argc, char* argv[])
 {
     o7si::config::load("/root/reps/seda/conf/test.conf");
+    auto stage4 = o7si::seda::StageManager::Instance()->doLogin("Stage4");
 
     o7si::log::LoggerManager::Instance()->login_behavior(1);
 
