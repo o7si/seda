@@ -153,9 +153,8 @@
                         history_command.push(command);
                     history_index = history_command.length;
 
-                    // 输入的为清理命令
                     if (command == 'clear') {
-                        $('#feedback-list').html(null);
+                        clear();
                         return;
                     }
 
@@ -176,6 +175,11 @@
         // stage static-chart stage_name
         // stage dynamic-chart stage_name
         function parser(id, command) {
+
+            if (command == 'history') {
+                history(id);
+                return;
+            }
 
             var command_list = command.split(/\s+/);
 
@@ -202,6 +206,25 @@
                 }
             }
             render_danger_feedback_window(id, "command invaild");
+        }
+    </script>
+
+    <script>
+        // 清空网页
+        function clear() {
+            $('#feedback-list').html(null);
+        }
+
+        // 历史命令列表
+        function history(id) {
+            var $table = $('<table class="table table-bordered table-hover"></table>');
+            for (var i = 0; i < history_command.length; ++ i) {
+                var $row = $('<tr></tr>');
+                $('<td width="10%">' + (i + 1) + '</td>').appendTo($row);
+                $('<td>' + history_command[i] + '</td>').appendTo($row);
+                $row.appendTo($table);
+            }
+            render_success_feedback_window(id, $table.prop('outerHTML'));
         }
     </script>
 </head>

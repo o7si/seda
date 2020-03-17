@@ -9,7 +9,7 @@ function stage_list(id) {
         success: function (result) {
 
             if (result['error_code'] != 0) {
-                render_feedback_window(id, 'panel-danger', result['error_desc']);
+                render_danger_feedback_window(id, result['error_desc']);
                 return;
             }
 
@@ -37,10 +37,10 @@ function stage_list(id) {
                 $('<td>' + result['data'][iter]['is_run'] + '</td>').appendTo($row);
                 $row.appendTo($table);
             }
-            render_feedback_window(id, 'panel-success', $table.prop('outerHTML'));
+            render_success_feedback_window(id, $table.prop('outerHTML'));
         },
         error: function (result) {
-            render_feedback_window(id, 'panel-danger', 'error');
+            render_danger_feedback_window(id, 'error');
         }
     });
 }
@@ -59,7 +59,7 @@ function stage_info(id, stage_name) {
 
             console.log(result);
             if (result['error_code'] != 0) {
-                render_feedback_window(id, 'panel-danger', result['error_desc']);
+                render_danger_feedback_window(id, result['error_desc']);
                 return;
             }
 
@@ -118,62 +118,71 @@ function stage_info(id, stage_name) {
 
             var $longest_dura = $('<tr></tr>');
             $('<td>' + '最长耗时（线程等待 + 任务执行）' + '</td>').appendTo($longest_dura);
-            $('<td>' + result['data']['longest_dura'] + '</td>').appendTo($longest_dura);
+            $('<td>' + result['data']['longest_dura'] * 1000 + '</td>').appendTo($longest_dura);
             $longest_dura.appendTo($table);
 
             var $longest_wait_dura = $('<tr></tr>');
             $('<td>' + '最长耗时（线程等待）' + '</td>').appendTo($longest_wait_dura);
-            $('<td>' + result['data']['longest_wait_dura'] + '</td>').appendTo($longest_wait_dura);
+            $('<td>' + result['data']['longest_wait_dura'] * 1000 + '</td>').appendTo($longest_wait_dura);
             $longest_wait_dura.appendTo($table);
 
             var $longest_exec_dura = $('<tr></tr>');
             $('<td>' + '最长耗时（任务执行）' + '</td>').appendTo($longest_exec_dura);
-            $('<td>' + result['data']['longest_exec_dura'] + '</td>').appendTo($longest_exec_dura);
+            $('<td>' + result['data']['longest_exec_dura'] * 1000 + '</td>').appendTo($longest_exec_dura);
             $longest_exec_dura.appendTo($table);
 
             var $sum_dura = $('<tr></tr>');
             $('<td>' + '总耗时（线程等待 + 任务执行）' + '</td>').appendTo($sum_dura);
-            $('<td>' + result['data']['sum_dura'] + '</td>').appendTo($sum_dura);
+            $('<td>' + result['data']['sum_dura'] * 1000 + '</td>').appendTo($sum_dura);
             $sum_dura.appendTo($table);
 
             var $sum_wait_dura = $('<tr></tr>');
             $('<td>' + '总耗时（线程等待）' + '</td>').appendTo($sum_wait_dura);
-            $('<td>' + result['data']['sum_wait_dura'] + '</td>').appendTo($sum_wait_dura);
+            $('<td>' + result['data']['sum_wait_dura'] * 1000 + '</td>').appendTo($sum_wait_dura);
             $sum_wait_dura.appendTo($table);
 
             var $sum_exec_dura = $('<tr></tr>');
             $('<td>' + '总耗时（任务执行）' + '</td>').appendTo($sum_exec_dura);
-            $('<td>' + result['data']['sum_exec_dura'] + '</td>').appendTo($sum_exec_dura);
+            $('<td>' + result['data']['sum_exec_dura'] * 1000 + '</td>').appendTo($sum_exec_dura);
             $sum_exec_dura.appendTo($table);
 
             var $avg_dura = $('<tr></tr>');
             $('<td>' + '平均耗时（线程等待 + 任务执行）' + '</td>').appendTo($avg_dura);
-            $('<td>' + result['data']['avg_dura'] + '</td>').appendTo($avg_dura);
+            $('<td>' + result['data']['avg_dura'] * 1000 + '</td>').appendTo($avg_dura);
             $avg_dura.appendTo($table);
 
             var $avg_wait_dura = $('<tr></tr>');
             $('<td>' + '平均耗时（线程等待）' + '</td>').appendTo($avg_wait_dura);
-            $('<td>' + result['data']['avg_wait_dura'] + '</td>').appendTo($avg_wait_dura);
+            $('<td>' + result['data']['avg_wait_dura'] * 1000 + '</td>').appendTo($avg_wait_dura);
             $avg_wait_dura.appendTo($table);
 
             var $avg_exec_dura = $('<tr></tr>');
             $('<td>' + '平均耗时（任务执行）' + '</td>').appendTo($avg_exec_dura);
-            $('<td>' + result['data']['avg_exec_dura'] + '</td>').appendTo($avg_exec_dura);
+            $('<td>' + result['data']['avg_exec_dura'] * 1000 + '</td>').appendTo($avg_exec_dura);
             $avg_exec_dura.appendTo($table);
 
             var $lastest_dura_list = $('<tr></tr>');
+            var dura_list = result['data']['lastest_dura_list'].slice(-20);
+            for (var i = 0; i < dura_list.length; ++i)
+                dura_list[i] *= 1000;
             $('<td>' + '最新的耗时列表（线程等待 + 任务执行）' + '</td>').appendTo($lastest_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_dura_list'].slice(-20) + '</td>').appendTo($lastest_dura_list);
+            $('<td style="word-break: break-all;">' + dura_list + '</td>').appendTo($lastest_dura_list);
             $lastest_dura_list.appendTo($table);
 
             var $lastest_wait_dura_list = $('<tr></tr>');
+            var wait_dura_list = result['data']['lastest_dura_list'].slice(-20);
+            for (var i = 0; i < wait_dura_list.length; ++i)
+                wait_dura_list[i] *= 1000;
             $('<td>' + '最新的耗时列表（线程等待）' + '</td>').appendTo($lastest_wait_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_wait_dura_list'].slice(-20) + '</td>').appendTo($lastest_wait_dura_list);
+            $('<td style="word-break: break-all;">' + wait_dura_list + '</td>').appendTo($lastest_wait_dura_list);
             $lastest_wait_dura_list.appendTo($table);
 
             var $lastest_exec_dura_list = $('<tr></tr>');
+            var exec_dura_list = result['data']['lastest_exec_dura_list'].slice(-20);
+            for (var i = 0; i < exec_dura_list.length; ++i)
+                exec_dura_list[i] *= 1000;
             $('<td>' + '最新的耗时列表（任务执行）' + '</td>').appendTo($lastest_exec_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_exec_dura_list'].slice(-20) + '</td>').appendTo($lastest_exec_dura_list);
+            $('<td style="word-break: break-all;">' + exec_dura_list + '</td>').appendTo($lastest_exec_dura_list);
             $lastest_exec_dura_list.appendTo($table);
 
             var $task_count = $('<tr></tr>');
@@ -181,10 +190,10 @@ function stage_info(id, stage_name) {
             $('<td>' + result['data']['task_count'] + '</td>').appendTo($task_count);
             $task_count.appendTo($table);
 
-            render_feedback_window(id, 'panel-success', $table.prop('outerHTML'));
+            render_success_feedback_window(id, $table.prop('outerHTML'));
         },
         error: function (result) {
-            render_feedback_window(id, 'panel-danger', 'error');
+            render_danger_feedback_window(id, 'error');
         }
     });
 }
@@ -204,14 +213,14 @@ function stage_update(id, stage_name, key, value) {
         success: function (result) {
 
             if (result['error_code'] != 0) {
-                render_feedback_window(id, 'panel-danger', result['error_desc']);
+                render_danger_feedback_window(id, result['error_desc']);
                 return;
             }
 
-            render_feedback_window(id, 'panel-success', result['data']);
+            render_success_feedback_window(id, result['data']);
         },
         error: function (result) {
-            render_feedback_window(id, 'panel-danger', 'error');
+            render_danger_feedback_window(id, result['error_desc']);
         }
     });
 }
@@ -298,10 +307,10 @@ function stage_dura_chart(id, stage_name, type) {
 
     // 请求数据并更新图表
     function update_chart() {
-        
+
         // 当 ctx 不可使用时，结束定时器
         if (!try_use_ctx()) {
-            
+
             clearInterval(interval_id);
             return;
         }
@@ -317,7 +326,7 @@ function stage_dura_chart(id, stage_name, type) {
             success: function (result) {
 
                 if (result['error_code'] != 0) {
-                    render_feedback_window_only_scene(id, 'panel-danger');
+                    render_danger_feedback_window_only_scene(id);
                     return;
                 }
 
@@ -341,16 +350,16 @@ function stage_dura_chart(id, stage_name, type) {
                 dura_chart.data.datasets[2].data = exec_dura_list;
                 dura_chart.update();
 
-                render_feedback_window_only_scene(id, 'panel-success');
+                render_success_feedback_window_only_scene(id);
             },
             error: function (result) {
-                render_feedback_window_only_scene(id, 'panel-danger');
+                render_danger_feedback_window_only_scene(id);
             }
         });
     }
 
     update_chart();
-    
+
     // 动态图表/静态图表
     if (type == "dynamic")
         interval_id = setInterval(update_chart, 500);
@@ -364,9 +373,4 @@ function stage_dynamic_dura_chart(id, stage_name) {
 // 绘制 Stage 的耗时图表（静态）
 function stage_static_dura_chart(id, stage_name) {
     stage_dura_chart(id, stage_name, "staitc");
-}
-
-// 命令错误的回显
-function command_error(id, desc) {
-    render_feedback_window(id, "panel-danger", desc);
 }
