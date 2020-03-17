@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
     server.setProtocol(6);
     server.restart();
 
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
     auto stage1 = o7si::seda::StageManager::Instance()->doLogin("Stage1");
     while (true)
     {
@@ -25,7 +27,6 @@ int main(int argc, char* argv[])
         stage1->call(0);        
 
         std::this_thread::sleep_for(std::chrono::seconds(2));
-
 
         auto stage = o7si::seda::StageManager::Instance()->doLogin("HelloWorld");
         if (stage == nullptr)

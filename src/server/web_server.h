@@ -14,6 +14,7 @@
 #include "../net/http_parser.h"
 #include "../net/sockaddr.h"
 #include "../net/socket.h"
+#include "../random.h"
 
 #include "servlet.h"
 
@@ -23,6 +24,16 @@ namespace o7si
 namespace server
 {
     
+// ----------------------------------------------------------------------------
+
+// 权限验证
+// 当该值为空时，不进行验证
+// 当该值不为空时，进行验证
+static std::string authority_code;
+
+std::string get_authority_code();
+
+void gen_authority_code();
 
 // ----------------------------------------------------------------------------
 

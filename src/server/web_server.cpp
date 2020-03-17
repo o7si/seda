@@ -6,9 +6,19 @@ namespace o7si
 namespace server
 {
 
-
 // ----------------------------------------------------------------------------
 
+std::string get_authority_code()
+{
+    return authority_code;
+}
+
+void gen_authority_code()
+{
+    authority_code = o7si::random::uuid();    
+}
+
+// ----------------------------------------------------------------------------
 
 WebServer::WebServer(int protocol, int port, std::string path)
     : m_path(std::move(path)),
@@ -21,6 +31,8 @@ WebServer::WebServer(int protocol, int port, std::string path)
 
 WebServer::~WebServer()
 {
+    if (m_shutdown)
+        return;
     stop(); 
 }
 
@@ -64,11 +76,15 @@ bool WebServer::start()
     for (int i = 0; i < m_pool_capacity; ++ i)
         m_worker_pool.emplace_back(Worker(this, i));
 
+    // 生成 UUID，用作权限验证
+    gen_authority_code();
+
     LOG_INFO_SYS << "webserver start success. "
                  << "port = " << m_port << ", "
                  << "protocol = " << m_protocol << ", "
                  << "path = " << m_path << ", "
                  << "thread_capacity = " << m_pool_capacity;
+    LOG_INFO_SYS << "authority code = " << get_authority_code();
     
     // 关闭 Socket 的输出
     m_socket->log(false);

@@ -5,7 +5,9 @@ function stage_list(id) {
         type: 'POST',
         contentType: 'application/json',
         dataType: 'json',
-        data: JSON.stringify(),
+        data: JSON.stringify({
+            'authority': localStorage.getItem('authority')
+        }),
         success: function (result) {
 
             if (result['error_code'] != 0) {
@@ -53,6 +55,7 @@ function stage_info(id, stage_name) {
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify({
+            'authority': localStorage.getItem('authority'),
             'stage_name': stage_name
         }),
         success: function (result) {
@@ -206,6 +209,7 @@ function stage_update(id, stage_name, key, value) {
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify({
+            'authority': localStorage.getItem('authority'),
             'stage_name': stage_name,
             'key': key,
             'value': value
@@ -321,6 +325,7 @@ function stage_dura_chart(id, stage_name, type) {
             contentType: 'application/json',
             dataType: 'json',
             data: JSON.stringify({
+                'authority': localStorage.getItem('authority'),
                 'stage_name': stage_name
             }),
             success: function (result) {

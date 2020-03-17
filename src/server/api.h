@@ -14,11 +14,13 @@
 #include "../seda/stage_manager.h"
 
 #include "api_manager.h"
+#include "web_server.h"
 
 // 错误码定义
 //
 // 一般的错误码：
 // 1    ->  missing parameter
+// 2    ->  permission denied
 //
 // Stage 相关的错误码：
 // 101  -> not find stage  
@@ -43,8 +45,10 @@ std::string make_error_json(int error_code, const std::string& error_desc);
 
 // ----------------------------------------------------------------------------
 
-// 获取帮助文档
-bool help(const std::string& in, std::string& out);
+// 权限验证
+bool verify(const Json::Value& params);
+
+// ----------------------------------------------------------------------------
 
 // 获取 Stage 列表 
 // 对于每个 Stage 而言，将返回以下信息：
@@ -86,17 +90,18 @@ bool stage_info(const std::string& in, std::string& out);
 
 // 修改某个 Stage 的信息
 // 对于该 Stage 而言，可供修改的参数如下：
-// | 1 | name                 | 名称             | 修改参数构成问题   | OK |
-// | 2 | short_name           | 短名称           | 修改参数不构成问题 | OK |
-// | 3 | thread_pool_name     | 线程池的名称     | 修改参数构成问题   | OK |
-// | 4 | thread_pool_capacity | 线程池的容量     | 修改参数构成问题   |
-// | 5 | performeter_name     | 性能监控器的名称 | 修改参数不构成问题 | OK |
-// | 6 | performeter_capacity | 性能监控器的容量 | 修改参数不构成问题 | OK | 
+// | 1 | name                 | 名称             |
+// | 2 | short_name           | 短名称           |
+// | 3 | thread_pool_name     | 线程池的名称     |
+// | 4 | thread_pool_capacity | 线程池的容量     |
+// | 5 | performeter_name     | 性能监控器的名称 |
+// | 6 | performeter_capacity | 性能监控器的容量 |
 bool stage_updata(const std::string& in, std::string& out);
 
 // 复读机
 bool repeater(const std::string& in, std::string& out);
 
+// ----------------------------------------------------------------------------
 
 }   // namespace server     
 }   // namespace o7si

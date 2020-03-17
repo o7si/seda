@@ -1,6 +1,5 @@
 #include "api.h"
 
-#include <iostream>
 
 namespace o7si
 {
@@ -41,13 +40,30 @@ std::string make_error_json(int error_code, const std::string& error_desc)
 
 // ----------------------------------------------------------------------------
 
-bool help(const std::string& in, std::string& out)
+bool verify(const Json::Value& params)
 {
-    return true;      
+    std::string authority = get_authority_code();    
+    if (authority.empty())
+        return true;
+
+    return params["authority"].asString() == authority;
 }
+
+// ----------------------------------------------------------------------------
 
 bool stage_list(const std::string& in, std::string& out)
 {
+    Json::Value params;
+    bool ret = make_json(in, params);
+    if (!ret)
+        return false;
+
+    if (!verify(params))
+    {
+        out = make_error_json(2, "permission denied");
+        return true;    
+    }
+
     Json::Value data = [&]
     {
         auto mapping = o7si::seda::StageManager::Instance()->getMapping();    
@@ -85,6 +101,12 @@ bool stage_info(const std::string& in, std::string& out)
     bool ret = make_json(in, params);
     if (!ret)
         return false;
+
+    if (!verify(params))
+    {
+        out = make_error_json(2, "permission denied");
+        return true;    
+    }
 
     // 没有携带 stage_name 参数
     if (!params.isMember("stage_name"))
@@ -174,6 +196,12 @@ bool stage_update(const std::string& in, std::string& out)
     bool ret = make_json(in, params);
     if (!ret)
         return false;
+
+    if (!verify(params))
+    {
+        out = make_error_json(2, "permission denied");
+        return true;    
+    }
         
     // 没有携带 stage_name 参数
     if (!params.isMember("stage_name"))
@@ -256,7 +284,6 @@ bool repeater(const std::string& in, std::string& out)
 
 // ----------------------------------------------------------------------------
 
-REGISTER_API(/help, help)
 REGISTER_API(/stage/list, stage_list)
 REGISTER_API(/stage/info, stage_info)
 REGISTER_API(/stage/update, stage_update)

@@ -169,11 +169,15 @@
         });
 
         // 解析并处理命令
+        // stage 相关
         // stage list
         // stage info stage_name
         // stage update stage_name key value
         // stage static-chart stage_name
         // stage dynamic-chart stage_name
+        // variable set key value
+        // variable get key
+        // variable del key
         function parser(id, command) {
 
             if (command == 'history') {
@@ -183,29 +187,49 @@
 
             var command_list = command.split(/\s+/);
 
-            if (command_list[0] == "stage") {
-                if (command_list[1] == "list") {
+            if (command_list[0] == 'variable') {
+                
+                if (command_list[1] == 'set') {
+                    variable_set(id, command_list[2], command_list[3]);
+                    return;
+                }
+                if (command_list[1] == 'get') {
+                    variable_get(id, command_list[2]);
+                    return;
+                }
+                if (command_list[1] == 'del') {
+                    variable_del(id, command_list[2]);
+                    return;
+                }
+                if (command_list[1] == 'list') {
+                    variable_list(id);
+                    return;
+                }
+            }
+
+            if (command_list[0] == 'stage') {
+                if (command_list[1] == 'list') {
                     stage_list(id);
                     return;
                 }
-                if (command_list[1] == "info") {
+                if (command_list[1] == 'info') {
                     stage_info(id, command_list[2]);
                     return;
                 }
-                if (command_list[1] == "update") {
+                if (command_list[1] == 'update') {
                     stage_update(id, command_list[2], command_list[3], command_list[4]);
                     return;
                 }
-                if (command_list[1] == "static-chart") {
+                if (command_list[1] == 'static-chart') {
                     stage_static_dura_chart(id, command_list[2]);
                     return;
                 }
-                if (command_list[1] == "dynamic-chart") {
+                if (command_list[1] == 'dynamic-chart') {
                     stage_dynamic_dura_chart(id, command_list[2]);
                     return;
                 }
             }
-            render_danger_feedback_window(id, "command invaild");
+            render_danger_feedback_window(id, 'command invaild');
         }
     </script>
 
@@ -222,6 +246,51 @@
                 var $row = $('<tr></tr>');
                 $('<td width="10%">' + (i + 1) + '</td>').appendTo($row);
                 $('<td>' + history_command[i] + '</td>').appendTo($row);
+                $row.appendTo($table);
+            }
+            render_success_feedback_window(id, $table.prop('outerHTML'));
+        }
+
+        // 添加变量
+        function variable_set(id, key, value) {
+            if (key == null || value == null) {
+                render_danger_feedback_window(id, 'error');
+                return;
+            }
+            localStorage.setItem(key, value);
+            render_success_feedback_window(id, key + '=' + value);
+        }
+        // 获取变量
+        function variable_get(id, key) {
+            if (key == null) {
+                render_danger_feedback_window(id, 'error');
+                return;
+            }
+            var value = localStorage.getItem(key);
+            render_success_feedback_window(id, key + '=' + value);
+        }
+        // 删除变量
+        function variable_del(id, key) {
+            if (key == null) {
+                render_danger_feedback_window(id, 'error');
+                return;
+            }
+            localStorage.removeItem(key);
+            render_success_feedback_window(id, key + '=');
+        }
+        // 变量列表
+        function variable_list(id) {
+            if (localStorage.length == 0) {
+                render_success_feedback_window(id, 'empty');
+                return;
+            }
+            var $table = $('<table class="table table-bordered table-hover"></table>');
+            for (var i = 0; i < localStorage.length; ++ i) {
+                var $row = $('<tr></tr>');
+                var key = localStorage.key(i);
+                var value = localStorage.getItem(key);
+                $('<td width="15%">' + key + '</td>').appendTo($row);
+                $('<td>' + value + '</td>').appendTo($row);
                 $row.appendTo($table);
             }
             render_success_feedback_window(id, $table.prop('outerHTML'));
