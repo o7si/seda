@@ -113,7 +113,7 @@ function stage_info(id, stage_name) {
 
             var $is_run = $('<tr></tr>');
             $('<td>' + '是否运行在系统中' + '</td>').appendTo($is_run);
-            $('<td>' + result['data']['is_run']+ '</td>').appendTo($is_run);
+            $('<td>' + result['data']['is_run'] + '</td>').appendTo($is_run);
             $is_run.appendTo($table);
 
             var $longest_dura = $('<tr></tr>');
@@ -163,17 +163,17 @@ function stage_info(id, stage_name) {
 
             var $lastest_dura_list = $('<tr></tr>');
             $('<td>' + '最新的耗时列表（线程等待 + 任务执行）' + '</td>').appendTo($lastest_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_dura_list'] + '</td>').appendTo($lastest_dura_list);
+            $('<td style="word-break: break-all;">' + result['data']['lastest_dura_list'].slice(-20) + '</td>').appendTo($lastest_dura_list);
             $lastest_dura_list.appendTo($table);
 
             var $lastest_wait_dura_list = $('<tr></tr>');
             $('<td>' + '最新的耗时列表（线程等待）' + '</td>').appendTo($lastest_wait_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_wait_dura_list'] + '</td>').appendTo($lastest_wait_dura_list);
+            $('<td style="word-break: break-all;">' + result['data']['lastest_wait_dura_list'].slice(-20) + '</td>').appendTo($lastest_wait_dura_list);
             $lastest_wait_dura_list.appendTo($table);
 
             var $lastest_exec_dura_list = $('<tr></tr>');
             $('<td>' + '最新的耗时列表（任务执行）' + '</td>').appendTo($lastest_exec_dura_list);
-            $('<td style="word-break: break-all;">' + result['data']['lastest_exec_dura_list'] + '</td>').appendTo($lastest_exec_dura_list); 
+            $('<td style="word-break: break-all;">' + result['data']['lastest_exec_dura_list'].slice(-20) + '</td>').appendTo($lastest_exec_dura_list);
             $lastest_exec_dura_list.appendTo($table);
 
             var $task_count = $('<tr></tr>');
@@ -190,8 +190,7 @@ function stage_info(id, stage_name) {
 }
 
 // 修改 Stage 的某个字段
-function stage_update(id, stage_name, key, value)
-{
+function stage_update(id, stage_name, key, value) {
     $.ajax({
         url: '/stage/update',
         type: 'POST',
@@ -215,4 +214,116 @@ function stage_update(id, stage_name, key, value)
             render_feedback_window(id, 'panel-danger', 'error');
         }
     });
+}
+
+// 绘制 Stage 的耗时图表
+function stage_dura_chart(id, stage_name) {
+
+    // 生成一个 Canvas 用于绘图
+    // canvas 的外部容器
+    var $container = $('<div style="position: relative; margin: auto; width:80vw; height: 80vh;"></div>')
+    var chart_id = "chart_" + id.slice(9);
+    $('<canvas id="' + chart_id + '"></canvas>').appendTo($container);
+
+    // 添加到页面
+    render_feedback_window(id, 'panel-primary', $container.prop('outerHTML'));
+    var ctx = document.getElementById(chart_id).getContext('2d');
+
+    function draw_chart(id, stage_name, ctx) {
+        $.ajax({
+            url: '/stage/info',
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                'stage_name': stage_name
+            }),
+            success: function (result) {
+
+                if (result['error_code'] != 0) {
+                    render_feedback_window(id, 'panel-danger', result['error_desc']);
+                    return;
+                }
+
+                // 图表显示的数据数量为 50 个
+                var number = 50;
+
+                var label = [];
+                for (var i = 0; i < number; ++i)
+                    label[i] = '';
+
+                var dura_list = result['data']['lastest_dura_list'];
+                dura_list = dura_list.slice(-50);
+                for (var i = 0; i < dura_list.length; ++i)
+                    dura_list[i] *= 1000;
+                var dura_wait_list = result['data']['lastest_wait_dura_list'];
+                dura_wait_list = dura_wait_list.slice(-50);
+                for (var i = 0; i < dura_wait_list.length; ++i)
+                    dura_wait_list[i] *= 1000;
+                var dura_exec_list = result['data']['lastest_exec_dura_list'];
+                dura_exec_list = dura_exec_list.slice(-50);
+                for (var i = 0; i < dura_exec_list.length; ++i)
+                    dura_exec_list[i] *= 1000;
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: label,
+                        datasets: [
+                            {
+                                label: "线程等待 + 任务执行",
+                                fill: false,
+                                pointBackgroundColor: "rgba(250, 177, 160, 1.0)",
+                                pointBorderWidth: 0,
+                                borderColor: "rgba(250, 177, 160, 1.0)",
+                                borderWidth: 2,
+                                data: dura_list
+                            },
+                            {
+                                label: "线程等待",
+                                fill: false,
+                                pointBackgroundColor: "rgba(255, 234, 167, 1.0)",
+                                pointBorderWidth: 0,
+                                borderColor: "rgba(255, 234, 167, 1.0)",
+                                borderWidth: 2,
+                                data: dura_wait_list
+                            },
+                            {
+                                label: "任务执行",
+                                fill: false,
+                                pointBackgroundColor: "rgba(178, 190, 195, 1.0)",
+                                pointBorderWidth: 0,
+                                borderColor: "rgba(178, 190, 195, 1.0)",
+                                borderWidth: 2,
+                                data: dura_exec_list
+                            }
+                        ]
+                    },
+                    options: {
+                        animation: false,
+                        scales: {
+                            xAxes: [{
+                                gridLines: {
+                                    display: false
+                                }
+                            }],
+                            yAxes: [{
+                                gridLines: {
+                                    display: true
+                                }
+                            }]
+                        }
+                    }
+                });
+                render_feedback_window_only_scene(id, 'panel-success');
+            },
+            error: function (result) {
+                render_feedback_window_only_scene(id, 'panel-danger');
+            }
+        });
+    }
+
+    setInterval(() => {
+        draw_chart(id, stage_name, ctx);
+    }, 1000);
 }

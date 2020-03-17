@@ -39,6 +39,9 @@ void Servlet::doGet(std::shared_ptr<o7si::net::HttpRequest> request,
     std::string resource;
     try
     {
+        if (request->path() == "/" || request->path() == "")
+            request->path("/index.html");
+
         std::ifstream stream(m_root + request->path(), std::ifstream::in);
         // 资源不存在，无法打开文件
         if (!stream.is_open())

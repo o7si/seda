@@ -26,10 +26,10 @@ public: \
 }; \
 REGISTER_STAGE(stage)
 
-STAGE(Stage1, 1500)
-STAGE(Stage2, 2500)
-STAGE(Stage3, 500)
-STAGE(Stage4, 3500)
+STAGE(Stage1, 10)
+STAGE(Stage2, 20)
+STAGE(Stage3, 10)
+STAGE(Stage4, 30)
 STAGE(Stage5, 3500)
 STAGE(Stage6, 3500)
 STAGE(Stage7, 3500)
