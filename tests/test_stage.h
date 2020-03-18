@@ -16,27 +16,22 @@ public: \
     std::pair<std::string, boost::any> handler(boost::any& args) override \
     { \
         int level = boost::any_cast<int>(args); \
-        LOG_DEBUG(my-log-1) << "o7si"; \
-        LOG_DEBUG(var) << level; \
-        LOG_DEBUG(test) << #stage << ".begin"; \
         std::this_thread::sleep_for(std::chrono::milliseconds(time)); \
-        LOG_DEBUG(test) << #stage << ".end"; \
         return { "success", level + 1 }; \
     } \
 }; \
 REGISTER_STAGE(stage)
 
 STAGE(Stage1, 10)
-STAGE(Stage2, 20)
-STAGE(Stage3, 10)
-STAGE(Stage4, 30)
-STAGE(Stage5, 3500)
-STAGE(Stage6, 3500)
-STAGE(Stage7, 3500)
-STAGE(Stage8, 3500)
-STAGE(Stage9, 3500)
-STAGE(Stage10, 3500)
-STAGE(Stage11, 3500)
+STAGE(Stage2, 15)
+STAGE(Stage3, 13)
+STAGE(Stage4, 32)
+STAGE(Stage5, 35)
+STAGE(Stage6, 29)
+STAGE(Stage7, 20)
+STAGE(Stage8, 23)
+STAGE(Stage9, 18)
+STAGE(Stage10, 7)
 
 }   // namespace seda
 }   // namespace o7si

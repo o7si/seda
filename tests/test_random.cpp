@@ -2,6 +2,7 @@
 
 #include <random.h>
 
+
 void test_uuid()
 {
     std::cout << __func__ << std::endl;

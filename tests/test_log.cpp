@@ -1,5 +1,6 @@
 #include <log.h>
 
+
 void test_log_print()
 {    
     // 普通日志

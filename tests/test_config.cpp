@@ -1,13 +1,17 @@
 #include <config.h>
 #include <log.h>
+#include <seda/stage_manager.h>
+#include <server/web_server.h>
 
-#include "stage/test01.h"
+#include "test_stage.h"
 
-void test_config_path()
+void test_config_system()
 {
-    auto pm = o7si::config::PathManager::Instance();
-    LOG_INFO_SYS << "log -> " << pm->get("log", "unknown"); 
-    LOG_INFO_SYS << "web -> " << pm->get("web", "unknown"); 
+    auto ptr = o7si::server::WebServerManager::Instance();
+    std::cout << "is_auth = " << ptr->isAuth() << std::endl;
+    std::cout << "auth_code = " << ptr->getAuthCode() << std::endl;
+    std::cout << "is_save = " << ptr->isSave() << std::endl;
+    std::cout << "auth_path = " << ptr->getAuthPath() << std::endl; 
 }
 
 void test_config_log()
@@ -29,47 +33,46 @@ void test_config_log()
     LOG_WARN(my-log-2) << "warn"; 
     LOG_ERROR(my-log-2) << "error"; 
     LOG_FATAL(my-log-2) << "fatal"; 
+
+    LOG_DEBUG(my-log-3) << "debug"; 
+    LOG_INFO(my-log-3) << "info"; 
+    LOG_WARN(my-log-3) << "warn"; 
+    LOG_ERROR(my-log-3) << "error"; 
+    LOG_FATAL(my-log-3) << "fatal"; 
 }
 
 void test_config_stage()
 {
-    using namespace o7si::seda;
-    auto stage1 = StageManager::Instance()->doLogin("Stage1");
-    auto stage2 = StageManager::Instance()->doLogin("Stage2");
-    auto stage3 = StageManager::Instance()->doLogin("Stage3");
-    auto stage4 = StageManager::Instance()->doLogin("Stage4");
-
-    auto stage1_mapping = stage1->next(); 
-    for (const auto& item : stage1_mapping)
-        LOG_INFO_SYS << item.first << " " << item.second->getName();
-    auto stage2_mapping = stage2->next(); 
-    for (const auto& item : stage2_mapping)
-        LOG_INFO_SYS << item.first << " " << item.second->getName();
-    auto stage3_mapping = stage3->next(); 
-    for (const auto& item : stage3_mapping)
-        LOG_INFO_SYS << item.first << " " << item.second->getName();
-    auto stage4_mapping = stage4->next(); 
-    for (const auto& item : stage4_mapping)
-        LOG_INFO_SYS << item.first << " " << item.second->getName();
-}
-
-void test_replace_layout()
-{
-    using namespace o7si::log;
-    auto user = LoggerManager::Instance()->doLogin("system");
-    LOG_INFO_SYS << "before";
-    std::list<std::shared_ptr<Appender>> apps = user->appenders();
-    std::shared_ptr<Appender> app = *apps.begin();
-    app->layout(std::make_shared<Layout>("%u|%u|%u %c")); 
-    LOG_INFO_SYS << "end";
+    auto mapping = o7si::seda::StageManager::Instance()->getMapping();
+    for (const auto& kv : mapping)
+    {
+        std::cout << kv.first 
+                  << "(" << kv.second->getThreadPoolCapacity() << ")" 
+                  << std::endl;
+        auto next = kv.second->next();
+        for (const auto& item : next)
+            std::cout << "\t" 
+                      << item.first 
+                      << " -> " 
+                      << item.second->getName()
+                      << std::endl;
+    }
 }
 
 int main(int argc, char* argv[])
 {
-    o7si::config::load("/root/reps/seda/conf/test.conf");
-    //test_config_path();    
+    if (argc < 2) 
+    {
+        std::cout << "Please input filename..." << std::endl;
+        std::cout << "e.g." << std::endl;
+        std::cout << argv[0] << " test.conf" << std::endl;    
+        return EXIT_FAILURE;
+    }
+
+    o7si::config::load(argv[1]);
+    test_config_system();
     test_config_log();
-    //test_config_stage();
-    test_replace_layout();
-    return 0;   
+    test_config_stage();
+
+    return EXIT_SUCCESS;   
 }

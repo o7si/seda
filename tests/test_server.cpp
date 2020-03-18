@@ -1,6 +1,8 @@
-#include <server/web_server.h>
 #include <config.h>
-#include "stage/test01.h"
+#include <server/web_server.h>
+
+#include "test_stage.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -11,13 +13,10 @@ int main(int argc, char* argv[])
 
     o7si::server::WebServer server(4, atoi(argv[1]), "/root/reps/seda/web");
     server.start();
-    std::this_thread::sleep_for(std::chrono::seconds(2));    
-    server.stop();
-
-    server.setProtocol(6);
-    server.restart();
-
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    //server.stop();
+    //server.setProtocol(6);
+    //server.restart();
 
     auto stage1 = o7si::seda::StageManager::Instance()->doLogin("Stage1");
     while (true)
