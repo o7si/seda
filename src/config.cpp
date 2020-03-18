@@ -8,58 +8,12 @@ namespace config
 
 // ----------------------------------------------------------------------------
 
-std::shared_ptr<PathManager> PathManager::instance(new PathManager());
-
-std::shared_ptr<PathManager> PathManager::Instance()
-{
-    return instance;    
-}
-
-void PathManager::set(const std::string& key, 
-                      const std::string& value)
-{
-    m_paths[key] = value + "/";    
-}
-
-std::string PathManager::get(const std::string& key, 
-                             const std::string& def)
-{
-    if (!exist(key))
-        return def + "/";
-    return m_paths[key] + "/"; 
-}
-
-void PathManager::remove(const std::string& key)
-{
-    if (!exist(key))
-        return;    
-    m_paths.erase(m_paths.find(key));
-}
-
-bool PathManager::exist(const std::string& key) const
-{
-    return has(key); 
-}
-
-bool PathManager::has(const std::string& key) const
-{
-    return m_paths.find(key) != m_paths.end(); 
-}
-
-// ----------------------------------------------------------------------------
-
 void load(const std::string& filename)
 {
     // 载入配置文件
     LOG_INFO_SYS << "Loading...(config)";
     YAML::Node config = YAML::LoadFile(filename);    
     
-    // 载入路径配置
-    LOG_INFO_SYS << "Loading...(config.path)";
-    YAML::Node path_config = config["path"];
-    path_config >> *o7si::config::PathManager::Instance();
-    LOG_INFO_SYS << "Complete(config.path)";
-
     // 日志模块的配置
     LOG_INFO_SYS << "Loading...(config.log)";
     YAML::Node log_config = config["log"];
@@ -79,18 +33,6 @@ void load(const std::string& filename)
 }
 
 // ----------------------------------------------------------------------------
-
-void operator>>(const YAML::Node& yaml, o7si::config::PathManager& manager)
-{
-    // 读取每一组键值对
-    for (auto iter = yaml.begin(); iter != yaml.end(); ++ iter)
-    {
-        std::string key = iter->first.as<std::string>();
-        std::string value = iter->second.as<std::string>();
-        
-        manager.set(key, value);   
-    }
-}
 
 void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
 {
@@ -129,11 +71,7 @@ void operator>>(const YAML::Node& yaml, o7si::log::LoggerManager& manager)
             // 文件输出地
             else if (type == "fileappender")
             {
-                // 如果未指定路径，则默认将日志输出至 "/tmp/" 目录下
-                std::string path = 
-                    PathManager::Instance()->get("log", "/tmp/");
-
-                std::string file = path + (*j)["file"].as<std::string>();
+                std::string file = (*j)["file"].as<std::string>();
                 user->add_appender(
                     std::make_shared<o7si::log::FileAppender>(
                         file, std::make_shared<o7si::log::Layout>(pattern) 
