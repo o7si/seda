@@ -8,14 +8,28 @@ namespace server
 
 // ----------------------------------------------------------------------------
 
-std::string get_authority_code()
+std::shared_ptr<WebServerManager> WebServerManager::Instance()
 {
-    return authority_code;
+    static std::shared_ptr<WebServerManager> instance(new WebServerManager());
+    return instance;    
 }
 
-void gen_authority_code()
+WebServerManager::WebServerManager()
+    : is_auth(false), is_save(false)
 {
-    authority_code = o7si::random::uuid();    
+}
+
+void WebServerManager::save()
+{
+    if (!isSave())
+        return;
+
+    std::ofstream stream(m_auth_path);
+    if (!stream.is_open())
+        throw std::logic_error("");
+
+    stream << m_auth_code << std::endl;
+    stream.close();
 }
 
 // ----------------------------------------------------------------------------
@@ -76,15 +90,13 @@ bool WebServer::start()
     for (int i = 0; i < m_pool_capacity; ++ i)
         m_worker_pool.emplace_back(Worker(this, i));
 
-    // 生成 UUID，用作权限验证
-    gen_authority_code();
-
     LOG_INFO_SYS << "webserver start success. "
                  << "port = " << m_port << ", "
                  << "protocol = " << m_protocol << ", "
                  << "path = " << m_path << ", "
                  << "thread_capacity = " << m_pool_capacity;
-    LOG_INFO_SYS << "authority code = " << get_authority_code();
+    LOG_INFO_SYS << "authority code = "
+                 << WebServerManager::Instance()->getAuthCode();
     
     // 关闭 Socket 的输出
     m_socket->log(false);

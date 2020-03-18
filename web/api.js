@@ -1,3 +1,23 @@
+// 复读机
+function repeater(id, content)
+{
+    $.ajax({
+        url: '/repeater',
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+            'content': content
+        }),
+        success: function(result) {
+            render_success_feedback_window(id, JSON.stringify(result));
+        },
+        error: function(result) {
+            render_danger_feedback_window(id, 'error');
+        }
+    });
+}
+
 // 获取 Stage 列表
 function stage_list(id) {
     $.ajax({

@@ -42,11 +42,10 @@ std::string make_error_json(int error_code, const std::string& error_desc)
 
 bool verify(const Json::Value& params)
 {
-    std::string authority = get_authority_code();    
-    if (authority.empty())
+    auto manager = WebServerManager::Instance();
+    if (!manager->isAuth())
         return true;
-
-    return params["authority"].asString() == authority;
+    return params["authority"].asString() == manager->getAuthCode();
 }
 
 // ----------------------------------------------------------------------------
@@ -277,7 +276,8 @@ bool stage_update(const std::string& in, std::string& out)
 
 bool repeater(const std::string& in, std::string& out)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    int rand = o7si::random::randint(1000, 5000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(rand));
     out = in;
     return true;    
 }

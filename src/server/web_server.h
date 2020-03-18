@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <thread>
 
@@ -26,14 +27,88 @@ namespace server
     
 // ----------------------------------------------------------------------------
 
-// 权限验证
-// 当该值为空时，不进行验证
-// 当该值不为空时，进行验证
-static std::string authority_code;
+class WebServerManager
+{
+public:
+    // 获取验证码
+    std::string getAuthCode() const
+    {
+        return m_auth_code;    
+    }
 
-std::string get_authority_code();
+    // 设置验证码（不推荐）
+    void setAuthCode(std::string code)
+    {
+        m_auth_code = std::move(code);    
+    }
 
-void gen_authority_code();
+    // 生成验证码
+    void genAuthCode()
+    {
+        m_auth_code = o7si::random::uuid();    
+    }
+
+    // 获取存储路径
+    std::string getAuthPath() const
+    {
+        return m_auth_path;        
+    }
+
+    // 设置存储路径
+    void setAuthPath(std::string path)
+    {
+        m_auth_path = std::move(path);    
+    }
+    
+    void isAuth(bool flag)
+    {
+        is_auth = flag; 
+    } 
+
+    // 是否进行验证
+    bool isAuth() const
+    {
+        return is_auth;    
+    }
+
+    void isSave(bool flag)
+    {
+        is_save = flag;    
+    }
+
+    // 是否进行存储
+    bool isSave() const
+    {
+        return is_save;    
+    }
+
+    // 存储
+    void save();
+
+public:
+    // 获取单例对象
+    static std::shared_ptr<WebServerManager> Instance();
+
+    // 删除拷贝构造函数，防止用户拷贝对象
+    WebServerManager(const WebServerManager& other) = delete;
+
+    // 删除移动构造函数，防止用户使用移动语义
+    WebServerManager(WebServerManager&& other) = delete;
+
+private:
+    // 将构造函数修饰为私有，防止用户擅自实例化对象
+    WebServerManager();
+    
+    // 身份验证
+    std::string m_auth_code;  
+    // 存储路径
+    std::string m_auth_path;
+
+    // 是否进行验证
+    bool is_auth;
+    // 是否进行存储
+    bool is_save;
+};
 
 // ----------------------------------------------------------------------------
 

@@ -187,6 +187,11 @@
 
             var command_list = command.split(/\s+/);
 
+            if (command_list[0] == 'repeater') {
+                repeater(id, command_list[1]);
+                return;
+            }
+
             if (command_list[0] == 'variable') {
                 
                 if (command_list[1] == 'set') {

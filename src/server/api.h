@@ -11,6 +11,7 @@
 
 #include <jsoncpp/json/json.h>
 
+#include "../random.h"
 #include "../seda/stage_manager.h"
 
 #include "api_manager.h"
