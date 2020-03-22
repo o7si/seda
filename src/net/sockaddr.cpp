@@ -1,6 +1,5 @@
 #include "sockaddr.h" 
 
-
 namespace o7si
 {
 namespace net
@@ -97,7 +96,10 @@ void Lookup::lookup(const std::string& host)
 
 // ----------------------------------------------------------------------------
 
-// SockAddr
+SockAddr::SockAddr()
+    : m_desc("no desc.")
+{
+}
 
 // ----------------------------------------------------------------------------
 
@@ -276,6 +278,17 @@ socklen_t SockAddrIn::length() const
     return sizeof(m_sockaddr);    
 }
 
+std::string SockAddrIn::format() const
+{
+    std::stringstream stream;
+    stream << "[IPv4]"
+           << "[" << getAddr() << "]"   
+           << ":" << getPort()
+           << "(" << (is_work() ? "work" : "not work") << ")"
+           << "|" << getDesc();
+    return stream.str();
+}
+
 // ----------------------------------------------------------------------------
 
 std::shared_ptr<SockAddrIn6> SockAddrIn6::LocalHost(uint32_t port)
@@ -449,6 +462,17 @@ socklen_t SockAddrIn6::length() const
     return sizeof(m_sockaddr);    
 }
 
+std::string SockAddrIn6::format() const
+{
+    std::stringstream stream;
+    stream << "[IPv6]"
+           << "[" << getAddr() << "]"
+           << ":" << getPort()
+           << "(" << (is_work() ? "work" : "not work") << ")"
+           << "|" << getDesc();
+    return stream.str(); 
+}
+
 // ----------------------------------------------------------------------------
 
 std::shared_ptr<SockAddrUn> SockAddrUn::LocalHost(const std::string& path)
@@ -554,32 +578,14 @@ socklen_t SockAddrUn::length() const
     return sizeof(m_sockaddr);    
 }
 
-// ----------------------------------------------------------------------------
-
-std::ostream& operator<<(std::ostream& stream, const SockAddrIn& sockaddr)
+std::string SockAddrUn::format() const
 {
-    stream << "[IPv4]"
-           << "[" << sockaddr.getAddr() << "]"   
-           << ":" << sockaddr.getPort()
-           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
-    return stream;
-}
-
-std::ostream& operator<<(std::ostream& stream, const SockAddrIn6& sockaddr)
-{
-    stream << "[IPv6]"
-           << "[" << sockaddr.getAddr() << "]"
-           << ":" << sockaddr.getPort()
-           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
-    return stream; 
-}
-
-std::ostream& operator<<(std::ostream& stream, const SockAddrUn& sockaddr)
-{
+    std::stringstream stream;
     stream << "[UNIX]"
-           << "[" << sockaddr.getPath() << "]"
-           << "(" << (sockaddr.is_work() ? "work" : "not work") << ")";
-    return stream;
+           << "[" << getPath() << "]"
+           << "(" << (is_work() ? "work" : "not work") << ")"
+           << "|" << getDesc();
+    return stream.str();
 }
 
 // ----------------------------------------------------------------------------

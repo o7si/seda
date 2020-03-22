@@ -10,7 +10,7 @@
 auto __reg_##stage = [] \
 { \
     auto reg_stage = o7si::seda::StageManager::Instance()->doRegister( \
-        #stage, std::make_shared<o7si::seda::stage>(#stage) \
+        #stage, std::make_shared<stage>(#stage) \
     ); \
     reg_stage->bind([reg_stage](boost::any& args) \
     { \

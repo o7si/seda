@@ -19,9 +19,6 @@ bool exist(const YAML::Node& yaml, const std::string& key)
     while (stream >> tmp)
         vec.push_back(tmp);
 
-    for (const auto& item : vec)
-        std::cout << item << std::endl;
-
     YAML::Node node = YAML::Clone(yaml);
     for (const auto& item : vec)
         node = node[item];

@@ -3,7 +3,7 @@
 #include <seda/stage_manager.h>
 #include <server/web_server.h>
 
-#include "test_stage.h"
+//#include "test_stage.h"
 
 void test_config_system()
 {

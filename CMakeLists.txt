@@ -30,6 +30,7 @@ set(SRCS
     src/net/sockaddr.h
     src/net/socket.cpp
     src/net/socket.h
+    src/oseda/seda.h
     src/random.cpp
     src/random.h
     src/seda/component/event_handler.hpp
@@ -64,6 +65,15 @@ set(LIBS
 
 include_directories(src)
 
+add_executable(test_tcp_server tests2/test_tcp_server.cpp)
+target_link_libraries(test_tcp_server ${LIBS})
+add_executable(test_tcp_client tests2/test_tcp_client.cpp)
+target_link_libraries(test_tcp_client ${LIBS})
+add_executable(test_udp_server tests2/test_udp_server.cpp)
+target_link_libraries(test_udp_server ${LIBS})
+add_executable(test_udp_client tests2/test_udp_client.cpp)
+target_link_libraries(test_udp_client ${LIBS})
+
 add_executable(test_random tests/test_random.cpp)
 target_link_libraries(test_random ${LIBS})
 add_executable(test_log tests/test_log.cpp)
@@ -81,7 +91,5 @@ add_executable(test_socket_udp_server tests/test_socket_udp_server.cpp)
 target_link_libraries(test_socket_udp_server ${LIBS})
 add_executable(test_socket_udp_client tests/test_socket_udp_client.cpp)
 target_link_libraries(test_socket_udp_client ${LIBS})
-add_executable(test_sockaddr_print tests/test_sockaddr_print.cpp)
-target_link_libraries(test_sockaddr_print ${LIBS})
 add_executable(test_server tests/test_server.cpp)
 target_link_libraries(test_server ${LIBS})

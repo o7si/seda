@@ -118,7 +118,7 @@ private:
 class SockAddr
 {
 public:
-    SockAddr() = default;
+    SockAddr();
 
     ~SockAddr() = default;
 
@@ -157,6 +157,9 @@ public:
 
     // 能够正常工作，即各项参数均未出错
     virtual bool is_work() const = 0;
+
+    // 格式化输出
+    virtual std::string format() const = 0;
 
 private:    
     // 关于地址的描述信息
@@ -238,6 +241,9 @@ public:
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
 
+    // 格式化输出
+    std::string format() const override;
+
     // 判断地址是否可用，即设置值的过程中未出现错误
     bool addr_is_available() const
     {
@@ -317,6 +323,9 @@ public:
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
 
+    // 格式化输出
+    std::string format() const override;
+
     // 判断地址是否可用，即设置值的过程中未出现错误
     bool addr_is_available() const
     {
@@ -383,6 +392,9 @@ public:
     // 获取内部 sockaddr_xx 对象的长度
     socklen_t length() const override;
 
+    // 格式化输出
+    std::string format() const override;
+
     // 判断路径是否可用，即设置值的过程中未出现错误
     bool path_is_available() const
     {
@@ -403,12 +415,6 @@ private:
     sockaddr_un m_sockaddr;
     bool m_path_available;
 };
-
-// ----------------------------------------------------------------------------
-
-std::ostream& operator<<(std::ostream& stream, const SockAddrIn& sockaddr);
-std::ostream& operator<<(std::ostream& stream, const SockAddrIn6& sockaddr);
-std::ostream& operator<<(std::ostream& stream, const SockAddrUn& sockaddr);
 
 // ----------------------------------------------------------------------------
 
