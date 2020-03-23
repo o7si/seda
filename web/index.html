@@ -149,7 +149,7 @@
 
                     // 将命令存入历史列表
                     // 当和上一次命令一致时，不存入历史列表
-                    if (command != history_command[-1])
+                    if (history_command.length == 0 || command != history_command[history_command.length - 1])
                         history_command.push(command);
                     history_index = history_command.length;
 

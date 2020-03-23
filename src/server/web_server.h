@@ -30,6 +30,42 @@ namespace server
 class WebServerManager
 {
 public:
+    // 获取端口
+    int getPort() const
+    {
+        return m_port;    
+    }
+
+    // 设置端口
+    void setPort(int port)
+    {
+        m_port = port;    
+    }
+
+    // 获取协议
+    int getProtocol() const
+    {
+        return m_protocol;    
+    } 
+
+    // 设置协议
+    void setProtocol(int protocol)
+    {
+        m_protocol = protocol;
+    }
+
+    // 获取网页路径
+    std::string getWebPath() const
+    {
+        return m_web_path;    
+    }
+
+    // 设置网页路径
+    void setWebPath(std::string path)
+    {
+        m_web_path = std::move(path);
+    }
+
     // 获取验证码
     std::string getAuthCode() const
     {
@@ -98,6 +134,13 @@ public:
 private:
     // 将构造函数修饰为私有，防止用户擅自实例化对象
     WebServerManager();
+
+    // 端口
+    int m_port;
+    // 协议
+    int m_protocol;
+    // 网页路径
+    std::string m_web_path;
     
     // 身份验证
     std::string m_auth_code;  
@@ -117,6 +160,9 @@ private:
 class WebServer
 {
 public:
+    // 从 WebServerManager 中提取所需的参数
+    WebServer();
+
     // protocol
     //      4: 使用 IPv4 地址
     //      6：使用 IPv6 地址

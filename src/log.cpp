@@ -271,7 +271,7 @@ std::shared_ptr<LoggerManager> LoggerManager::Instance()
 LoggerManager::LoggerManager()
 {
     // 默认有一个系统用户，日志级别为 DEBUG 
-    m_table[LOG_SYSTEM_USER] = std::make_shared<Logger>(Level::DEBUG);    
+    m_table[LOG_SYSTEM_USER] = std::make_shared<Logger>(Level::INFO);    
     // 给系统用户添加一个默认的控制台输出地
     m_table[LOG_SYSTEM_USER]->add_appender(
         std::make_shared<ConsoleAppender>(

@@ -83,19 +83,26 @@ void operator>>(const YAML::Node& yaml,
     if (yaml.Type() == YAML::NodeType::Undefined)
         return;
 
-    // is_authority 的默认值为 true
-    // 当配置文件中未指定时，使用默认值
-    manager.isAuth(exist(yaml, "is_authority") ?
-        yaml["is_authority"].as<bool>() : true
-    );
+    if (exist(yaml, "port"))
+        manager.setPort(yaml["port"].as<int>()); 
+    if (exist(yaml, "protocol"))
+        manager.setProtocol(yaml["protocol"].as<int>());
+
+    // 必须指定网页的存储路径
+    if (exist(yaml, "protocol"))
+        manager.setWebPath(yaml["web_path"].as<std::string>());
+    else
+        throw std::logic_error("");
+
+    if (exist(yaml, "is_authority"))
+        manager.isAuth(yaml["is_authority"].as<bool>());
 
     manager.genAuthCode();    
 
     if (exist(yaml, "authority_code_path"))
     {
-        std::string path = yaml["authority_code_path"].as<std::string>();
         manager.isSave(true);    
-        manager.setAuthPath(path);
+        manager.setAuthPath(yaml["authority_code_path"].as<std::string>());
         manager.save();
     }
 }

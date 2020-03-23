@@ -64,6 +64,8 @@ public:
             for (size_t i = m_capacity; i < m_threads.size(); ++ i)
                 if (m_threads[i].joinable())
                     m_threads[i].join();
+            m_threads.resize(m_capacity);
+            return;
         }
     }
 

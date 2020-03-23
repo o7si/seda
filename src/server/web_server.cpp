@@ -15,7 +15,8 @@ std::shared_ptr<WebServerManager> WebServerManager::Instance()
 }
 
 WebServerManager::WebServerManager()
-    : is_auth(false), is_save(false)
+    : m_port(10000), m_protocol(4),
+      is_auth(false), is_save(false)
 {
 }
 
@@ -33,6 +34,13 @@ void WebServerManager::save()
 }
 
 // ----------------------------------------------------------------------------
+
+WebServer::WebServer()
+    : WebServer(WebServerManager::Instance()->getProtocol(),
+                WebServerManager::Instance()->getPort(),
+                WebServerManager::Instance()->getWebPath())
+{
+}
 
 WebServer::WebServer(int protocol, int port, std::string path)
     : m_path(std::move(path)),
